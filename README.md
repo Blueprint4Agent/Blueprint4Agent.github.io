@@ -91,13 +91,16 @@ git status --short
 
 ## Deployment
 
-```bash
-npm run deploy
-```
+Deployment is handled by GitHub Actions.
+Pushing to `main` runs `.github/workflows/deploy.yml`, builds the Docusaurus site, uploads `build/` as a Pages artifact, and deploys it to GitHub Pages.
 
-Deployment is configured for GitHub Pages with:
+GitHub Pages must use the GitHub Actions source, not the legacy `main` branch root source.
+
+The public site is:
+
+- `https://blueprint4agent.github.io/`
+
+The Docusaurus production configuration is:
 
 - `url`: `https://blueprint4agent.github.io`
 - `baseUrl`: `/`
-
-Use the repository's GitHub Pages workflow or Docusaurus deployment command according to the release process in use.

@@ -93,13 +93,16 @@ git status --short
 
 ## Deployment
 
-```bash
-npm run deploy
-```
+배포는 GitHub Actions로 처리합니다.
+`main`에 push하면 `.github/workflows/deploy.yml`이 실행되고, Docusaurus 사이트를 빌드한 뒤 `build/`를 Pages artifact로 업로드하여 GitHub Pages에 배포합니다.
 
-GitHub Pages 배포 설정은 아래 값을 기준으로 합니다.
+GitHub Pages source는 legacy `main` branch root가 아니라 GitHub Actions로 설정되어야 합니다.
+
+공개 사이트 URL은 아래와 같습니다.
+
+- `https://blueprint4agent.github.io/`
+
+Docusaurus production 설정은 아래 값을 기준으로 합니다.
 
 - `url`: `https://blueprint4agent.github.io`
 - `baseUrl`: `/`
-
-릴리스 프로세스에 맞춰 저장소의 GitHub Pages workflow 또는 Docusaurus 배포 명령을 사용합니다.
