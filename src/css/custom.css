@@ -1,0 +1,707 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+    --nav-height: 3.75rem;
+    --radius-pill: 999px;
+    --radius-panel: 2rem;
+    --radius-input: 1rem;
+    --bg: #f5f7fb;
+    --bg-grad-a: rgba(48, 117, 211, 0.18);
+    --bg-grad-b: rgba(196, 153, 54, 0.14);
+    --text: #132033;
+    --text-soft: #4a5a6b;
+    --panel: rgba(255, 255, 255, 0.97);
+    --panel-border: rgba(19, 32, 51, 0.2);
+    --input-bg: rgba(255, 255, 255, 0.99);
+    --input-border: rgba(19, 32, 51, 0.22);
+    --accent: #0b4ea8;
+    --accent-hover: #063d86;
+    --shadow: 0 20px 44px rgba(22, 33, 48, 0.16);
+    --button-bg: #101010;
+    --button-fg: #f7f7f7;
+    --button-border: #101010;
+    --scrollbar-size: 0.6rem;
+    --scrollbar-thumb: rgba(66, 87, 113, 0.42);
+    --scrollbar-thumb-hover: rgba(66, 87, 113, 0.62);
+    --doc-sidebar-width: 16.5rem;
+    --doc-page-bg: #f5f7fb;
+    --doc-card-bg: rgba(255, 255, 255, 0.94);
+    --doc-card-bg-hover: #ffffff;
+    --doc-muted-bg: rgba(230, 234, 242, 0.72);
+    --doc-accent: #b14a85;
+    --doc-accent-strong: #93376d;
+    --doc-callout-bg: rgba(217, 240, 201, 0.9);
+    --doc-callout-border: #3a9a38;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.76);
+    --sidebar-active-bg: #ffffff;
+    --sidebar-active-border: rgba(19, 32, 51, 0.14);
+
+    --ifm-font-family-base:
+        "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --ifm-heading-font-family:
+        "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --ifm-background-color: var(--bg);
+    --ifm-font-color-base: var(--text);
+    --ifm-font-color-secondary: var(--text-soft);
+    --ifm-color-primary: var(--text);
+    --ifm-navbar-height: var(--nav-height);
+    --ifm-navbar-background-color: color-mix(in oklab, var(--panel) 88%, transparent 12%);
+    --ifm-global-radius: 12px;
+    --docusaurus-highlighted-code-line-bg: rgba(11, 78, 168, 0.12);
+}
+
+[data-theme="dark"] {
+    --bg: #0b0b0c;
+    --bg-grad-a: rgba(255, 255, 255, 0.05);
+    --bg-grad-b: rgba(255, 255, 255, 0.02);
+    --text: #f3f3f3;
+    --text-soft: #a3a3a3;
+    --panel: rgba(30, 30, 33, 0.92);
+    --panel-border: rgba(148, 148, 153, 0.3);
+    --input-bg: rgba(38, 38, 41, 0.96);
+    --input-border: rgba(152, 152, 158, 0.38);
+    --accent: #d4d4d8;
+    --accent-hover: #ececef;
+    --shadow: 0 22px 52px rgba(0, 0, 0, 0.42);
+    --button-bg: #f7f7f7;
+    --button-fg: #101216;
+    --button-border: #f7f7f7;
+    --scrollbar-thumb: rgba(156, 156, 162, 0.46);
+    --scrollbar-thumb-hover: rgba(194, 194, 199, 0.62);
+    --doc-page-bg: #111112;
+    --doc-card-bg: #24242a;
+    --doc-card-bg-hover: #2b2b33;
+    --doc-muted-bg: #1a1a1d;
+    --doc-accent: #d25ca5;
+    --doc-accent-strong: #f070bc;
+    --doc-callout-bg: #0d3c08;
+    --doc-callout-border: #43b83c;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.055);
+    --sidebar-active-bg: rgba(255, 255, 255, 0.085);
+    --sidebar-active-border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    background-color: var(--scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}
+
+html,
+body {
+    background: var(--bg);
+}
+
+html.docs-wrapper,
+html.docs-wrapper body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.navbar {
+    border-bottom: 1px solid color-mix(in oklab, var(--panel-border) 85%, transparent 15%);
+    background: color-mix(in oklab, var(--panel) 88%, transparent 12%);
+    backdrop-filter: blur(10px);
+    box-shadow: none;
+    padding: 0 1rem;
+    min-height: var(--nav-height);
+}
+
+.navbar__inner {
+    min-height: var(--nav-height);
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+}
+
+.navbar__title {
+    font:
+        600 0.9rem/1 "Inter",
+        system-ui,
+        sans-serif;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+}
+
+.navbar__link,
+.navbar__link:hover {
+    color: var(--text-soft);
+}
+
+.navbar__link--active {
+    color: var(--text);
+}
+
+.navbar__logo img {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.45rem;
+}
+
+.navbar-b4a-cta {
+    border: 1px solid var(--button-border);
+    border-radius: var(--radius-pill);
+    background: var(--button-bg);
+    color: var(--button-fg) !important;
+    padding: 0.32rem 0.72rem;
+    font:
+        600 0.76rem/1 "Inter",
+        system-ui,
+        sans-serif;
+}
+
+.navbar-b4a-cta:hover {
+    color: var(--button-fg) !important;
+    background: color-mix(in oklab, var(--button-bg) 92%, #ffffff 8%);
+}
+
+.navbar-github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.navbar-github-link::before {
+    content: "";
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    background: center / contain no-repeat url("/img/github-mark-dark.svg");
+}
+
+[data-theme="dark"] .navbar-github-link::before {
+    background-image: url("/img/github-mark-light.svg");
+}
+
+.navbar-github-link svg[class*="iconExternalLink"] {
+    display: none;
+}
+
+.navbar-locale-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.navbar-locale-link::before {
+    content: "";
+    width: 0.95rem;
+    height: 0.95rem;
+    display: inline-block;
+    background-color: currentColor;
+    mask: center / contain no-repeat
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 8 6 6'/%3E%3Cpath d='m4 14 6-6 2-3'/%3E%3Cpath d='M2 5h12'/%3E%3Cpath d='M7 2h1'/%3E%3Cpath d='m22 22-5-10-5 10'/%3E%3Cpath d='M14 18h6'/%3E%3C/svg%3E");
+}
+
+.navbar-locale-link [class*="iconLanguage"] {
+    display: none;
+}
+
+.navbar__items,
+.navbar__item,
+.navbar__brand {
+    min-height: var(--nav-height);
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar__toggle {
+    display: none !important;
+}
+
+.theme-doc-sidebar-container {
+    border-right: 1px solid color-mix(in oklab, var(--panel-border) 84%, transparent 16%) !important;
+    background: color-mix(in oklab, var(--doc-page-bg) 94%, var(--panel) 6%);
+    backdrop-filter: blur(8px);
+    margin-top: 0 !important;
+    width: 16.5rem !important;
+    overflow-x: visible;
+}
+
+.menu {
+    padding: 1.35rem 1rem 0.7rem;
+}
+
+.menu__link {
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    min-height: 2rem;
+    font:
+        700 0.86rem/1 "Inter",
+        system-ui,
+        sans-serif;
+    color: var(--text-soft);
+    justify-content: flex-start;
+    white-space: normal;
+    width: 100%;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease;
+}
+
+.menu__link:hover {
+    color: var(--text);
+    border-color: var(--sidebar-active-border);
+    background: var(--sidebar-hover-bg);
+}
+
+.menu__link--active,
+.menu__link--active:hover {
+    color: var(--text);
+    border-color: var(--sidebar-active-border);
+    background: var(--sidebar-active-bg);
+    box-shadow: none;
+}
+
+.menu__list-item-collapsible,
+.menu__list-item-collapsible:hover,
+.menu__list-item-collapsible--active {
+    background: transparent;
+}
+
+.menu__list-item-collapsible > .menu__link--sublist,
+.menu__list-item-collapsible > .menu__link--sublist:hover,
+.menu__list-item-collapsible > .menu__link--sublist.menu__link--active {
+    background: transparent !important;
+    border-color: transparent;
+    color: var(--text);
+}
+
+.menu__list-item-collapsible > .menu__link--sublist-caret::after {
+    margin-left: 0;
+    margin-right: 0.45rem;
+    min-width: 1rem;
+    order: -1;
+    width: 1rem;
+}
+
+.menu__list-item-collapsible > .menu__caret,
+.menu__list-item-collapsible > .menu__caret:hover {
+    background: transparent;
+}
+
+.dropdown__link,
+.dropdown__link:hover {
+    color: var(--text);
+}
+
+.dropdown__link:hover {
+    background: color-mix(in oklab, var(--input-bg) 78%, transparent 22%);
+}
+
+.clean-btn:hover {
+    background: color-mix(in oklab, var(--input-bg) 78%, transparent 22%);
+}
+
+.breadcrumbs {
+    color: var(--text-soft);
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 1.35rem;
+}
+
+.breadcrumbs__link,
+.breadcrumbs__link:hover,
+.breadcrumbs__item--active .breadcrumbs__link {
+    color: var(--text-soft);
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+    color: var(--text);
+}
+
+.main-wrapper {
+    padding: 0;
+    background: var(--doc-page-bg);
+}
+
+html.docs-wrapper .main-wrapper {
+    height: calc(100vh - var(--ifm-navbar-height));
+    overflow: hidden;
+}
+
+html.docs-wrapper [class*="docsWrapper"],
+html.docs-wrapper [class*="docRoot"] {
+    height: 100%;
+    min-height: 0;
+}
+
+html.docs-wrapper main[class*="docMainContainer"] {
+    height: 100%;
+    overflow-y: auto;
+}
+
+html.docs-wrapper .theme-doc-sidebar-container {
+    height: 100%;
+    overflow: hidden;
+}
+
+html.docs-wrapper .theme-doc-sidebar-container [class*="sidebar"] {
+    padding-top: 0;
+}
+
+.theme-doc-markdown {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-soft);
+    font-size: 1.03rem;
+    line-height: 1.75;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.theme-doc-markdown h1 {
+    color: var(--text);
+    font-size: clamp(2.35rem, 4.2vw, 3.35rem);
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+    margin: 1.05rem 0 1.8rem;
+}
+
+.theme-doc-markdown h2 {
+    color: var(--text);
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    letter-spacing: -0.04em;
+    margin: 3.2rem 0 1rem;
+}
+
+.theme-doc-markdown p {
+    margin: 0 0 1.4rem;
+}
+
+.theme-doc-markdown a {
+    color: var(--doc-accent-strong);
+    text-decoration-color: color-mix(in oklab, var(--doc-accent-strong) 55%, transparent 45%);
+    text-underline-offset: 0.16em;
+}
+
+.theme-doc-markdown code {
+    border: 1px solid color-mix(in oklab, var(--panel-border) 72%, transparent 28%);
+    background: var(--doc-muted-bg);
+    color: var(--text);
+}
+
+.theme-doc-markdown ul {
+    margin: 0 0 1.5rem;
+}
+
+.doc-version-row {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.4rem 0 1.5rem;
+}
+
+.doc-pill {
+    align-items: center;
+    border: 1px solid color-mix(in oklab, var(--panel-border) 82%, transparent 18%);
+    border-radius: var(--radius-pill);
+    color: var(--text);
+    display: inline-flex;
+    font:
+        700 0.78rem/1 "Inter",
+        system-ui,
+        sans-serif;
+    min-height: 1.55rem;
+    padding: 0.25rem 0.7rem;
+}
+
+.doc-pill--strong {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--doc-page-bg);
+}
+
+.doc-callout {
+    background: var(--doc-callout-bg);
+    border-left: 0.35rem solid var(--doc-callout-border);
+    border-radius: 0.8rem;
+    color: #edf8eb;
+    margin: 2rem 0 1.7rem;
+    padding: 1.2rem 1.35rem;
+}
+
+[data-theme="light"] .doc-callout {
+    color: #123210;
+}
+
+.doc-callout strong {
+    color: inherit;
+    display: block;
+    font-size: 0.88rem;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.45rem;
+}
+
+.doc-callout .doc-block-text {
+    display: block;
+    margin: 0;
+}
+
+.doc-card-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 1.7rem 0 2.4rem;
+}
+
+.doc-card-link {
+    background: var(--doc-card-bg);
+    border: 1px solid color-mix(in oklab, var(--panel-border) 72%, transparent 28%);
+    border-radius: 0.8rem;
+    color: var(--text-soft) !important;
+    display: block;
+    min-height: 12rem;
+    padding: 1.35rem;
+    text-decoration: none !important;
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease;
+}
+
+.doc-card-link:hover {
+    background: var(--doc-card-bg-hover);
+    border-color: color-mix(in oklab, var(--doc-accent) 54%, var(--panel-border) 46%);
+    transform: translateY(-2px);
+}
+
+.doc-card-link::after {
+    color: var(--text-soft);
+    content: "›";
+    float: right;
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-top: -0.15rem;
+}
+
+.doc-card-link__eyebrow {
+    color: var(--doc-accent);
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+}
+
+.doc-card-link strong {
+    color: var(--text);
+    display: block;
+    font-size: 1.35rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+.doc-card-link .doc-block-text {
+    display: block;
+    margin: 0;
+}
+
+@media (min-width: 997px) {
+    main[class*="docMainContainer"] > .container {
+        max-width: calc(1240px + clamp(11rem, 18vw, 15rem) + clamp(0.75rem, 1.5vw, 1.25rem));
+        padding-inline: clamp(1rem, 3vw, 2rem);
+    }
+
+    main[class*="docMainContainer"] > .container > .row {
+        column-gap: clamp(0.75rem, 1.5vw, 1.25rem);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) clamp(11rem, 18vw, 15rem);
+        margin-inline: 0;
+    }
+
+    main[class*="docMainContainer"] > .container > .row > .col[class*="docItemCol"] {
+        grid-column: 1;
+        max-width: 100% !important;
+        padding-inline: 0;
+        width: 100%;
+    }
+
+    main[class*="docMainContainer"] [class*="docItemContainer"] {
+        margin-inline: auto;
+        max-width: min(100%, 56rem);
+    }
+
+    main[class*="docMainContainer"] > .container > .row > .col.col--3 {
+        grid-column: 2;
+        max-width: none;
+        margin-left: 0;
+        padding-inline: 0;
+        width: 100%;
+    }
+
+    .theme-doc-toc-desktop {
+        --ifm-toc-padding-horizontal: 0.25rem;
+        border-left: 1px solid color-mix(in oklab, var(--panel-border) 72%, transparent 28%);
+        color: var(--text-soft);
+        max-height: calc(100vh - var(--ifm-navbar-height) - 2rem);
+        padding-left: 0.9rem;
+        top: 1rem;
+    }
+
+    .theme-doc-toc-desktop li {
+        margin-left: 0.25rem;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 996px) {
+    .theme-doc-markdown {
+        padding-inline: 1rem;
+    }
+
+    .doc-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@layer docusaurus.theme-classic {
+    @media (min-width: 997px) {
+        main[class*="docMainContainer"] > .container > .row > .col[class*="docItemCol"] {
+            max-width: 100% !important;
+        }
+    }
+}
+
+.theme-toggle-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.35rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in oklab, var(--panel-border) 82%, transparent 18%);
+    background: color-mix(in oklab, var(--panel) 95%, transparent 5%);
+    gap: 0.24rem;
+}
+
+.theme-toggle-button__title {
+    margin: 0 0.2rem 0 0.25rem;
+    font:
+        600 0.76rem/1 "Inter",
+        system-ui,
+        sans-serif;
+    color: var(--text-soft);
+    white-space: nowrap;
+}
+
+.theme-toggle-button__option {
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    color: var(--text-soft);
+    background: transparent;
+    cursor: pointer;
+}
+
+.theme-toggle-button__option svg {
+    width: 1.08rem;
+    height: 1.08rem;
+}
+
+.theme-toggle-button__option--active {
+    color: var(--text);
+    border-color: color-mix(in oklab, var(--panel-border) 70%, transparent 30%);
+    background: color-mix(in oklab, var(--input-bg) 82%, transparent 18%);
+}
+
+.hero-cta {
+    min-height: 3.05rem;
+    padding: 0.68rem 1.35rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--button-border);
+    background: var(--button-bg);
+    color: var(--button-fg);
+    font:
+        600 1rem/1 "Inter",
+        system-ui,
+        sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.52rem;
+}
+
+.hero-cta:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+    color: var(--button-fg);
+}
+
+.hero-cta--ghost {
+    background: color-mix(in oklab, var(--panel) 95%, transparent 5%);
+    color: var(--text);
+    border-color: color-mix(in oklab, var(--panel-border) 82%, transparent 18%);
+}
+
+.hero-cta--ghost:hover {
+    color: var(--text);
+    background: color-mix(in oklab, var(--input-bg) 82%, transparent 18%);
+}
+
+.hero-cta__icon {
+    width: 1.02rem;
+    height: 1.02rem;
+    display: inline-block;
+    flex-shrink: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.hero-cta__icon--b4a {
+    background-image: url("/img/b4a-mark-dark.svg");
+}
+
+[data-theme="dark"] .hero-cta__icon--b4a {
+    background-image: url("/img/b4a-mark.svg");
+}
+
+.hero-cta__icon--github {
+    background-image: url("/img/github-mark-dark.svg");
+}
+
+[data-theme="dark"] .hero-cta__icon--github {
+    background-image: url("/img/github-mark-light.svg");
+}
+
+.footer {
+    display: none;
+}
+
+/* Remove default Docusaurus hero primary blue */
+.hero--primary {
+    --ifm-hero-background-color: transparent;
+    --ifm-hero-text-color: var(--text);
+    background: transparent !important;
+    color: var(--text) !important;
+}
+
+.hero__subtitle {
+    color: var(--text-soft);
+}
