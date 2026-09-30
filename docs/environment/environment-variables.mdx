@@ -1,0 +1,180 @@
+---
+title: Environment variables
+sidebar_position: 1
+description: Every backend, Docker, and frontend environment variable, with defaults and sync tooling.
+---
+
+# Environment variables
+
+B4FastAPI reads three `.env` files. Each has a committed `.env.example`, which is the source of keys, defaults, comments, and order.
+
+| File                | Used by                                                       | Created by  |
+| ------------------- | ------------------------------------------------------------- | ----------- |
+| `src/backend/.env`  | `make backend-dev`, tests, `make user-role`, local Celery     | `make init` |
+| `docker/.env`       | Docker Compose: app, Celery, PostgreSQL, Redis, observability | `make init` |
+| `src/frontend/.env` | Vite dev server and frontend builds                           | `make init` |
+
+## Keeping files in sync
+
+| Command                                          | What it does                                                                                                          |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `make env-sync`                                  | Rebuilds backend and frontend `.env` files from their examples, keeping existing values. Adds new keys with defaults. |
+| `make env-check`                                 | Fails on missing, duplicate, or invalid keys and outdated layout                                                      |
+| `make docker-env-sync` / `make docker-env-check` | The same for `docker/.env`                                                                                            |
+| `make env-contract-check`                        | Checks that backend and Docker examples declare the same shared keys, without reading real `.env` files               |
+
+- Before changing a file, sync writes a timestamped backup to `.env-backups/` (ignored by Git and Docker, readable only by you).
+- Values are never printed. Keys that exist only in your `.env` are kept in a separate section at the end.
+- `make docker-deploy` runs `docker-env-check` first and stops if keys are missing.
+
+:::tip[Adding a setting]
+
+Add a shared backend setting to both `src/backend/.env.example` and `docker/.env.example`. `make env-contract-check`, which also runs in `make check` and CI, fails if one of them is missing it.
+
+:::
+
+## Backend variables
+
+Defaults below are from `src/backend/.env.example` (local development). [Docker defaults](#docker-defaults) that differ are listed afterwards.
+
+### Server
+
+| Variable          | Default                                                         | Description                                                |
+| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| `APP_NAME`        | `Blueprint4FastAPI API`                                         | API title shown in OpenAPI                                 |
+| `APP_ENV`         | `local`                                                         | Environment name (`docker` in Docker)                      |
+| `LOG_LEVEL`       | `INFO`                                                          | Python log level                                           |
+| `APP_PORT`        | `8000`                                                          | Port for `make backend-dev`                                |
+| `APP_BASE_URL`    | `http://localhost:5173`                                         | Public frontend origin for email links and OAuth redirects |
+| `SWAGGER_ENABLED` | `true`                                                          | Serves Swagger UI at `/docs`                               |
+| `METRICS_ENABLED` | `true`                                                          | Serves Prometheus metrics at `/metrics`                    |
+| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | Comma-separated allowed origins                            |
+
+### Observability
+
+| Variable                             | Default                     | Description                                                              |
+| ------------------------------------ | --------------------------- | ------------------------------------------------------------------------ |
+| `TRACING_ENABLED`                    | `false`                     | Exports OpenTelemetry traces                                             |
+| `LOGS_ENABLED`                       | `false`                     | Exports application and Uvicorn logs over OTLP, independently of tracing |
+| `OTEL_SERVICE_NAME`                  | `blueprint4fastapi-backend` | Service name in traces and logs                                          |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`        | `http://localhost:4317`     | OTLP gRPC collector endpoint                                             |
+| `OTEL_EXPORTER_OTLP_INSECURE`        | `true`                      | Use plaintext gRPC                                                       |
+| `OTEL_EXPORTER_OTLP_TIMEOUT_SECONDS` | `10`                        | Export timeout                                                           |
+| `OTEL_TRACE_SAMPLE_RATIO`            | `1.0`                       | Fraction of traces sampled                                               |
+
+### Authentication
+
+| Variable                                  | Default                    | Description                                                        |
+| ----------------------------------------- | -------------------------- | ------------------------------------------------------------------ |
+| `LOGIN_ENABLED`                           | `true`                     | `false` runs with a bootstrap admin and forces email and OAuth off |
+| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | Bootstrap user when login is disabled                              |
+| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | Bootstrap user name                                                |
+| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | Token signing key. `make project-init` generates one.              |
+| `ALGORITHM`                               | `HS256`                    | JWT algorithm                                                      |
+| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | Access token lifetime                                              |
+| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | Refresh cookie lifetime with "remember me"                         |
+| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | Verification link lifetime                                         |
+| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | Reset link lifetime                                                |
+| `LOGIN_FAILED_LIMIT`                      | `5`                        | Failed logins per IP before lockout                                |
+| `LOGIN_LOCKED_MINUTES`                    | `5`                        | Lockout duration                                                   |
+
+### Database
+
+| Variable      | Default            | Description                                                    |
+| ------------- | ------------------ | -------------------------------------------------------------- |
+| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` or `postgresql+asyncpg`                     |
+| `DB_NAME`     | `template.db`      | SQLite file name, or PostgreSQL database name                  |
+| `DB_HOST`     | `localhost`        | PostgreSQL host (ignored by SQLite)                            |
+| `DB_PORT`     | `5432`             | PostgreSQL port                                                |
+| `DB_USER`     | `postgres`         | PostgreSQL user                                                |
+| `DB_PASSWORD` | `postgres`         | PostgreSQL password. Enter it raw; the backend URL-encodes it. |
+
+Change `DB_DRIVER` and `DB_NAME` together. See [Database & Redis](/docs/environment/database-and-redis).
+
+### Redis and Celery
+
+| Variable            | Default             | Description                                                               |
+| ------------------- | ------------------- | ------------------------------------------------------------------------- |
+| `REDIS_IN_MEMORY`   | `true`              | Use an in-process fake Redis instead of a server                          |
+| `REDIS_HOST`        | `localhost`         | Redis host                                                                |
+| `REDIS_PORT`        | `6379`              | Redis port                                                                |
+| `REDIS_DB`          | `0`                 | Redis database index                                                      |
+| `REDIS_PASSWORD`    | _(empty)_           | Enables Redis authentication when set                                     |
+| `CELERY_BROKER_URL` | _(empty)_           | Broker URL. Empty uses the Redis settings above. Use `rediss://` for TLS. |
+| `CELERY_QUEUE`      | `b4fastapi.default` | Queue name; unique per deployment sharing Redis                           |
+| `CELERY_KEY_PREFIX` | `b4fastapi:celery:` | Redis key prefix; unique per deployment sharing Redis                     |
+
+### Email and SMTP
+
+| Variable                          | Default                | Description                                                   |
+| --------------------------------- | ---------------------- | ------------------------------------------------------------- |
+| `EMAIL_ENABLED`                   | `false`                | Sends verification and reset email. Requires a Celery worker. |
+| `EMAIL_FROM`                      | `no-reply@example.com` | Sender address                                                |
+| `EMAIL_BRAND_NAME`                | `Blueprint4FastAPI`    | Brand shown in emails                                         |
+| `SMTP_HOST`                       | _(empty)_              | SMTP server                                                   |
+| `SMTP_PORT`                       | `587`                  | SMTP port                                                     |
+| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(empty)_              | SMTP credentials                                              |
+| `SMTP_USE_STARTTLS`               | `true`                 | Upgrade with STARTTLS                                         |
+| `SMTP_USE_SSL`                    | `false`                | Use implicit TLS instead                                      |
+| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP timeout                                                  |
+| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | The worker checks the SMTP connection at startup              |
+| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | Delayed retries after the first attempt                       |
+| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | Delay between retries                                         |
+
+### OAuth
+
+| Variable                                                      | Default                 | Description                       |
+| ------------------------------------------------------------- | ----------------------- | --------------------------------- |
+| `OAUTH_ENABLED`                                               | `false`                 | Enables Google and GitHub sign-in |
+| `OAUTH_ALLOWED_PROVIDERS`                                     | `google,github`         | Providers to offer                |
+| `OAUTH_STATE_EXPIRE_MINUTES`                                  | `10`                    | State lifetime                    |
+| `OAUTH_FRONTEND_SUCCESS_PATH`                                 | `/dashboard`            | Redirect after success            |
+| `OAUTH_FRONTEND_FAILURE_PATH`                                 | `/login`                | Redirect after failure            |
+| `OAUTH_GOOGLE_CLIENT_ID` / `_CLIENT_SECRET`                   | _(empty)_               | Google credentials                |
+| `OAUTH_GOOGLE_AUTHORIZE_URL` / `_TOKEN_URL` / `_USERINFO_URL` | Google public endpoints | Rarely changed                    |
+| `OAUTH_GITHUB_CLIENT_ID` / `_CLIENT_SECRET`                   | _(empty)_               | GitHub credentials                |
+| `OAUTH_GITHUB_AUTHORIZE_URL` / `_TOKEN_URL` / `_USERINFO_URL` | GitHub public endpoints | Rarely changed                    |
+
+### Realtime
+
+| Variable                | Default | Description                          |
+| ----------------------- | ------- | ------------------------------------ |
+| `SSE_HEARTBEAT_SECONDS` | `20`    | Heartbeat interval on event streams  |
+| `SSE_RETRY_MILLIS`      | `5000`  | Reconnect delay suggested to clients |
+
+## Docker defaults
+
+`docker/.env.example` declares the same backend keys with these container defaults:
+
+| Variable                            | Docker default                                 |
+| ----------------------------------- | ---------------------------------------------- |
+| `APP_ENV`                           | `docker`                                       |
+| `APP_BASE_URL`                      | `http://localhost:8000`                        |
+| `CORS_ORIGINS`                      | Adds `http://localhost:8000`                   |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                   |
+| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres` |
+| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                              |
+
+It also has Docker-only keys:
+
+| Variable                                      | Default                     | Description                                                      |
+| --------------------------------------------- | --------------------------- | ---------------------------------------------------------------- |
+| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | App image tag                                                    |
+| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose project; selects containers and volumes                  |
+| `APP_HOST_PORT`                               | `8000`                      | Published app port (all interfaces)                              |
+| `POSTGRES_HOST_PORT`                          | `5432`                      | Published on `127.0.0.1`                                         |
+| `REDIS_HOST_PORT`                             | `6379`                      | Published on `127.0.0.1`                                         |
+| `GRAFANA_HOST_PORT`                           | `3000`                      | Published on `127.0.0.1`                                         |
+| `PROMETHEUS_HOST_PORT`                        | `9090`                      | Published on `127.0.0.1`                                         |
+| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | Published on `127.0.0.1`                                         |
+| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Backend scraped by Prometheus (`app:8000` for the Docker app)    |
+| `GRAFANA_ADMIN_USER`                          | `admin`                     | Grafana admin user for a new volume                              |
+| `GRAFANA_ADMIN_PASSWORD`                      | _(empty)_                   | Required to start Grafana; `admin` and `CHANGE_ME*` are rejected |
+
+Quote literal values containing `$` with single quotes so Compose does not interpolate them.
+
+## Frontend variables
+
+| Variable            | Default   | Description                                                                                                                                                                   |
+| ------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL` | _(empty)_ | API origin. Empty uses `http://localhost:8000` in development and the page's own origin in other web builds. Set it for desktop builds, separate hosting, or another backend. |

@@ -1,0 +1,66 @@
+---
+title: Observability
+sidebar_position: 3
+description: Metrics, traces, and logs with Prometheus, Tempo, Loki, and Grafana.
+---
+
+# Observability
+
+The backend exposes Prometheus metrics and exports OpenTelemetry traces and logs. A local stack of the Collector, Tempo, Loki, Prometheus, and Grafana runs under the `observability` Compose profile.
+
+```text
+Backend ──OTLP gRPC──▶ OTel Collector ──▶ Tempo (traces)
+        │                             └─▶ Loki  (logs)
+        └── /metrics ◀── Prometheus
+                               Grafana queries Tempo, Loki, and Prometheus
+```
+
+| Signal  | Enable                           | Store                  | Query in Grafana                 |
+| ------- | -------------------------------- | ---------------------- | -------------------------------- |
+| Metrics | `METRICS_ENABLED=true` (default) | Prometheus             | Dashboards, Explore → Prometheus |
+| Traces  | `TRACING_ENABLED=true`           | Tempo                  | Explore → Tempo                  |
+| Logs    | `LOGS_ENABLED=true`              | Loki (7-day retention) | Explore → Loki                   |
+
+## Start the stack
+
+1. Run `make docker-env-sync` and set `GRAFANA_ADMIN_PASSWORD` in `docker/.env`. Grafana refuses an empty password, `admin`, or `CHANGE_ME*`.
+2. Point Prometheus at the backend with `PROMETHEUS_BACKEND_TARGET`:
+
+    | Backend                        | Value                         |
+    | ------------------------------ | ----------------------------- |
+    | `make backend-dev` on the host | `host.docker.internal:8000`   |
+    | Host backend on another port   | `host.docker.internal:<port>` |
+    | `make docker-up` app           | `app:8000`                    |
+
+3. Start it:
+
+    ```bash
+    make docker-observability-up
+    ```
+
+4. Enable the signals you want in the backend's env file and restart the backend. On the host, use `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317`; in Docker it is `http://otel-collector:4317`.
+5. Open Grafana at `http://localhost:3000`.
+
+`make docker-observability-down` stops only the observability services and keeps their data volumes. The app, PostgreSQL, and Redis keep running.
+
+## Logs
+
+```logql
+{service_name="blueprint4fastapi-backend"}
+```
+
+- Application, worker, Uvicorn server, and access logs are exported at `LOG_LEVEL`. Console output stays unchanged.
+- Request and task IDs are structured metadata, not labels. Filter with `| request_id="..."` or `| task_id="..."`.
+- Logs are batched in memory. Abrupt termination or long collector outages can lose logs, so this is not an audit log.
+
+## Traces
+
+- FastAPI, SQL, and Redis operations are traced. Services decorated with `@observe_service("domain.action")` add a span with outcome and error code.
+- `X-Trace-ID` response headers and log records use the active span's trace ID, so a log line leads to its trace.
+- `/metrics` and health endpoints are excluded from tracing.
+
+## Network and access
+
+- Grafana, Prometheus, and OTLP ports are published only on `127.0.0.1`. Use an SSH tunnel for remote access.
+- Tempo and Loki have no published ports; Grafana reaches them on the Compose network.
+- Grafana anonymous access is disabled.

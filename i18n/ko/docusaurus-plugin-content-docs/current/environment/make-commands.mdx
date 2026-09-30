@@ -1,0 +1,155 @@
+---
+title: Make 명령어
+sidebar_position: 5
+description: 작업별로 묶은 B4FastAPI의 모든 make 타깃입니다.
+---
+
+# Make 명령어
+
+루트 `Makefile`은 모든 워크플로우의 단일 진입점입니다. `make help`로 같은 목록을 출력할 수 있습니다. 프론트엔드 관련 타깃은 `src/frontend` 안의 B4React `Makefile`에 위임됩니다.
+
+## 자주 하는 작업
+
+| 하고 싶은 일           | 실행                                                 |
+| ---------------------- | ---------------------------------------------------- |
+| 새 클론 준비           | `make init install`                                  |
+| 로컬에서 앱 실행       | `make backend-dev`와 `make frontend-dev`             |
+| 커밋 전 변경 검사      | `make verify-plan` 후 `make verify`                  |
+| CI와 같은 전체 검사    | `make ci`                                            |
+| Docker로 배포          | `make docker-deploy`                                 |
+| 사용자를 관리자로 지정 | `make user-role EMAIL=person@example.com ROLE=admin` |
+
+## 변수
+
+| 변수                                                           | 사용 타깃               | 효과                                 |
+| -------------------------------------------------------------- | ----------------------- | ------------------------------------ |
+| `VERIFY_BASE`                                                  | `verify-plan`, `verify` | `HEAD` 대신 이 커밋부터 비교         |
+| `VERIFY_FULL=1`                                                | `verify`                | 모든 검사 강제 실행                  |
+| `DOCKER_SERVICE`                                               | `docker-logs`           | 확인할 서비스(기본 `app`)            |
+| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`             | 시작 단계별 대기 시간(기본 120)      |
+| `PROJECT_CONFIG`                                               | `project-*`             | 매니페스트 경로(기본 `project.json`) |
+| `FRONTEND_DIR`                                                 | `frontend-style-studio` | 편집할 프론트엔드 체크아웃           |
+| `EMAIL`, `ROLE`                                                | `user-role`             | 대상 계정과 새 역할                  |
+| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`  | 검증할 예정 메타데이터               |
+
+## 설정과 환경
+
+| 타깃                 | 설명                                             |
+| -------------------- | ------------------------------------------------ |
+| `help`               | 사용 가능한 Make 타깃 표시                       |
+| `init`               | 백엔드, 프론트엔드, docker env 파일 초기화       |
+| `install`            | 백엔드와 프론트엔드 의존성 설치                  |
+| `frontend-init`      | 커밋된 버전으로 서브모듈 초기화                  |
+| `env-sync`           | 개발 env 키와 템플릿 구성을 백업과 함께 동기화   |
+| `env-check`          | 개발 env 키, 구성, 템플릿 일관성 검사            |
+| `docker-env-sync`    | 배포 env 키와 템플릿 구성을 백업과 함께 동기화   |
+| `docker-env-check`   | 배포 env 키, 구성, 템플릿 일관성 검사            |
+| `env-contract-check` | 로컬 env 파일 없이 개발·배포 예제의 공유 키 비교 |
+
+## 개발과 운영
+
+| 타깃                    | 설명                                                      |
+| ----------------------- | --------------------------------------------------------- |
+| `backend-dev`           | 백엔드 개발 서버 실행                                     |
+| `frontend-dev`          | 프론트엔드 개발 서버 실행                                 |
+| `frontend-desktop-dev`  | Tauri 데스크톱 셸에서 프론트엔드 실행                     |
+| `frontend-style-studio` | FRONTEND_DIR(기본 src/frontend)의 로컬 스타일 편집기 실행 |
+| `celery-worker`         | 독립 Celery 워커 실행(로컬 기본 solo, Linux 운영 prefork) |
+| `celery-beat`           | 단일 스케줄러 실행, 기본 비즈니스 스케줄 없음             |
+| `celery-ping`           | 설정된 브로커로 실행 중인 Celery 워커 확인                |
+| `celery-probe`          | 무해한 작업 전송, 워커 로그에서 완료와 작업 ID 확인       |
+| `user-role`             | 기존 계정 역할 지정: EMAIL=address ROLE=admin\|user       |
+
+## 설치와 빌드
+
+| 타깃                        | 설명                                                          |
+| --------------------------- | ------------------------------------------------------------- |
+| `backend-install`           | 백엔드 의존성 설치                                            |
+| `frontend-install`          | 프론트엔드 의존성 설치                                        |
+| `build`                     | 백엔드 환경과 프론트엔드 정적 산출물 빌드                     |
+| `backend-build`             | lockfile 기준으로 백엔드 의존성 동기화                        |
+| `frontend-build`            | B4React dist 산출물만 빌드                                    |
+| `frontend-build-sync`       | 고정된 로컬 타입을 다시 생성한 뒤 B4React dist 빌드           |
+| `frontend-package`          | 프론트엔드를 빌드해 백엔드 정적 dist로 패키징                 |
+| `frontend-package-verified` | frontend-test-routes로 이미 빌드·검증된 dist 패키징           |
+| `frontend-desktop-build`    | Tauri 데스크톱 애플리케이션 빌드                              |
+| `project-brand`             | 선택적인 루트 project.json에서 공개 프론트엔드 식별 정보 생성 |
+
+## 검증
+
+| 타깃                | 설명                                                      |
+| ------------------- | --------------------------------------------------------- |
+| `verify-plan`       | 변경 범위 기반 검사 계획 표시(VERIFY_BASE 기본값 HEAD)    |
+| `verify`            | 변경 범위로 선택된 검사 실행, VERIFY_FULL=1이면 전체 검사 |
+| `verify-light`      | 의존성 설치 없이 변경된 텍스트와 JSON 검증                |
+| `verification-test` | 변경 분류와 검증 선택 로직 테스트                         |
+| `check`             | 코드, env 키, 타입, 고정된 API 계약 검사                  |
+| `test`              | 백엔드와 프론트엔드 테스트 실행                           |
+| `ci`                | 로컬 CI 검사 실행(check, test, build)                     |
+| `format`            | 백엔드와 프론트엔드 코드 포맷                             |
+
+## 백엔드 검사
+
+| 타깃                         | 설명                                   |
+| ---------------------------- | -------------------------------------- |
+| `backend-check`              | 백엔드 lint와 포맷 검사                |
+| `backend-format`             | 백엔드 코드 포맷                       |
+| `backend-test`               | 백엔드 테스트 실행                     |
+| `backend-architecture-check` | 라우터·DB와 하위 계층 import 경계 검사 |
+
+## 프론트엔드 검사
+
+| 타깃                               | 설명                                                      |
+| ---------------------------------- | --------------------------------------------------------- |
+| `frontend-typecheck`               | 정적 산출물 빌드 없이 프론트엔드 TypeScript 검사          |
+| `frontend-test`                    | 프론트엔드 테스트 실행                                    |
+| `frontend-format`                  | 프론트엔드 코드 포맷                                      |
+| `frontend-format-check`            | 프론트엔드 포맷 검사                                      |
+| `frontend-architecture-check`      | 고정된 프론트엔드 의존성 경계 검사                        |
+| `frontend-react-performance-check` | 프론트엔드 상태와 memo 최적화 안전장치 검증               |
+| `frontend-test-routes`             | 프로덕션 프론트엔드 lazy route를 빌드해 Chromium에서 검증 |
+| `architecture-check`               | 백엔드·프론트엔드 의존성 경계 검사                        |
+
+## API 계약
+
+| 타깃                      | 설명                                            |
+| ------------------------- | ----------------------------------------------- |
+| `contract-export`         | 서버를 실행하지 않고 OpenAPI 기준본 내보내기    |
+| `contract-check`          | 백엔드 내보내기와 고정된 프론트엔드 기준본 비교 |
+| `frontend-contract-check` | 제공자와 고정된 소비자 OpenAPI 계약 비교        |
+| `frontend-api-generate`   | B4React 자체 고정 기준본에서 타입 생성          |
+| `frontend-api-check`      | 생성된 프론트엔드 타입의 불일치 감지            |
+
+## 프로젝트 초기화
+
+| 타깃                  | 설명                                                             |
+| --------------------- | ---------------------------------------------------------------- |
+| `project-plan`        | 파일을 쓰지 않고 PROJECT_CONFIG 기준 초기화 미리보기             |
+| `project-init`        | 관련 없는 env 값을 유지하며 PROJECT_CONFIG의 식별 정보·기능 적용 |
+| `project-check`       | 생성된 식별 정보·기능을 PROJECT_CONFIG와 비교                    |
+| `project-init-check`  | 프로젝트 초기화 코드와 공개 매니페스트 예제 검사                 |
+| `project-init-test`   | 격리된 프로젝트 초기화 시나리오 검증                             |
+| `project-init-format` | 프로젝트 초기화 도구 포맷                                        |
+| `project-build-test`  | 격리된 프로덕션 프론트엔드 빌드에서 커스텀 브랜드 검증           |
+
+## Docker
+
+| 타깃                        | 설명                                               |
+| --------------------------- | -------------------------------------------------- |
+| `docker-build`              | Docker 앱 이미지 빌드                              |
+| `docker-up`                 | 필요한 인프라를 시작하고 앱 준비 상태까지 대기     |
+| `docker-down`               | Docker 서비스 중지                                 |
+| `docker-logs`               | DOCKER_SERVICE(기본 app)의 Docker 로그 확인        |
+| `docker-deploy`             | 빌드, 앱만 재생성, 준비 상태 대기, 이미지 내보내기 |
+| `docker-export`             | Docker 앱 이미지를 docker/artifacts로 내보내기     |
+| `docker-observability-up`   | 로컬 옵저버빌리티 스택 시작                        |
+| `docker-observability-down` | 로컬 옵저버빌리티 서비스만 중지                    |
+| `docker-celery-up`          | 앱 이미지로 선택형 Celery 워커와 단일 Beat 시작    |
+| `docker-celery-down`        | API와 Redis는 두고 Celery 프로세스만 중지          |
+
+## Git 거버넌스
+
+| 타깃                      | 설명                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| `git-governance-check`    | Git 거버넌스 검증, 커밋·PR·병합 메타데이터를 선택적으로 전달 |
+| `git-governance-pr-check` | 실제 PR 메타데이터와 작성된 모든 커밋 검증                   |

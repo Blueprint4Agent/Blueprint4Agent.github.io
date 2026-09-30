@@ -36,7 +36,13 @@ const sidebars: SidebarsConfig = {
             label: "Environment & Options",
             collapsible: false,
             link: { type: "doc", id: "environment/index" },
-            items: [],
+            items: [
+                "environment/environment-variables",
+                "environment/database-and-redis",
+                "environment/observability",
+                "environment/docker",
+                "environment/make-commands",
+            ],
         },
         {
             type: "category",

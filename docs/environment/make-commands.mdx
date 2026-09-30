@@ -1,0 +1,155 @@
+---
+title: Make commands
+sidebar_position: 5
+description: Every B4FastAPI make target, grouped by task.
+---
+
+# Make commands
+
+The root `Makefile` is the single entry point for every workflow. Run `make help` to print the same list. Targets that touch the frontend delegate to B4React's own `Makefile` inside `src/frontend`.
+
+## Common tasks
+
+| I want to                          | Run                                                  |
+| ---------------------------------- | ---------------------------------------------------- |
+| Set up a fresh clone               | `make init install`                                  |
+| Run the app locally                | `make backend-dev` and `make frontend-dev`           |
+| Check my changes before committing | `make verify-plan`, then `make verify`               |
+| Run everything CI runs             | `make ci`                                            |
+| Deploy with Docker                 | `make docker-deploy`                                 |
+| Promote a user to admin            | `make user-role EMAIL=person@example.com ROLE=admin` |
+
+## Variables
+
+| Variable                                                       | Used by                 | Effect                                     |
+| -------------------------------------------------------------- | ----------------------- | ------------------------------------------ |
+| `VERIFY_BASE`                                                  | `verify-plan`, `verify` | Compare from this commit instead of `HEAD` |
+| `VERIFY_FULL=1`                                                | `verify`                | Force every check                          |
+| `DOCKER_SERVICE`                                               | `docker-logs`           | Service to follow (default `app`)          |
+| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`             | Wait per startup stage (default 120)       |
+| `PROJECT_CONFIG`                                               | `project-*`             | Manifest path (default `project.json`)     |
+| `FRONTEND_DIR`                                                 | `frontend-style-studio` | Frontend checkout to edit                  |
+| `EMAIL`, `ROLE`                                                | `user-role`             | Account and new role                       |
+| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`  | Planned metadata to validate               |
+
+## Setup and environment
+
+| Target               | Description                                                              |
+| -------------------- | ------------------------------------------------------------------------ |
+| `help`               | Show available Make targets                                              |
+| `init`               | Initialize backend, frontend, and docker env files                       |
+| `install`            | Install backend and frontend dependencies                                |
+| `frontend-init`      | Initialize submodules at their committed versions                        |
+| `env-sync`           | Sync development env keys and template layout with backups               |
+| `env-check`          | Check development env keys, layout, and template consistency             |
+| `docker-env-sync`    | Sync deployment env keys and template layout with backups                |
+| `docker-env-check`   | Check deployment env keys, layout, and template consistency              |
+| `env-contract-check` | Check shared development/deployment example keys without local env files |
+
+## Develop and operate
+
+| Target                  | Description                                                                   |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| `backend-dev`           | Run backend development server                                                |
+| `frontend-dev`          | Run frontend development server                                               |
+| `frontend-desktop-dev`  | Run the frontend in the Tauri desktop shell                                   |
+| `frontend-style-studio` | Run local style editor for FRONTEND_DIR (default src/frontend)                |
+| `celery-worker`         | Run standalone Celery worker (local default: solo; Linux production: prefork) |
+| `celery-beat`           | Run the single scheduler; no business schedules enabled by default            |
+| `celery-ping`           | Check running Celery workers through the configured broker                    |
+| `celery-probe`          | Send a harmless task; confirm completion and task ID in worker logs           |
+| `user-role`             | Set an existing account role: EMAIL=address ROLE=admin\|user                  |
+
+## Install and build
+
+| Target                      | Description                                                       |
+| --------------------------- | ----------------------------------------------------------------- |
+| `backend-install`           | Install backend dependencies                                      |
+| `frontend-install`          | Install frontend dependencies                                     |
+| `build`                     | Build backend environment and frontend static artifacts           |
+| `backend-build`             | Sync backend dependencies from lockfile                           |
+| `frontend-build`            | Build only B4React dist artifacts                                 |
+| `frontend-build-sync`       | Regenerate local pinned types, then build B4React dist            |
+| `frontend-package`          | Build and package frontend into backend static dist               |
+| `frontend-package-verified` | Package dist already built and verified by frontend-test-routes   |
+| `frontend-desktop-build`    | Build the Tauri desktop application                               |
+| `project-brand`             | Generate public frontend identity from optional root project.json |
+
+## Verify
+
+| Target              | Description                                                           |
+| ------------------- | --------------------------------------------------------------------- |
+| `verify-plan`       | Show change-scoped checks (VERIFY_BASE defaults to HEAD)              |
+| `verify`            | Run checks selected by change scope; VERIFY_FULL=1 forces full checks |
+| `verify-light`      | Validate changed text and JSON without installing dependencies        |
+| `verification-test` | Test change classification and verification selection                 |
+| `check`             | Check code, env keys, types, and pinned API contracts                 |
+| `test`              | Run backend and frontend tests                                        |
+| `ci`                | Run local CI checks                                                   |
+| `format`            | Format backend and frontend code                                      |
+
+## Backend checks
+
+| Target                       | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| `backend-check`              | Run backend lint and format checks                |
+| `backend-format`             | Format backend code                               |
+| `backend-test`               | Run backend tests                                 |
+| `backend-architecture-check` | Check router/DB and lower-layer import boundaries |
+
+## Frontend checks
+
+| Target                             | Description                                                  |
+| ---------------------------------- | ------------------------------------------------------------ |
+| `frontend-typecheck`               | Check frontend TypeScript without building static artifacts  |
+| `frontend-test`                    | Run frontend tests                                           |
+| `frontend-format`                  | Format frontend code                                         |
+| `frontend-format-check`            | Check frontend formatting                                    |
+| `frontend-architecture-check`      | Check pinned frontend dependency boundaries                  |
+| `frontend-react-performance-check` | Validate frontend state and memo optimization safeguards     |
+| `frontend-test-routes`             | Build and verify production frontend lazy routes in Chromium |
+| `architecture-check`               | Check backend/frontend dependency boundaries                 |
+
+## API contract
+
+| Target                    | Description                                            |
+| ------------------------- | ------------------------------------------------------ |
+| `contract-export`         | Export the OpenAPI baseline without running a server   |
+| `contract-check`          | Check backend export and pinned frontend baseline      |
+| `frontend-contract-check` | Compare provider and pinned consumer OpenAPI contracts |
+| `frontend-api-generate`   | Generate types from B4React own pinned baseline        |
+| `frontend-api-check`      | Detect generated frontend type drift                   |
+
+## Project initialization
+
+| Target                | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `project-plan`        | Preview project initialization from PROJECT_CONFIG without writing files     |
+| `project-init`        | Apply identity/features from PROJECT_CONFIG, preserving unrelated env values |
+| `project-check`       | Check generated identity/features against PROJECT_CONFIG                     |
+| `project-init-check`  | Check project initializer code and public manifest example                   |
+| `project-init-test`   | Verify isolated project initialization scenarios                             |
+| `project-init-format` | Format project initializer tooling                                           |
+| `project-build-test`  | Verify custom branding in an isolated production frontend build              |
+
+## Docker
+
+| Target                      | Description                                                       |
+| --------------------------- | ----------------------------------------------------------------- |
+| `docker-build`              | Build docker app image                                            |
+| `docker-up`                 | Start required infra and wait for app readiness                   |
+| `docker-down`               | Stop docker services                                              |
+| `docker-logs`               | Follow docker logs for DOCKER_SERVICE, defaults to app            |
+| `docker-deploy`             | Build, recreate app only, wait for readiness, and export image    |
+| `docker-export`             | Export docker app image to docker/artifacts                       |
+| `docker-observability-up`   | Start local observability stack                                   |
+| `docker-observability-down` | Stop only local observability services                            |
+| `docker-celery-up`          | Start opt-in Celery worker and singleton Beat using the app image |
+| `docker-celery-down`        | Stop Celery processes without stopping API or Redis               |
+
+## Git governance
+
+| Target                    | Description                                                             |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `git-governance-check`    | Validate git governance; optionally pass commit, PR, and merge metadata |
+| `git-governance-pr-check` | Validate actual PR metadata and every authored commit                   |

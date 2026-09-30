@@ -179,7 +179,7 @@ body {
 /* Keep Korean words intact when wrapping. */
 html[lang="ko-KR"] body {
     word-break: keep-all;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 :focus-visible {

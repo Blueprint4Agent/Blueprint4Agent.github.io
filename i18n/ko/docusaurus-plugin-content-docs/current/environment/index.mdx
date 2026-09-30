@@ -7,3 +7,21 @@ description: 환경변수, 데이터 저장소, 옵저버빌리티, Docker, make
 # 환경 및 옵션
 
 B4FastAPI는 `.env` 파일로 설정하고 `make` 타깃으로 운영합니다. 이 섹션은 모든 변수와 타깃을 정리하고 지원 인프라를 설명합니다.
+
+<CardGrid columns={2}>
+    <Card icon="file-code" title="환경변수" href="/docs/environment/environment-variables">
+        백엔드, Docker, 프론트엔드의 모든 변수와 기본값, 동기화 도구
+    </Card>
+    <Card icon="database" title="데이터베이스와 Redis" href="/docs/environment/database-and-redis">
+        SQLite와 PostgreSQL, 마이그레이션, 백업, Redis 모드
+    </Card>
+    <Card icon="activity" title="옵저버빌리티" href="/docs/environment/observability">
+        Prometheus 메트릭, Tempo 트레이스, Loki 로그, Grafana
+    </Card>
+    <Card icon="container" title="Docker" href="/docs/environment/docker">
+        서비스, 배포 모드, 배포 명령, 이미지 파이프라인
+    </Card>
+    <Card icon="terminal" title="Make 명령어" href="/docs/environment/make-commands">
+        작업별로 묶은 make 타깃 72개
+    </Card>
+</CardGrid>

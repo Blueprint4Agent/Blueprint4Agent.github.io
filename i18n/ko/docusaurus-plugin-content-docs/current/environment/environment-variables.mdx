@@ -1,0 +1,180 @@
+---
+title: 환경변수
+sidebar_position: 1
+description: 백엔드, Docker, 프론트엔드의 모든 환경변수와 기본값, 동기화 도구를 정리합니다.
+---
+
+# 환경변수
+
+B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `.env.example`이 있으며, 키·기본값·주석·순서의 기준이 됩니다.
+
+| 파일                | 사용처                                                       | 생성 방법   |
+| ------------------- | ------------------------------------------------------------ | ----------- |
+| `src/backend/.env`  | `make backend-dev`, 테스트, `make user-role`, 로컬 Celery    | `make init` |
+| `docker/.env`       | Docker Compose: app, Celery, PostgreSQL, Redis, 옵저버빌리티 | `make init` |
+| `src/frontend/.env` | Vite 개발 서버와 프론트엔드 빌드                             | `make init` |
+
+## 파일 동기화
+
+| 명령                                             | 동작                                                                                                        |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `make env-sync`                                  | 기존 값을 유지하며 예제 기준으로 백엔드·프론트엔드 `.env`를 다시 구성합니다. 새 키는 기본값으로 추가합니다. |
+| `make env-check`                                 | 누락·중복·잘못된 키와 오래된 구성을 발견하면 실패합니다.                                                    |
+| `make docker-env-sync` / `make docker-env-check` | `docker/.env`에 대해 같은 작업을 합니다.                                                                    |
+| `make env-contract-check`                        | 실제 `.env` 없이 백엔드와 Docker 예제가 같은 공유 키를 선언했는지 확인합니다.                               |
+
+- 파일을 바꾸기 전에 `.env-backups/`에 시각이 붙은 백업을 남깁니다(Git·Docker 제외, 본인만 읽기 가능).
+- 값은 출력하지 않습니다. 내 `.env`에만 있는 키는 파일 끝의 별도 구역에 유지됩니다.
+- `make docker-deploy`는 먼저 `docker-env-check`를 실행하고 키가 빠져 있으면 멈춥니다.
+
+:::tip[설정 추가]
+
+공유 백엔드 설정은 `src/backend/.env.example`과 `docker/.env.example` 양쪽에 추가합니다. 한쪽에 빠지면 `make check`와 CI에서도 실행되는 `make env-contract-check`가 실패합니다.
+
+:::
+
+## 백엔드 변수
+
+아래 기본값은 `src/backend/.env.example`(로컬 개발) 기준입니다. 값이 다른 [Docker 기본값](#docker-기본값)은 뒤에 정리합니다.
+
+### 서버
+
+| 변수              | 기본값                                                          | 설명                                                         |
+| ----------------- | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| `APP_NAME`        | `Blueprint4FastAPI API`                                         | OpenAPI에 표시되는 API 이름                                  |
+| `APP_ENV`         | `local`                                                         | 환경 이름(Docker에서는 `docker`)                             |
+| `LOG_LEVEL`       | `INFO`                                                          | Python 로그 레벨                                             |
+| `APP_PORT`        | `8000`                                                          | `make backend-dev` 포트                                      |
+| `APP_BASE_URL`    | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 origin |
+| `SWAGGER_ENABLED` | `true`                                                          | `/docs`에서 Swagger UI 제공                                  |
+| `METRICS_ENABLED` | `true`                                                          | `/metrics`에서 Prometheus 메트릭 제공                        |
+| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | 쉼표로 구분한 허용 origin                                    |
+
+### 옵저버빌리티
+
+| 변수                                 | 기본값                      | 설명                                                         |
+| ------------------------------------ | --------------------------- | ------------------------------------------------------------ |
+| `TRACING_ENABLED`                    | `false`                     | OpenTelemetry 트레이스 내보내기                              |
+| `LOGS_ENABLED`                       | `false`                     | 애플리케이션·Uvicorn 로그를 OTLP로 내보내기, 트레이싱과 독립 |
+| `OTEL_SERVICE_NAME`                  | `blueprint4fastapi-backend` | 트레이스와 로그의 서비스 이름                                |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`        | `http://localhost:4317`     | OTLP gRPC Collector 엔드포인트                               |
+| `OTEL_EXPORTER_OTLP_INSECURE`        | `true`                      | 평문 gRPC 사용                                               |
+| `OTEL_EXPORTER_OTLP_TIMEOUT_SECONDS` | `10`                        | 내보내기 제한 시간                                           |
+| `OTEL_TRACE_SAMPLE_RATIO`            | `1.0`                       | 트레이스 샘플링 비율                                         |
+
+### 인증
+
+| 변수                                      | 기본값                     | 설명                                                            |
+| ----------------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| `LOGIN_ENABLED`                           | `true`                     | `false`면 부트스트랩 관리자로 실행하고 이메일·OAuth를 강제로 끔 |
+| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | 로그인 비활성화 시 부트스트랩 사용자                            |
+| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | 부트스트랩 사용자 이름                                          |
+| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | 토큰 서명 키. `make project-init`이 생성                        |
+| `ALGORITHM`                               | `HS256`                    | JWT 알고리즘                                                    |
+| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | 액세스 토큰 수명                                                |
+| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | "기억하기" 사용 시 refresh 쿠키 수명                            |
+| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | 인증 링크 수명                                                  |
+| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | 재설정 링크 수명                                                |
+| `LOGIN_FAILED_LIMIT`                      | `5`                        | 잠금 전 IP별 허용 실패 횟수                                     |
+| `LOGIN_LOCKED_MINUTES`                    | `5`                        | 잠금 시간                                                       |
+
+### 데이터베이스
+
+| 변수          | 기본값             | 설명                                                          |
+| ------------- | ------------------ | ------------------------------------------------------------- |
+| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` 또는 `postgresql+asyncpg`                  |
+| `DB_NAME`     | `template.db`      | SQLite 파일 이름 또는 PostgreSQL 데이터베이스 이름            |
+| `DB_HOST`     | `localhost`        | PostgreSQL 호스트(SQLite는 무시)                              |
+| `DB_PORT`     | `5432`             | PostgreSQL 포트                                               |
+| `DB_USER`     | `postgres`         | PostgreSQL 사용자                                             |
+| `DB_PASSWORD` | `postgres`         | PostgreSQL 비밀번호. 원문 그대로 입력하면 백엔드가 URL 인코딩 |
+
+`DB_DRIVER`와 `DB_NAME`은 함께 바꿉니다. [데이터베이스와 Redis](/docs/environment/database-and-redis)를 참고하세요.
+
+### Redis와 Celery
+
+| 변수                | 기본값              | 설명                                                          |
+| ------------------- | ------------------- | ------------------------------------------------------------- |
+| `REDIS_IN_MEMORY`   | `true`              | 서버 대신 프로세스 내부 가짜 Redis 사용                       |
+| `REDIS_HOST`        | `localhost`         | Redis 호스트                                                  |
+| `REDIS_PORT`        | `6379`              | Redis 포트                                                    |
+| `REDIS_DB`          | `0`                 | Redis 데이터베이스 번호                                       |
+| `REDIS_PASSWORD`    | _(비어 있음)_       | 설정하면 Redis 인증 사용                                      |
+| `CELERY_BROKER_URL` | _(비어 있음)_       | 브로커 URL. 비어 있으면 위 Redis 설정 사용, TLS는 `rediss://` |
+| `CELERY_QUEUE`      | `b4fastapi.default` | 큐 이름. Redis를 공유하는 배포마다 고유하게                   |
+| `CELERY_KEY_PREFIX` | `b4fastapi:celery:` | Redis 키 접두사. Redis를 공유하는 배포마다 고유하게           |
+
+### 이메일과 SMTP
+
+| 변수                              | 기본값                 | 설명                                    |
+| --------------------------------- | ---------------------- | --------------------------------------- |
+| `EMAIL_ENABLED`                   | `false`                | 인증·재설정 메일 발송. Celery 워커 필요 |
+| `EMAIL_FROM`                      | `no-reply@example.com` | 발신 주소                               |
+| `EMAIL_BRAND_NAME`                | `Blueprint4FastAPI`    | 메일에 표시되는 브랜드                  |
+| `SMTP_HOST`                       | _(비어 있음)_          | SMTP 서버                               |
+| `SMTP_PORT`                       | `587`                  | SMTP 포트                               |
+| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(비어 있음)_          | SMTP 자격 증명                          |
+| `SMTP_USE_STARTTLS`               | `true`                 | STARTTLS로 업그레이드                   |
+| `SMTP_USE_SSL`                    | `false`                | 대신 암묵적 TLS 사용                    |
+| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP 제한 시간                          |
+| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | 워커 시작 시 SMTP 연결 확인             |
+| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | 첫 시도 후 지연 재시도 횟수             |
+| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | 재시도 간격                             |
+
+### OAuth
+
+| 변수                                                          | 기본값                 | 설명                      |
+| ------------------------------------------------------------- | ---------------------- | ------------------------- |
+| `OAUTH_ENABLED`                                               | `false`                | Google·GitHub 로그인 사용 |
+| `OAUTH_ALLOWED_PROVIDERS`                                     | `google,github`        | 제공할 제공자             |
+| `OAUTH_STATE_EXPIRE_MINUTES`                                  | `10`                   | state 수명                |
+| `OAUTH_FRONTEND_SUCCESS_PATH`                                 | `/dashboard`           | 성공 후 리다이렉트 경로   |
+| `OAUTH_FRONTEND_FAILURE_PATH`                                 | `/login`               | 실패 후 리다이렉트 경로   |
+| `OAUTH_GOOGLE_CLIENT_ID` / `_CLIENT_SECRET`                   | _(비어 있음)_          | Google 자격 증명          |
+| `OAUTH_GOOGLE_AUTHORIZE_URL` / `_TOKEN_URL` / `_USERINFO_URL` | Google 공개 엔드포인트 | 거의 변경하지 않음        |
+| `OAUTH_GITHUB_CLIENT_ID` / `_CLIENT_SECRET`                   | _(비어 있음)_          | GitHub 자격 증명          |
+| `OAUTH_GITHUB_AUTHORIZE_URL` / `_TOKEN_URL` / `_USERINFO_URL` | GitHub 공개 엔드포인트 | 거의 변경하지 않음        |
+
+### 실시간
+
+| 변수                    | 기본값 | 설명                              |
+| ----------------------- | ------ | --------------------------------- |
+| `SSE_HEARTBEAT_SECONDS` | `20`   | 이벤트 스트림 heartbeat 간격      |
+| `SSE_RETRY_MILLIS`      | `5000` | 클라이언트에 권장하는 재연결 지연 |
+
+## Docker 기본값
+
+`docker/.env.example`은 같은 백엔드 키를 선언하되 컨테이너용 기본값이 다릅니다.
+
+| 변수                                | Docker 기본값                                  |
+| ----------------------------------- | ---------------------------------------------- |
+| `APP_ENV`                           | `docker`                                       |
+| `APP_BASE_URL`                      | `http://localhost:8000`                        |
+| `CORS_ORIGINS`                      | `http://localhost:8000` 추가                   |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                   |
+| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres` |
+| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                              |
+
+Docker 전용 키도 있습니다.
+
+| 변수                                          | 기본값                      | 설명                                               |
+| --------------------------------------------- | --------------------------- | -------------------------------------------------- |
+| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | 앱 이미지 태그                                     |
+| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose 프로젝트. 컨테이너와 볼륨을 결정           |
+| `APP_HOST_PORT`                               | `8000`                      | 공개되는 앱 포트(모든 인터페이스)                  |
+| `POSTGRES_HOST_PORT`                          | `5432`                      | `127.0.0.1`에만 공개                               |
+| `REDIS_HOST_PORT`                             | `6379`                      | `127.0.0.1`에만 공개                               |
+| `GRAFANA_HOST_PORT`                           | `3000`                      | `127.0.0.1`에만 공개                               |
+| `PROMETHEUS_HOST_PORT`                        | `9090`                      | `127.0.0.1`에만 공개                               |
+| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | `127.0.0.1`에만 공개                               |
+| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Prometheus가 수집할 백엔드(Docker 앱은 `app:8000`) |
+| `GRAFANA_ADMIN_USER`                          | `admin`                     | 새 볼륨의 Grafana 관리자                           |
+| `GRAFANA_ADMIN_PASSWORD`                      | _(비어 있음)_               | Grafana 시작에 필수. `admin`, `CHANGE_ME*`는 거부  |
+
+`$`가 들어간 값은 Compose 보간을 막기 위해 작은따옴표로 감쌉니다.
+
+## 프론트엔드 변수
+
+| 변수                | 기본값        | 설명                                                                                                                                                      |
+| ------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL` | _(비어 있음)_ | API origin. 비어 있으면 개발 중에는 `http://localhost:8000`, 다른 웹 빌드는 페이지 자신의 origin을 사용. 데스크톱 빌드, 별도 호스팅, 다른 백엔드에서 지정 |

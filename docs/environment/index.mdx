@@ -7,3 +7,25 @@ description: Environment variables, data stores, observability, Docker, and make
 # Environment & options
 
 B4FastAPI is configured through `.env` files and operated through `make` targets. These pages list every variable and target, and explain the supporting infrastructure.
+
+<CardGrid columns={2}>
+    <Card
+        icon="file-code"
+        title="Environment variables"
+        href="/docs/environment/environment-variables"
+    >
+        Every backend, Docker, and frontend variable with defaults and sync tooling.
+    </Card>
+    <Card icon="database" title="Database & Redis" href="/docs/environment/database-and-redis">
+        SQLite and PostgreSQL, migrations, backups, and Redis modes.
+    </Card>
+    <Card icon="activity" title="Observability" href="/docs/environment/observability">
+        Prometheus metrics, Tempo traces, Loki logs, and Grafana.
+    </Card>
+    <Card icon="container" title="Docker" href="/docs/environment/docker">
+        Services, deployment modes, deploy commands, and the image pipeline.
+    </Card>
+    <Card icon="terminal" title="Make commands" href="/docs/environment/make-commands">
+        All 72 make targets grouped by task.
+    </Card>
+</CardGrid>
