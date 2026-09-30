@@ -1,0 +1,79 @@
+---
+title: 프로젝트 초기화
+sidebar_position: 3
+description: project.json으로 복사한 블루프린트의 이름, 브랜드, 데스크톱 식별자, 기능 스위치를 설정합니다.
+---
+
+# 프로젝트 초기화
+
+블루프린트를 복사한 뒤 새 프로젝트 정보를 `project.json`에 한 번만 작성합니다. 초기화 도구는 관련 없는 설정은 건드리지 않고 백엔드, Docker, 프론트엔드, 데스크톱 설정에 식별 정보를 적용합니다.
+
+## 작업 흐름
+
+```bash
+make frontend-init
+make install
+cp project.example.json project.json
+# project.json의 공개 값을 수정합니다
+make project-plan    # 파일을 쓰지 않고 검증 후 영향받는 파일 목록 출력
+make project-init    # 적용, 변경되는 파일은 먼저 백업
+make project-check   # 생성된 설정이 달라졌으면 실패
+```
+
+`make project-init`은 변경되는 파일을 Git에서 제외된 `.project-backups/<timestamp>/`에 백업합니다. 같은 입력으로 다시 실행하면 아무것도 바뀌지 않습니다. 다른 매니페스트를 쓰려면 `PROJECT_CONFIG=path/to/project.json`을 지정합니다.
+
+## 매니페스트 필드
+
+```json title="project.json"
+{
+    "version": 1,
+    "slug": "acme",
+    "name": "Acme",
+    "short_name": "ACME",
+    "identifier": "com.acme.desktop",
+    "features": { "login": true, "email": false, "oauth": false },
+    "logo": "branding/logo.svg",
+    "logo_dark": "branding/logo-dark.svg"
+}
+```
+
+| 필드                | 효과                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| `version`           | 매니페스트 형식, 현재 `1`                                                                |
+| `slug`              | Docker 이미지, Compose 프로젝트, 텔레메트리 서비스 이름에 쓰는 소문자 kebab-case 키      |
+| `name`              | 브라우저 제목, 내비게이션, 이메일 브랜드, API 이름, 데스크톱 제품명과 창 제목(최대 60자) |
+| `short_name`        | 사이드바와 내비게이션 바 워드마크(최대 16자)                                             |
+| `identifier`        | 역방향 DNS 형식 Tauri 애플리케이션 ID, 예: `com.example.myapp`                           |
+| `features.login`    | `LOGIN_ENABLED` 설정                                                                     |
+| `features.email`    | `EMAIL_ENABLED` 설정(로그인 필요)                                                        |
+| `features.oauth`    | `OAUTH_ENABLED` 설정(로그인 필요)                                                        |
+| `logo`, `logo_dark` | `branding/` 아래의 선택형 SVG, PNG, WEBP, JPEG, 각 2 MB 이하                             |
+
+## 초기화 도구가 관리하는 범위
+
+- `src/backend/.env`와 `docker/.env`의 식별 정보와 세 가지 기능 키. 데이터베이스 연결, 시크릿 같은 다른 값은 유지됩니다.
+- 비어 있거나 없거나 `CHANGE_ME`인 시크릿은 새로 생성됩니다.
+- 프론트엔드 `.env`는 예제 기준으로 동기화됩니다.
+- Git에서 제외되는 프론트엔드 빌드 입력: `src/frontend/project.local.json`, `src/frontend/public/project-brand/`. 서브모듈에 커밋하지 않습니다.
+
+데이터베이스 접속이나 마이그레이션, SMTP·OAuth 자격 증명 준비, 패키지·모듈 이름 변경, 네이티브 설치 아이콘 생성(B4React `src-tauri/icons`에 유지)은 하지 않습니다.
+
+:::warning[slug 변경]
+
+slug는 Compose 프로젝트 이름이 됩니다. 이름이 바뀌면 별도의 컨테이너와 데이터 볼륨을 사용합니다. 새로 복사한 프로젝트에 사용하고, 실행 중인 배포의 이름을 바꾸는 용도로 쓰지 않습니다.
+
+:::
+
+## 변경 후 조치
+
+- 기능 스위치: `make project-init` 후 백엔드를 재시작합니다.
+- 이름이나 로고: 프론트엔드 개발 서버를 재시작하거나 다시 빌드합니다.
+- `project.json`과 원본 로고는 커밋합니다. 자격 증명은 Git에서 제외된 env 파일이나 배포 시크릿에 둡니다.
+
+## 검증
+
+| 명령                      | 검사 내용                                                       |
+| ------------------------- | --------------------------------------------------------------- |
+| `make project-init-check` | 초기화 코드와 공개 예제 매니페스트                              |
+| `make project-init-test`  | 격리된 초기화와 값 보존 시나리오                                |
+| `make project-build-test` | 커스텀 브랜드 프로덕션 빌드를 Chromium에서 렌더링(영어, 한국어) |

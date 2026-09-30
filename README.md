@@ -1,23 +1,16 @@
-# Blueprint4Agent Documentation Hub
+# B4Agent Manual
 
-This repository hosts the organization-level documentation site for Blueprint4Agent.
+This repository hosts the B4Agent manual: documentation for the B4Agent full-stack blueprint (B4FastAPI + B4React, with B4SpringBoot planned).
 It is built with [Docusaurus](https://docusaurus.io/) and published through GitHub Pages.
-
-The site documents shared project context, documentation rules, and operating conventions.
-Repository-specific technical implementation details should live in the relevant project repository.
 
 ## Project Scope
 
-Blueprint4Agent documentation must include the following baseline content:
+The manual is organized in `sidebars.ts` into Getting Started, Features, Environment & Options, Verification, and Backends. See `AGENTS.md` for the required sections.
 
-- Project Overview
-- Project Purpose
-- Project Composition: B4F, B4B, and this Docusaurus documentation site
+Documentation starts at:
 
-Current documentation starts at:
-
-- `docs/about-b4a/what-is-b4a.mdx`
-- `i18n/ko/docusaurus-plugin-content-docs/current/about-b4a/what-is-b4a.mdx`
+- `docs/getting-started/overview.mdx` (served at `/docs`)
+- `i18n/ko/docusaurus-plugin-content-docs/current/getting-started/overview.mdx`
 
 Localized repository notes are maintained under `notes/<locale>/`.
 The current additional locale is `ko`.

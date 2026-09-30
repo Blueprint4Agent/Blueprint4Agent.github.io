@@ -4,8 +4,8 @@ Read this file first before making any changes in this repository.
 
 ## Repository Scope
 
-This repository is the **central documentation hub for Blueprint4Agent**.
-It hosts the organization-wide documentation website based on **Docusaurus** and deployed with **GitHub Pages**.
+This repository hosts the **B4Agent manual**: the documentation for the B4Agent full-stack blueprint, which combines B4FastAPI (backend) and B4React (frontend), with B4SpringBoot planned as the next backend.
+It is a **Docusaurus** site deployed with **GitHub Pages**.
 
 ## Documentation Language Policy
 
@@ -27,13 +27,15 @@ It hosts the organization-wide documentation website based on **Docusaurus** and
 
 ## Required Baseline Content
 
-Organization-level documentation in this repository must include:
+The manual must keep these sections in `sidebars.ts` (`manualSidebar`):
 
-- `Project Overview`
-- `Project Purpose`
-- `Project Composition` (B4F, B4B, Docusaurus documentation site)
+- `Getting Started`: overview (project purpose and composition), quick start, project initialization, repository layout
+- `Features`: one page per feature that works out of the box (`docs/features/`)
+- `Environment & Options`: environment variables, database and Redis, observability, Docker, make commands (`docs/environment/`)
+- `Verification`: verification process, checks and tests, git governance (`docs/verification/`)
+- `Backends`: backend-specific pages such as B4SpringBoot (`docs/backends/`)
 
-Repository-specific technical details must be documented in each repository separately.
+Describe behavior as implemented in the current B4FastAPI `main` and its pinned B4React commit, and verify facts against those repositories. The repositories' own guides remain the source of truth; this manual summarizes them for users and links to them.
 
 ## Required Read Order
 

@@ -1,0 +1,76 @@
+---
+title: Quick start
+sidebar_position: 2
+description: Clone B4FastAPI with its B4React submodule and run both locally.
+---
+
+# Quick start
+
+Run the B4FastAPI backend and the B4React frontend on your machine. The default local setup uses SQLite and an in-memory Redis, so no Docker services are required.
+
+## Requirements
+
+| Tool                                        | Used for                                                   |
+| ------------------------------------------- | ---------------------------------------------------------- |
+| Git                                         | Cloning the backend and its B4React submodule              |
+| [uv](https://docs.astral.sh/uv/) and Python | Backend dependencies, tests, and env tooling               |
+| Node.js 24 and npm                          | B4React development, tests, and builds                     |
+| Docker with Compose                         | Optional: PostgreSQL, Redis, observability, and deployment |
+| Rust and Tauri platform dependencies        | Optional: the desktop shell                                |
+
+## 1. Clone with the frontend submodule
+
+```bash
+git clone --recurse-submodules https://github.com/Blueprint4Agent/B4FastAPI.git
+cd B4FastAPI
+```
+
+In an existing clone, run `make frontend-init` to check out the pinned B4React commit.
+
+## 2. Create env files and install dependencies
+
+```bash
+make init       # backend, frontend, and docker .env files from their examples
+make install    # backend (uv) and frontend (npm) dependencies
+```
+
+`make init` never overwrites an existing `.env`. Use `make env-sync` later to add keys introduced by a newer example.
+
+## 3. Run the backend and frontend
+
+Use two terminals:
+
+```bash
+make backend-dev
+```
+
+```bash
+make frontend-dev
+```
+
+| URL                                  | What you get                                              |
+| ------------------------------------ | --------------------------------------------------------- |
+| `http://localhost:5173`              | B4React app (Vite dev server) with the component showcase |
+| `http://localhost:8000/docs`         | Swagger UI for the FastAPI backend                        |
+| `http://localhost:8000/health/ready` | Readiness check for the database and Redis                |
+
+:::tip[Explore without signing up]
+
+The root route opens the public component showcase. Sign up from the profile menu to try account features. With `EMAIL_ENABLED=false` (the default), email verification is skipped.
+
+:::
+
+## 4. Check your setup
+
+```bash
+make verify-plan   # shows which checks your working-tree changes require
+make verify        # runs them
+```
+
+See [Verification](/docs/verification) for how checks are selected.
+
+## Next steps
+
+- Give the copy its own name, brand, and feature switches with [project initialization](/docs/getting-started/project-initialization).
+- Learn which repository owns what in [repository layout](/docs/getting-started/repository-layout).
+- Switch to PostgreSQL, real Redis, or Docker in [Environment & options](/docs/environment).

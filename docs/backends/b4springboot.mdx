@@ -1,0 +1,23 @@
+---
+title: B4SpringBoot
+sidebar_position: 1
+description: The planned Spring Boot backend for the shared B4React frontend.
+---
+
+# B4SpringBoot <Badge tone="warn">Planned</Badge>
+
+B4SpringBoot will be the second backend blueprint in B4Agent. It is not published yet.
+
+## What stays the same
+
+- **Frontend.** B4SpringBoot will pin B4React as a Git submodule at `src/frontend`, exactly like B4FastAPI.
+- **API contract.** It must implement the same `contracts/openapi.json`, including authentication, cookies, error codes, readiness, and Server-Sent Events behavior. Schema equality alone does not replace those behavior tests.
+- **Harness.** `AGENTS.md` read order, worklogs, git governance, and change-scoped verification apply the same way.
+
+## What will differ
+
+- The backend stack, build tool, and test runner.
+- Its own packaging adapter for serving B4React's `dist`.
+- B4React runs against it with `VITE_API_BASE_URL=http://localhost:8080` during development.
+
+This manual will add B4SpringBoot-specific pages under **Backends** when the repository is released. Until then, every feature and option page describes B4FastAPI.

@@ -1,0 +1,79 @@
+---
+title: Project initialization
+sidebar_position: 3
+description: Configure a copied blueprint's name, brand, desktop identity, and feature switches from project.json.
+---
+
+# Project initialization
+
+After copying the blueprint, describe the new project once in `project.json`. The initializer applies the identity to backend, Docker, frontend, and desktop configuration without touching unrelated settings.
+
+## Workflow
+
+```bash
+make frontend-init
+make install
+cp project.example.json project.json
+# edit the public values in project.json
+make project-plan    # validate and list affected files without writing
+make project-init    # apply; changed files are backed up first
+make project-check   # fail if generated configuration has drifted
+```
+
+`make project-init` backs up changed files under the ignored `.project-backups/<timestamp>/` directory. Running it again with unchanged input changes nothing. Use `PROJECT_CONFIG=path/to/project.json` to select another manifest.
+
+## Manifest fields
+
+```json title="project.json"
+{
+    "version": 1,
+    "slug": "acme",
+    "name": "Acme",
+    "short_name": "ACME",
+    "identifier": "com.acme.desktop",
+    "features": { "login": true, "email": false, "oauth": false },
+    "logo": "branding/logo.svg",
+    "logo_dark": "branding/logo-dark.svg"
+}
+```
+
+| Field               | Effect                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `version`           | Manifest format, currently `1`                                                                           |
+| `slug`              | Lowercase kebab-case key for the Docker image, Compose project, and telemetry service name               |
+| `name`              | Browser title, navigation, email brand, API name, desktop product and window title (up to 60 characters) |
+| `short_name`        | Sidebar and navbar wordmark (up to 16 characters)                                                        |
+| `identifier`        | Reverse-DNS Tauri application ID, for example `com.example.myapp`                                        |
+| `features.login`    | Sets `LOGIN_ENABLED`                                                                                     |
+| `features.email`    | Sets `EMAIL_ENABLED` (requires login)                                                                    |
+| `features.oauth`    | Sets `OAUTH_ENABLED` (requires login)                                                                    |
+| `logo`, `logo_dark` | Optional SVG, PNG, WEBP, or JPEG under `branding/`, up to 2 MB each                                      |
+
+## What the initializer owns
+
+- Identity and the three feature keys in `src/backend/.env` and `docker/.env`. Other values, such as database connections and secrets, are preserved.
+- Missing, blank, or `CHANGE_ME` secrets are generated.
+- The frontend `.env` is synchronized from its example.
+- Ignored frontend build inputs: `src/frontend/project.local.json` and `src/frontend/public/project-brand/`. Never commit them into the submodule.
+
+It does not contact or migrate the database, provision SMTP or OAuth credentials, rename package or module names, or generate native installer icons (those stay in B4React `src-tauri/icons`).
+
+:::warning[Changing the slug]
+
+The slug becomes the Compose project name. A new name selects a separate set of containers and data volumes. Use it for a new copy, not to rename a running deployment.
+
+:::
+
+## After changes
+
+- Feature switches: run `make project-init` and restart the backend.
+- Name or logo: restart the frontend dev server or rebuild.
+- Commit `project.json` and the source logos. Keep credentials in ignored env files or deployment secrets.
+
+## Verification
+
+| Command                   | Checks                                                                      |
+| ------------------------- | --------------------------------------------------------------------------- |
+| `make project-init-check` | Initializer code and the public example manifest                            |
+| `make project-init-test`  | Isolated initialization and value preservation scenarios                    |
+| `make project-build-test` | A custom-branded production build rendered in Chromium (English and Korean) |

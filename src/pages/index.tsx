@@ -8,7 +8,7 @@ import { Card, CardGrid } from "@site/src/components/docs";
 import GitHubMark from "@site/src/components/icons/GitHubMark";
 import type { IconName } from "@site/src/components/icons/registry";
 
-const MANUAL_START = "/docs/about-b4a/what-is-b4a";
+const MANUAL_START = "/docs";
 
 type Highlight = { icon: IconName; title: string; description: string };
 

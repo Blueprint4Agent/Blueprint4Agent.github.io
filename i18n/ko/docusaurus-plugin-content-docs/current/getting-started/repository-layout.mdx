@@ -1,0 +1,94 @@
+---
+title: 저장소 구조
+sidebar_position: 4
+description: 저장소별 담당 범위, B4FastAPI 디렉터리 구조, B4React 서브모듈 작업 흐름을 설명합니다.
+---
+
+# 저장소 구조
+
+B4FastAPI는 클론하고 배포하는 저장소입니다. B4React는 그 안에 고정된 Git 서브모듈로 들어 있어 프론트엔드가 자체 이력, 리뷰, 릴리스를 가집니다.
+
+## 담당 범위
+
+| 영역                                                  | 담당                                      |
+| ----------------------------------------------------- | ----------------------------------------- |
+| 백엔드 코드, OpenAPI 내보내기, 마이그레이션           | B4FastAPI `src/backend/`                  |
+| 통합 패키징, Docker, 릴리스 워크플로우                | B4FastAPI `docker/`, `.github/workflows/` |
+| 프론트엔드 소스, 테스트, 데스크톱 셸, 생성된 API 타입 | B4React(B4FastAPI의 `src/frontend/`)      |
+| 양쪽이 합의하는 API 계약                              | 각 저장소의 `contracts/openapi.json`      |
+
+## B4FastAPI 디렉터리
+
+```text
+B4FastAPI/
+├── AGENTS.md              # 에이전트 읽기 순서, 검증, Git 거버넌스
+├── DEPLOY.md              # Docker 배포 모드와 파이프라인
+├── PROJECT_SETUP.md       # project.json 초기화
+├── Makefile               # 모든 워크플로우 훅(make help)
+├── project.example.json
+├── branding/              # 선택형 프로젝트 로고
+├── contracts/             # 내보낸 OpenAPI 기준본
+├── docker/
+│   ├── docker-compose.yml
+│   ├── observability/     # Collector, Tempo, Loki, Prometheus, Grafana 설정
+│   └── scripts/           # build, up, down, deploy, export
+├── notes/                 # 검증, 컬렉션, 서브모듈 가이드(+ ko/)
+├── scripts/               # env, 검증, 거버넌스, 아키텍처 도구
+├── src/
+│   ├── backend/           # FastAPI 앱, Alembic, 테스트, 백엔드 가이드
+│   └── frontend/          # B4React 서브모듈
+└── worklog/               # 커밋마다 하나의 항목
+```
+
+백엔드 애플리케이션은 엄격한 계층 구조를 따릅니다.
+
+```text
+src/backend/app/
+├── routers/v1/   # HTTP 엔드포인트(auth, api-keys, events)
+├── services/     # 라우터가 호출하는 도메인 로직
+├── models/       # SQLAlchemy 모델과 Pydantic 스키마
+├── core/         # config, db, cache, celery, mail, realtime, observability, errors
+└── utils/        # 쿠키, 보안, 토큰
+```
+
+라우터는 서비스에 위임하고, 하위 계층은 라우터를 import하지 않습니다. `make architecture-check`가 이 경계를 강제합니다.
+
+## 서브모듈 작업
+
+서브모듈은 분리된(detached) 커밋으로 체크아웃됩니다. 프론트엔드 변경은 B4React에 먼저 반영합니다.
+
+1. `src/frontend` 안에서 이름 있는 브랜치를 만들어 B4React에 push하고 PR을 엽니다.
+2. 병합되면 B4FastAPI의 고정 커밋을 옮깁니다.
+
+    ```bash
+    git -C src/frontend fetch origin
+    git -C src/frontend checkout <reviewed-commit-sha>
+    make verify
+    git add src/frontend
+    ```
+
+3. 새 gitlink를 worklog와 함께 커밋하고 B4FastAPI PR을 엽니다.
+
+:::warning
+
+CI에서 `git submodule update --remote`를 실행하지 않습니다. 빌드는 항상 검토되고 고정된 커밋을 사용합니다.
+
+:::
+
+## API 계약 변경
+
+1. 백엔드 브랜치에서 FastAPI 선언을 바꾸고 `make contract-export`를 실행합니다.
+2. B4React 브랜치에서 스냅샷을 `contracts/openapi.json`에 반영하고, 출처 커밋을 `contracts/source.json`에 기록한 뒤 `make api-generate`로 타입을 생성하고 사용하는 코드를 수정합니다.
+3. B4React를 먼저 병합하고, 백엔드 PR에서 그 커밋을 고정한 뒤 `make verify`를 실행합니다.
+
+`make contract-check`는 백엔드 내보내기와 고정된 프론트엔드 스냅샷이 같아야 통과하므로, 계약 변경이 한쪽에만 들어갈 수 없습니다.
+
+## 빌드 담당
+
+| 명령                    | 결과                                                  |
+| ----------------------- | ----------------------------------------------------- |
+| `make frontend-build`   | `src/frontend/dist`만 생성                            |
+| `make frontend-package` | 빌드 후 `dist`를 `src/backend/app/static/dist`에 복사 |
+| `make build`            | 백엔드 환경과 통합 프론트엔드 패키징                  |
+
+`dist`가 패키징되어 있으면 백엔드가 SPA를 제공하고, API가 아닌 경로는 `index.html`로 대체합니다. B4React의 `dist`는 `VITE_API_BASE_URL`과 백엔드 CORS·쿠키 설정을 맞추면 별도로 호스팅할 수도 있습니다.

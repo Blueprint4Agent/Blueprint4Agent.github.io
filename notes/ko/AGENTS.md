@@ -4,8 +4,8 @@
 
 ## Repository Scope
 
-이 저장소는 **Blueprint4Agent 전체 문서의 중앙 허브**입니다.
-**Docusaurus 기반**으로 구성되고 **GitHub Pages**로 배포되는 조직 공통 문서 웹사이트를 관리합니다.
+이 저장소는 **B4Agent 매뉴얼**을 관리합니다. B4Agent는 B4FastAPI(백엔드)와 B4React(프론트엔드)를 결합한 풀스택 블루프린트이며, 다음 백엔드로 B4SpringBoot가 예정되어 있습니다.
+**Docusaurus** 사이트이며 **GitHub Pages**로 배포됩니다.
 
 ## Documentation Language Policy
 
@@ -27,13 +27,15 @@
 
 ## Required Baseline Content
 
-이 저장소의 조직 단위 문서에는 최소한 아래 항목이 포함되어야 합니다.
+매뉴얼은 `sidebars.ts`(`manualSidebar`)에 아래 섹션을 유지해야 합니다.
 
-- `Project Overview`
-- `Project Purpose`
-- `Project Composition` (B4F, B4B, Docusaurus documentation site)
+- `Getting Started`: 개요(프로젝트 목적과 구성), 빠른 시작, 프로젝트 초기화, 저장소 구조
+- `Features`: 기본 제공 기능마다 한 페이지(`docs/features/`)
+- `Environment & Options`: 환경변수, 데이터베이스와 Redis, 옵저버빌리티, Docker, make 명령어(`docs/environment/`)
+- `Verification`: 검증 프로세스, 검사와 테스트, Git 거버넌스(`docs/verification/`)
+- `Backends`: B4SpringBoot 같은 백엔드별 페이지(`docs/backends/`)
 
-저장소별 상세 기술 문서는 각 저장소에서 별도로 관리합니다.
+현재 B4FastAPI `main`과 고정된 B4React 커밋에 구현된 동작을 기준으로 작성하고, 사실은 해당 저장소에서 확인합니다. 각 저장소의 가이드가 원본이며, 이 매뉴얼은 사용자를 위해 요약하고 원본으로 연결합니다.
 
 ## Required Read Order
 

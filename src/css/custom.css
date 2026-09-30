@@ -649,8 +649,16 @@ html[lang="ko-KR"] body {
     line-height: 1.5;
 }
 
+.theme-doc-markdown table {
+    background: var(--panel);
+}
+
 .theme-doc-markdown thead tr {
-    background: var(--ifm-table-head-background);
+    background: color-mix(in oklab, var(--text) 4%, var(--panel-solid));
+}
+
+.theme-doc-markdown tbody tr {
+    background: transparent;
 }
 
 .theme-doc-markdown th {

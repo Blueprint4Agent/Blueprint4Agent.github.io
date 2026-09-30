@@ -3,8 +3,24 @@
         "message": "Next",
         "description": "The label for version current"
     },
-    "sidebar.tutorialSidebar.category.About B4A": {
-        "message": "B4A 소개",
-        "description": "The label for category 'About B4A' in sidebar 'tutorialSidebar'"
+    "sidebar.manualSidebar.category.Getting Started": {
+        "message": "시작하기",
+        "description": "The label for category 'Getting Started' in sidebar 'manualSidebar'"
+    },
+    "sidebar.manualSidebar.category.Features": {
+        "message": "기능",
+        "description": "The label for category 'Features' in sidebar 'manualSidebar'"
+    },
+    "sidebar.manualSidebar.category.Environment & Options": {
+        "message": "환경 및 옵션",
+        "description": "The label for category 'Environment & Options' in sidebar 'manualSidebar'"
+    },
+    "sidebar.manualSidebar.category.Verification": {
+        "message": "검증",
+        "description": "The label for category 'Verification' in sidebar 'manualSidebar'"
+    },
+    "sidebar.manualSidebar.category.Backends": {
+        "message": "백엔드",
+        "description": "The label for category 'Backends' in sidebar 'manualSidebar'"
     }
 }

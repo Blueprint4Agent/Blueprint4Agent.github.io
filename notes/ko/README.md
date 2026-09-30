@@ -1,23 +1,16 @@
-# Blueprint4Agent Documentation Hub
+# B4Agent Manual
 
-이 저장소는 Blueprint4Agent의 조직 단위 문서 사이트를 관리합니다.
+이 저장소는 B4Agent 매뉴얼을 관리합니다. B4Agent 풀스택 블루프린트(B4FastAPI + B4React, B4SpringBoot 예정)의 문서입니다.
 사이트는 [Docusaurus](https://docusaurus.io/)로 구성되며 GitHub Pages로 배포됩니다.
-
-이 사이트는 공통 프로젝트 맥락, 문서화 규칙, 운영 기준을 문서화합니다.
-저장소별 세부 구현 문서는 해당 프로젝트 저장소에서 관리해야 합니다.
 
 ## Project Scope
 
-Blueprint4Agent 문서에는 최소한 아래 기준 콘텐츠가 포함되어야 합니다.
+매뉴얼은 `sidebars.ts`에서 Getting Started, Features, Environment & Options, Verification, Backends로 구성됩니다. 필수 섹션은 `AGENTS.md`를 참고합니다.
 
-- Project Overview
-- Project Purpose
-- Project Composition: B4F, B4B, Docusaurus documentation site
+문서는 아래 파일에서 시작합니다.
 
-현재 문서는 아래 파일에서 시작합니다.
-
-- `docs/about-b4a/what-is-b4a.mdx`
-- `i18n/ko/docusaurus-plugin-content-docs/current/about-b4a/what-is-b4a.mdx`
+- `docs/getting-started/overview.mdx` (`/docs`로 제공)
+- `i18n/ko/docusaurus-plugin-content-docs/current/getting-started/overview.mdx`
 
 Locale별 저장소 notes는 `notes/<locale>/` 아래에서 관리합니다.
 현재 추가 locale은 `ko`입니다.
