@@ -380,23 +380,11 @@
     "home.highlight.verify.desc": {
         "message": "변경 범위 기반 검사, worklog, Git 거버넌스를 모든 커밋에 적용합니다."
     },
-    "home.hero.eyebrow": {
-        "message": "B4Agent 매뉴얼"
-    },
-    "home.hero.title": {
-        "message": "에이전틱 코딩을 위한 풀스택 블루프린트"
-    },
     "home.hero.subtitle": {
         "message": "FastAPI 백엔드와 공유 React 프론트엔드를 고정된 API 계약으로 연결하고, 에이전트가 첫 커밋부터 따르는 검증 하네스를 제공합니다."
     },
-    "home.hero.note": {
-        "message": "현재 B4FastAPI + B4React · 다음은 B4SpringBoot"
-    },
     "home.hero.start": {
         "message": "매뉴얼 읽기"
-    },
-    "home.stack.title": {
-        "message": "블루프린트 스택"
     },
     "home.stack.backend": {
         "message": "백엔드"
@@ -442,5 +430,44 @@
     },
     "toc.title": {
         "message": "이 페이지 목차"
+    },
+    "home.hero.copied": {
+        "message": "복사했습니다"
+    },
+    "home.hero.copy": {
+        "message": "명령어 복사"
+    },
+    "home.hero.pill": {
+        "message": "현재 B4FastAPI + B4React · 다음은 B4SpringBoot"
+    },
+    "home.hero.titleLead": {
+        "message": "에이전틱 코딩을 위한"
+    },
+    "home.hero.titleAccent": {
+        "message": "풀스택 블루프린트"
+    },
+    "home.stack.eyebrow": {
+        "message": "스택"
+    },
+    "home.stack.heading": {
+        "message": "하나의 계약, 어떤 백엔드든"
+    },
+    "home.stack.description": {
+        "message": "프론트엔드는 공유됩니다. 백엔드는 이를 서브모듈로 고정하고 같은 OpenAPI 계약을 제공합니다."
+    },
+    "home.highlights.eyebrow": {
+        "message": "기능"
+    },
+    "home.highlights.description": {
+        "message": "운영 웹 앱에 필요한 것들이 이미 연결되고, 테스트되고, 문서화되어 있습니다."
+    },
+    "home.closing.title": {
+        "message": "다음 프로젝트를 에이전트와 함께 시작하세요"
+    },
+    "home.closing.description": {
+        "message": "블루프린트를 클론하고 project.json으로 이름을 정하면, 하네스가 모든 커밋을 검증합니다."
+    },
+    "home.closing.cta": {
+        "message": "빠른 시작"
     }
 }
