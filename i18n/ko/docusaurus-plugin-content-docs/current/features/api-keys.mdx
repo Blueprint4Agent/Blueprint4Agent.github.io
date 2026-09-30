@@ -1,0 +1,41 @@
+---
+title: API 키
+sidebar_position: 4
+description: 스크립트와 서비스에서 API를 호출하기 위한 개인 API 키입니다.
+---
+
+# API 키
+
+개인 API 키를 사용하면 스크립트와 서비스가 브라우저 세션 없이 사용자 자격으로 API를 호출할 수 있습니다.
+
+|                |                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------- |
+| **활성화**     | 로그인한 사용자는 항상 사용 가능                                                    |
+| **엔드포인트** | `GET/POST /api/v1/api-keys`, `DELETE /api-keys/{id}`, `PATCH /api-keys/{id}/status` |
+| **프론트엔드** | **설정 → 개발자**                                                                   |
+
+## 키 사용
+
+키는 `X-API-Key` 헤더로 보냅니다. 로그인이 필요한 모든 엔드포인트가 Bearer 토큰 대신 이 헤더를 받습니다.
+
+```bash
+curl -H "X-API-Key: <your key>" http://localhost:8000/api/v1/auth/me
+```
+
+요청에 Bearer 토큰과 API 키가 모두 있으면 같은 사용자의 것이어야 합니다(다르면 `API_KEY_USER_MISMATCH`). 폐기되었거나 만료된 키는 `API_KEY_INVALID`를 반환합니다.
+
+## 키 관리
+
+- **생성**: 이름(1–100자)과 선택적 만료일을 지정합니다. 전체 비밀 값은 한 번만 표시되고, 목록에는 키 접두사만 보입니다.
+- **비활성화·활성화**: 삭제하지 않고 키를 끄거나 켭니다.
+- **삭제**: 키를 영구 삭제합니다.
+- 표에는 상태, 요청 수, 마지막 사용, 만료일이 표시되며 페이지당 6행입니다.
+
+## 실시간 갱신
+
+생성, 삭제, 상태 변경은 [실시간 이벤트](/docs/features/realtime-events)로 사용자의 열린 탭에 전달되어 모든 탭이 동기화됩니다. 알림은 최선 노력(best effort) 방식입니다. HTTP 결과는 전달 성공 여부와 관계없고, 클라이언트는 재연결 후 다시 조회합니다.
+
+## 코드
+
+- 백엔드: `routers/v1/api_key.py`, `services/api_key.py`, `models/api_key.py`, `deps.py`
+- 프론트엔드: `src/frontend/src/hooks/api/apiKey/`, `components/features/apiKey/`

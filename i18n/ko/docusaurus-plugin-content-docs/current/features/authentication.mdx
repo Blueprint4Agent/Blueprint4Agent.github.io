@@ -1,0 +1,51 @@
+---
+title: 인증
+sidebar_position: 1
+description: 이메일·비밀번호 계정, 세션, 로그인 잠금, 로그인 비활성화 모드, 최근 계정을 설명합니다.
+---
+
+# 인증
+
+짧은 수명의 액세스 토큰, refresh 쿠키, 로그인 잠금, 단일 사용자 도구를 위한 로그인 비활성화 모드를 갖춘 이메일·비밀번호 계정입니다.
+
+|                |                                                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **활성화**     | 기본 활성화(`LOGIN_ENABLED=true`)                                                                                      |
+| **설정**       | `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `LOGIN_FAILED_LIMIT`, `LOGIN_LOCKED_MINUTES` |
+| **엔드포인트** | `/api/v1/auth/signup`, `login`, `refresh`, `logout`, `me`, `token`                                                     |
+| **프론트엔드** | 쇼케이스 위에 뜨는 `/login`, `/signup` 대화상자                                                                        |
+
+## 세션
+
+1. `POST /api/v1/auth/login`은 본문으로 액세스 토큰과 사용자 정보를 반환합니다.
+2. 동시에 HttpOnly 쿠키 `template_refresh_token`, `template_refresh_sid` 두 개를 설정합니다. HTTPS에서는 `Secure`, `SameSite=None`, HTTP에서는 `SameSite=Lax`를 사용합니다.
+3. `remember_me=true`이면 쿠키가 `REFRESH_TOKEN_EXPIRE_DAYS` 동안 유지되고, 아니면 브라우저 세션 동안만 유지됩니다.
+4. B4React는 액세스 토큰을 Bearer 토큰으로 보내고, 만료되면 `POST /api/v1/auth/refresh`를 호출합니다.
+5. `POST /api/v1/auth/logout`은 세션을 정리합니다.
+
+`POST /api/v1/auth/token`은 OAuth2 password 폼을 받으므로 Swagger UI의 **Authorize** 버튼이 동작합니다.
+
+## 로그인 잠금
+
+로그인 실패는 클라이언트 IP별로 Redis에 집계됩니다. `LOGIN_FAILED_LIMIT`(기본 5)회 실패하면 해당 IP의 로그인은 `LOGIN_LOCKED_MINUTES`(기본 5분) 동안 `ACCOUNT_LOCKED`를 반환합니다. 실패 응답에는 `remaining_attempts`가 포함됩니다.
+
+## 역할
+
+모든 사용자는 `user` 또는 `admin` 역할을 가집니다. 관리자 전용 엔드포인트는 요청마다 현재 데이터베이스 역할을 확인합니다. [관리자와 역할](/docs/features/admin-and-roles)을 참고하세요.
+
+## 로그인 비활성화 모드
+
+내부 도구처럼 계정 없이 운영하려면 `LOGIN_ENABLED=false`로 설정합니다.
+
+- 시작 시 `BOOTSTRAP_USER_EMAIL`, `BOOTSTRAP_USER_NAME`으로 부트스트랩 관리자가 준비됩니다.
+- `/config`가 프론트엔드에 부트스트랩 액세스 토큰을 전달하고, 앱은 로그인된 상태로 열립니다.
+- 이메일과 OAuth는 런타임에 강제로 꺼집니다.
+
+## 최근 계정
+
+로그인 폼의 **계정 기억하기**는 선택 사항입니다. 브라우저는 최대 5개 계정을 90일 동안 보관하며(이메일, 이름, 제공자, 마지막 사용 시각, 선택적 아바타 썸네일), 비밀번호나 토큰은 저장하지 않습니다. 프로필 메뉴에서 기억된 계정으로 전환하거나 계정을 추가할 수 있고, 전환할 때는 항상 다시 로그인해야 합니다.
+
+## 코드
+
+- 백엔드: `src/backend/app/routers/v1/auth.py`, `services/auth.py`, `deps.py`, `utils/cookies.py`
+- 프론트엔드: `src/frontend/src/pages/login/`, `hooks/api/auth/`

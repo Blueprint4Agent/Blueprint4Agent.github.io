@@ -1,0 +1,40 @@
+---
+title: Showcase & style studio
+sidebar_position: 9
+description: The public component catalog and the local style editor.
+---
+
+# Showcase & style studio
+
+The root route opens a public catalog of every shared component. During local development, the style studio edits the design tokens of that catalog and writes them back to the stylesheet.
+
+## Component showcase
+
+- Opens at `/` (redirects to `/show-case`) for guests and signed-in users. The landing page moved to `/welcome`.
+- Every shared UI component has a rendered, interactive example, grouped by category and searchable.
+- Previews never call account APIs or start OAuth.
+- `make ui-composition-check` fails if a new public UI export has no showcase example.
+
+## Style studio
+
+Run the backend, then start the editor:
+
+```bash
+make backend-dev
+make frontend-style-studio   # opens Vite on 127.0.0.1 with the editor enabled
+```
+
+Open `http://127.0.0.1:5173/show-case`. A side panel previews:
+
+- Light and dark colors for background, panels, inputs, text, buttons, and hover states
+- Corner radius, spacing, font family, size, weight, and line height
+
+**Apply** validates the tokens, backs up the previous CSS under `.style-studio-backups/`, and writes `src/frontend/src/styles/app.css`. The change is an ordinary B4React working-tree change: commit it through a B4React branch and PR, then update the pin.
+
+:::note
+
+The editor exists only in this local, loopback-only mode. `make frontend-dev`, production builds, and desktop builds never include it.
+
+:::
+
+Set `FRONTEND_DIR=/absolute/path/to/B4React` to edit a separate B4React checkout instead.

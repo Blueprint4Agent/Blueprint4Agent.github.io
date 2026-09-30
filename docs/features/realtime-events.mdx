@@ -1,0 +1,39 @@
+---
+title: Realtime events
+sidebar_position: 6
+description: Server-Sent Events that keep open screens in sync with backend changes.
+---
+
+# Realtime events
+
+A per-user Server-Sent Events stream pushes domain events to every open tab, so screens refresh without polling.
+
+|               |                                                                         |
+| ------------- | ----------------------------------------------------------------------- |
+| **Enable**    | Always on for signed-in users                                           |
+| **Endpoint**  | `GET /api/v1/events/stream` (Bearer token or API key)                   |
+| **Settings**  | `SSE_HEARTBEAT_SECONDS` (default 20), `SSE_RETRY_MILLIS` (default 5000) |
+| **Transport** | Redis pub/sub, so events reach users on any API instance                |
+
+## How it works
+
+1. A service finishes a state change, for example creating an API key.
+2. It publishes a typed domain event (`app/core/realtime/domain_events/`) through the Redis broker.
+3. The stream sends it to the user's connections, with heartbeats every `SSE_HEARTBEAT_SECONDS`.
+4. B4React's realtime hooks parse the event and refresh the affected state in one place.
+
+## Delivery guarantees
+
+Events are notifications, not a message log:
+
+- There is no replay; `Last-Event-ID` is accepted for diagnostics only.
+- Publishing is best effort and bounded to two seconds. A failed publish never changes the HTTP result.
+- After a reconnect, window activation, or desktop recovery, the client refetches instead of trusting missed events.
+
+## Adding an event
+
+1. Define the event type under `app/core/realtime/domain_events/<domain>.py`.
+2. Publish it from the service after the change is committed. Routers never publish events.
+3. Handle it in `src/frontend/src/hooks/realtime/<domain>/` and update state through the domain hook.
+
+This is the backend **domain event loop** and the frontend **realtime refresh loop** described in each repository's guide.

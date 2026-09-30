@@ -1,0 +1,41 @@
+---
+title: API keys
+sidebar_position: 4
+description: Personal API keys for calling the API from scripts and services.
+---
+
+# API keys
+
+Personal API keys let scripts and services call the API as a user without a browser session.
+
+|               |                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------- |
+| **Enable**    | Always available to signed-in users                                                 |
+| **Endpoints** | `GET/POST /api/v1/api-keys`, `DELETE /api-keys/{id}`, `PATCH /api-keys/{id}/status` |
+| **Frontend**  | **Settings → Developers**                                                           |
+
+## Using a key
+
+Send the key in the `X-API-Key` header. Any endpoint that requires a signed-in user accepts it instead of a Bearer token:
+
+```bash
+curl -H "X-API-Key: <your key>" http://localhost:8000/api/v1/auth/me
+```
+
+If a request carries both a Bearer token and an API key, they must belong to the same user (`API_KEY_USER_MISMATCH` otherwise). Revoked or expired keys return `API_KEY_INVALID`.
+
+## Managing keys
+
+- **Create** with a name (1–100 characters) and an optional expiry. The full secret is shown once; the list only shows the key prefix.
+- **Disable or enable** a key without deleting it.
+- **Delete** a key permanently.
+- The table shows status, request count, last use, and expiry, six rows per page.
+
+## Realtime updates
+
+Create, delete, and status changes are pushed to the user's open tabs through [realtime events](/docs/features/realtime-events), so every tab stays in sync. Notifications are best effort: the HTTP result never depends on delivery, and clients refetch after reconnecting.
+
+## Code
+
+- Backend: `routers/v1/api_key.py`, `services/api_key.py`, `models/api_key.py`, `deps.py`
+- Frontend: `src/frontend/src/hooks/api/apiKey/`, `components/features/apiKey/`

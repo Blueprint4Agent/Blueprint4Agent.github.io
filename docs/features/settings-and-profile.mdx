@@ -1,0 +1,43 @@
+---
+title: Settings & profile
+sidebar_position: 8
+description: The app shell, settings sections, profile editing, themes, shortcuts, and toasts.
+---
+
+# Settings & profile
+
+B4React ships a complete app shell: a resizable sidebar, a settings workspace, profile editing, light and dark themes, keyboard shortcuts, and toast feedback.
+
+## App shell
+
+- A persistent sidebar: 48px collapsed, 224px expanded, resizable from 200 to 360px. The width is remembered.
+- Profile and connectivity status live in the sidebar footer.
+- On mobile the sidebar overlays content with a dismissible backdrop.
+
+## Settings sections
+
+| Section    | Who             | Contents                                   |
+| ---------- | --------------- | ------------------------------------------ |
+| General    | Everyone        | Language (English, Korean)                 |
+| Appearance | Everyone        | System, light, or dark theme with previews |
+| Profile    | Signed-in users | Name, profile photo, linked login methods  |
+| Developers | Signed-in users | [API keys](/docs/features/api-keys)        |
+
+The section is part of the URL (`/settings?section=...`). Guests are redirected to General when they open an account-only section.
+
+## Keyboard shortcuts
+
+| Shortcut                      | Action             |
+| ----------------------------- | ------------------ |
+| <kbd>Mod</kbd> + <kbd>B</kbd> | Toggle the sidebar |
+| <kbd>Mod</kbd> + <kbd>,</kbd> | Open settings      |
+
+<kbd>Mod</kbd> is Command on macOS and Control on Windows and Linux.
+
+## Toasts
+
+Explicit actions confirm once with a short capsule toast at the top of the screen: sign-in and sign-out, signup, verification resend, password reset, profile changes, API key actions, and copying secrets. Validation errors stay inline, and toasts never contain passwords, secrets, or tokens.
+
+## Localization
+
+All UI text is translated into English and Korean with react-i18next. Authentication emails follow the user's language.

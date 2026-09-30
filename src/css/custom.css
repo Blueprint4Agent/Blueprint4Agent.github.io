@@ -661,6 +661,17 @@ html[lang="ko-KR"] body {
     background: transparent;
 }
 
+/* Key/value "at a glance" tables are written with an empty header row. */
+.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) thead {
+    display: none;
+}
+
+.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) td:first-child {
+    width: 8.5rem;
+    color: var(--text);
+    white-space: nowrap;
+}
+
 .theme-doc-markdown th {
     color: var(--text);
     font-size: 0.75rem;
@@ -1045,6 +1056,14 @@ html[lang="ko-KR"] body {
 
 .b4-card__body {
     grid-area: body;
+}
+
+.b4-card__body > p {
+    margin: 0;
+}
+
+.b4-card__body > p + p {
+    margin-top: var(--space-2);
 }
 
 .b4-card--link {

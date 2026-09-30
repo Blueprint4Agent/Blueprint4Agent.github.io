@@ -7,3 +7,52 @@ description: B4FastAPI와 B4React가 기본으로 제공하는 기능입니다.
 # 기능
 
 이 섹션의 모든 기능은 블루프린트를 실행하는 즉시 동작합니다. 페이지마다 기능이 하는 일, 켜는 방법, 관련 설정, 코드 위치를 설명합니다.
+
+## 계정과 접근
+
+<CardGrid columns={2}>
+    <Card icon="shield" title="인증" href="/docs/features/authentication">
+        이메일 계정, refresh 쿠키, 로그인 잠금, 로그인 비활성화 모드
+    </Card>
+    <Card icon="mail" title="이메일" href="/docs/features/email">
+        Celery 워커로 발송하는 인증 메일과 비밀번호 재설정
+    </Card>
+    <Card icon="lock" title="OAuth" href="/docs/features/oauth">
+        인증된 이메일로 연결되는 Google·GitHub 로그인
+    </Card>
+    <Card icon="key" title="API 키" href="/docs/features/api-keys">
+        스크립트와 서비스용 `X-API-Key` 개인 키
+    </Card>
+    <Card icon="users" title="관리자와 역할" href="/docs/features/admin-and-roles">
+        관리자 사용자 목록과 `make user-role` 명령
+    </Card>
+</CardGrid>
+
+## 런타임
+
+<CardGrid columns={2}>
+    <Card icon="radio" title="실시간 이벤트" href="/docs/features/realtime-events">
+        Redis pub/sub 기반 사용자별 Server-Sent Events
+    </Card>
+    <Card icon="clock" title="백그라운드 작업" href="/docs/features/background-jobs">
+        독립 Celery 워커와 Beat 스케줄러
+    </Card>
+</CardGrid>
+
+## 프론트엔드
+
+<CardGrid columns={2}>
+    <Card icon="settings" title="설정과 프로필" href="/docs/features/settings-and-profile">
+        앱 셸, 설정 섹션, 테마, 단축키, 토스트
+    </Card>
+    <Card
+        icon="palette"
+        title="쇼케이스와 스타일 스튜디오"
+        href="/docs/features/showcase-and-style-studio"
+    >
+        공개 컴포넌트 카탈로그와 로컬 토큰 편집기
+    </Card>
+    <Card icon="monitor" title="데스크톱 앱" href="/docs/features/desktop-app">
+        연결 복구를 갖춘 선택형 Tauri 2 셸
+    </Card>
+</CardGrid>

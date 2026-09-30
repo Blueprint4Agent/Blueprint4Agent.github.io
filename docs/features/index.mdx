@@ -7,3 +7,52 @@ description: Features that B4FastAPI and B4React provide out of the box.
 # Features
 
 Everything on these pages works as soon as the blueprint runs. Each page explains what the feature does, how to turn it on, which settings control it, and where the code lives.
+
+## Accounts and access
+
+<CardGrid columns={2}>
+    <Card icon="shield" title="Authentication" href="/docs/features/authentication">
+        Email accounts, refresh cookies, lockout, and login-disabled mode.
+    </Card>
+    <Card icon="mail" title="Email" href="/docs/features/email">
+        Verification and password reset through a Celery worker.
+    </Card>
+    <Card icon="lock" title="OAuth" href="/docs/features/oauth">
+        Google and GitHub sign-in linked by verified email.
+    </Card>
+    <Card icon="key" title="API keys" href="/docs/features/api-keys">
+        Personal keys sent as `X-API-Key` for scripts and services.
+    </Card>
+    <Card icon="users" title="Admin & roles" href="/docs/features/admin-and-roles">
+        Admin user directory and the `make user-role` command.
+    </Card>
+</CardGrid>
+
+## Runtime
+
+<CardGrid columns={2}>
+    <Card icon="radio" title="Realtime events" href="/docs/features/realtime-events">
+        Per-user Server-Sent Events over Redis pub/sub.
+    </Card>
+    <Card icon="clock" title="Background jobs" href="/docs/features/background-jobs">
+        Standalone Celery worker and Beat scheduler.
+    </Card>
+</CardGrid>
+
+## Frontend
+
+<CardGrid columns={2}>
+    <Card icon="settings" title="Settings & profile" href="/docs/features/settings-and-profile">
+        App shell, settings sections, themes, shortcuts, and toasts.
+    </Card>
+    <Card
+        icon="palette"
+        title="Showcase & style studio"
+        href="/docs/features/showcase-and-style-studio"
+    >
+        Public component catalog and the local token editor.
+    </Card>
+    <Card icon="monitor" title="Desktop app" href="/docs/features/desktop-app">
+        Optional Tauri 2 shell with connectivity recovery.
+    </Card>
+</CardGrid>

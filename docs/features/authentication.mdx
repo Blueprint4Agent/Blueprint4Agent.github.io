@@ -1,0 +1,51 @@
+---
+title: Authentication
+sidebar_position: 1
+description: Email and password accounts, sessions, lockout, login-disabled mode, and recent accounts.
+---
+
+# Authentication
+
+Email and password accounts with short-lived access tokens, a refresh cookie, login lockout, and a login-disabled mode for single-user tools.
+
+|               |                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Enable**    | On by default (`LOGIN_ENABLED=true`)                                                                                   |
+| **Settings**  | `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `LOGIN_FAILED_LIMIT`, `LOGIN_LOCKED_MINUTES` |
+| **Endpoints** | `/api/v1/auth/signup`, `login`, `refresh`, `logout`, `me`, `token`                                                     |
+| **Frontend**  | `/login`, `/signup` dialogs over the showcase                                                                          |
+
+## Sessions
+
+1. `POST /api/v1/auth/login` returns an access token and the user in the body.
+2. It also sets two HttpOnly cookies, `template_refresh_token` and `template_refresh_sid`. Over HTTPS they are `Secure` with `SameSite=None`; over HTTP they use `SameSite=Lax`.
+3. With `remember_me=true` the cookies persist for `REFRESH_TOKEN_EXPIRE_DAYS`; otherwise they last for the browser session.
+4. B4React sends the access token as a Bearer token and calls `POST /api/v1/auth/refresh` when it expires.
+5. `POST /api/v1/auth/logout` clears the session.
+
+`POST /api/v1/auth/token` accepts the OAuth2 password form, so the **Authorize** button in Swagger UI works.
+
+## Lockout
+
+Failed logins are counted in Redis per client IP. After `LOGIN_FAILED_LIMIT` failures (default 5), logins from that IP return `ACCOUNT_LOCKED` for `LOGIN_LOCKED_MINUTES` (default 5). Failed responses include `remaining_attempts`.
+
+## Roles
+
+Every user has the role `user` or `admin`. Admin-only endpoints check the current database role on each request. See [Admin & roles](/docs/features/admin-and-roles).
+
+## Login-disabled mode
+
+Set `LOGIN_ENABLED=false` to run without accounts, for example for an internal tool:
+
+- Startup provisions a bootstrap admin from `BOOTSTRAP_USER_EMAIL` and `BOOTSTRAP_USER_NAME`.
+- `/config` hands the frontend a bootstrap access token, and the app opens signed in.
+- Email and OAuth are forced off at runtime.
+
+## Recent accounts
+
+**Remember accounts** is opt-in on the login form. The browser keeps up to five identities for 90 days (email, name, provider, last use, and an optional avatar thumbnail), never passwords or tokens. From the profile menu, users can switch to a remembered account or add another; switching always requires signing in again.
+
+## Code
+
+- Backend: `src/backend/app/routers/v1/auth.py`, `services/auth.py`, `deps.py`, `utils/cookies.py`
+- Frontend: `src/frontend/src/pages/login/`, `hooks/api/auth/`

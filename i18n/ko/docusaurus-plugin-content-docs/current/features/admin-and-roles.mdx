@@ -1,0 +1,51 @@
+---
+title: 관리자와 역할
+sidebar_position: 5
+description: 관리자 패널, 사용자 목록, 운영자 역할 관리 명령을 설명합니다.
+---
+
+# 관리자와 역할
+
+사용자는 `user` 또는 `admin` 역할을 가집니다. 관리자는 `/admin`에서 읽기 전용 사용자 목록을 볼 수 있고, 역할은 UI가 아닌 운영자 명령으로 변경합니다.
+
+|                |                                                                          |
+| -------------- | ------------------------------------------------------------------------ |
+| **활성화**     | `admin` 역할 사용자에게 항상 제공                                        |
+| **엔드포인트** | `GET /api/v1/auth/admin/users`, `GET /api/v1/auth/admin/user-role-stats` |
+| **프론트엔드** | 프로필 메뉴의 **관리자 패널**(`/admin`)                                  |
+| **명령**       | `make user-role EMAIL=<address> ROLE=admin\|user`                        |
+
+## 역할 지정
+
+```bash
+make user-role EMAIL=person@example.com ROLE=admin
+make user-role EMAIL=person@example.com ROLE=user
+```
+
+이 명령은 백엔드 환경(`src/backend/.env`)을 사용합니다. Docker 배포에서는 앱 컨테이너 안에서 실행합니다.
+
+```bash
+cd docker
+docker compose exec app .venv/bin/python -m app.manage_user_role --email person@example.com --role admin
+```
+
+- 이미 있는 활성 계정만 변경하며 계정이나 테이블을 만들지 않습니다.
+- 마지막 활성 관리자를 강등하는 요청은 거부됩니다.
+- `LOGIN_ENABLED=false`에서는 부트스트랩 사용자가 이미 관리자이므로 거부됩니다.
+- 새 역할은 다음 요청부터 적용됩니다.
+
+## 관리자 패널
+
+설정 레이아웃을 재사용하며 사용자마다 이름, 이메일, 역할, 계정·인증 상태, 로그인 방식, 가입일, 마지막 로그인 성공 시각을 보여줍니다.
+
+- 이름이나 이메일로 검색하고, 역할과 활성·비활성 상태로 필터링합니다.
+- 결과는 최신순으로 페이지네이션됩니다(`page_size` 1–100, 기본 20).
+- **활성**은 계정이 사용 가능하다는 뜻이며 현재 접속 중이라는 뜻이 아닙니다.
+- IP 주소, user agent, 비밀번호, 토큰, 제공자 식별자는 반환하지 않습니다.
+
+패널은 포커스, 화면 표시, 수동 새로고침, 연결 복구 시 갱신됩니다. 사용자 변경을 폴링하거나 스트리밍하지 않습니다.
+
+## 코드
+
+- 백엔드: `routers/v1/auth.py`(관리자 라우트), `manage_user_role.py`, `routers/list_query.py`
+- 프론트엔드: `src/frontend/src/pages/admin/`, `components/features/admin/`

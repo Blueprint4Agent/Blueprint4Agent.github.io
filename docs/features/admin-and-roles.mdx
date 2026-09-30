@@ -1,0 +1,51 @@
+---
+title: Admin & roles
+sidebar_position: 5
+description: The administrator panel, user directory, and operator role management.
+---
+
+# Admin & roles
+
+Users are either `user` or `admin`. Administrators get a read-only user directory at `/admin`; roles are changed by an operator command, not through the UI.
+
+|               |                                                                          |
+| ------------- | ------------------------------------------------------------------------ |
+| **Enable**    | Always available to users with the `admin` role                          |
+| **Endpoints** | `GET /api/v1/auth/admin/users`, `GET /api/v1/auth/admin/user-role-stats` |
+| **Frontend**  | **Admin panel** in the profile menu (`/admin`)                           |
+| **Command**   | `make user-role EMAIL=<address> ROLE=admin\|user`                        |
+
+## Assigning roles
+
+```bash
+make user-role EMAIL=person@example.com ROLE=admin
+make user-role EMAIL=person@example.com ROLE=user
+```
+
+The command uses the backend environment (`src/backend/.env`). In a Docker deployment, run it inside the app container:
+
+```bash
+cd docker
+docker compose exec app .venv/bin/python -m app.manage_user_role --email person@example.com --role admin
+```
+
+- It changes existing, active accounts only; it never creates accounts or tables.
+- Demoting the last active admin is rejected.
+- It is rejected when `LOGIN_ENABLED=false`, because the bootstrap user is already an admin.
+- The new role applies on the next request.
+
+## Admin panel
+
+The panel reuses the settings layout and lists each user's name, email, role, account and verification status, login methods, signup date, and latest successful login.
+
+- Search by name or email, filter by role and by enabled/disabled status.
+- Results are paginated (`page_size` 1–100, default 20), newest first.
+- **Active** means the account is enabled, not that the user is online.
+- IP addresses, user agents, passwords, tokens, and provider identifiers are never returned.
+
+The panel refreshes on focus, visibility, manual refresh, and connectivity recovery. It does not poll or stream user changes.
+
+## Code
+
+- Backend: `routers/v1/auth.py` (admin routes), `manage_user_role.py`, `routers/list_query.py`
+- Frontend: `src/frontend/src/pages/admin/`, `components/features/admin/`
