@@ -11,16 +11,14 @@ export default function CollapseButton({ onClick }: Props): ReactNode {
         description: "The title attribute for collapse button of doc sidebar",
     });
     return (
-        <div className="sidebar-footer">
-            <button
-                type="button"
-                title={label}
-                aria-label={label}
-                className="sidebar-toggle"
-                onClick={onClick}
-            >
-                <PanelLeftClose aria-hidden="true" />
-            </button>
-        </div>
+        <button
+            type="button"
+            title={label}
+            aria-label={label}
+            className="sidebar-toggle"
+            onClick={onClick}
+        >
+            <PanelLeftClose aria-hidden="true" />
+        </button>
     );
 }

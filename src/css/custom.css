@@ -21,7 +21,7 @@
 :root {
     --font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-    --nav-height: 3.25rem;
+    --nav-height: 2.75rem;
     --radius-pill: 999px;
     --radius-panel: 1rem;
     --radius-control: 0.5rem;
@@ -117,6 +117,7 @@
     --ifm-menu-color-active: var(--text);
     --ifm-dropdown-background-color: var(--popover-bg);
     --doc-sidebar-width: var(--sidebar-expanded-width);
+    --doc-sidebar-hidden-width: 3rem;
     --docusaurus-highlighted-code-line-bg: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
@@ -246,24 +247,36 @@ html[lang="ko-KR"] body {
     display: block;
 }
 
-/* ---------- Navbar (B4React PublicNavbar + BrandBanner) ---------- */
+/* ---------- Navbar (B4React PublicNavbar) ---------- */
 
 .navbar {
-    border-bottom: 1px solid color-mix(in oklab, var(--panel-border) 85%, transparent 15%);
+    height: var(--nav-height);
+    padding: 0 var(--space-4);
+    border-bottom: 0.5px solid var(--panel-border);
     background: var(--panel);
-    backdrop-filter: blur(10px);
+    /* No backdrop-filter: it would trap the fixed mobile drawer inside the navbar. */
+}
+
+.navbar__inner {
+    height: 100%;
+}
+
+.navbar__items {
+    gap: var(--space-2);
 }
 
 .navbar__brand {
-    gap: 10px;
-    margin-right: var(--space-4);
+    gap: var(--space-2);
+    height: var(--rail-control-size);
+    margin-right: var(--space-3);
+    padding-right: var(--space-2);
+    border-radius: var(--radius-control);
 }
 
 .navbar__logo {
-    width: 40px;
-    height: 40px;
+    width: 1.5rem;
+    height: 1.5rem;
     margin-right: 0;
-    padding: 5px;
 }
 
 .navbar__logo img {
@@ -273,27 +286,24 @@ html[lang="ko-KR"] body {
 
 .navbar__title {
     color: var(--text);
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 1;
+    font:
+        600 1rem/1 var(--font-family),
+        system-ui,
+        sans-serif;
+    letter-spacing: -0.03em;
 }
 
-.navbar__items {
-    gap: var(--space-1);
-}
-
-/* Navbar links reuse the sidebar item geometry. */
+/* Text links: 13px/500, soft until hovered or active. */
 .navbar__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    height: var(--sidebar-row-height);
-    padding: var(--space-1) var(--space-3);
+    height: var(--rail-control-size);
+    padding: 0 var(--space-2);
     border-radius: var(--radius-control);
     color: var(--text-soft);
     font:
-        500 0.8125rem/1.25 var(--font-family),
+        500 0.8125rem/1 var(--font-family),
         system-ui,
         sans-serif;
     transition:
@@ -301,15 +311,26 @@ html[lang="ko-KR"] body {
         color 120ms ease;
 }
 
-.navbar__link:hover {
-    color: var(--text);
-    background: color-mix(in oklab, var(--text) 12%, transparent);
-}
-
+.navbar__link:hover,
 .navbar__link--active,
 .navbar__link--active:hover {
     color: var(--text);
+    background: transparent;
+}
+
+/* Right-hand controls share the 32px control height. */
+.navbar__items--right .dropdown > .navbar__link {
+    padding: 0 var(--space-3);
+}
+
+.navbar__items--right .dropdown > .navbar__link:hover,
+.navbar__items--right > .navbar-icon-link:hover {
     background: color-mix(in oklab, var(--text) 8%, transparent);
+}
+
+.navbar__items--right .dropdown > .navbar__link svg {
+    width: 1rem;
+    height: 1rem;
 }
 
 .navbar__items--right .dropdown > .navbar__link::after {
@@ -328,6 +349,11 @@ html[lang="ko-KR"] body {
     padding: 0;
 }
 
+.navbar-icon-link svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
 .navbar__toggle {
     align-items: center;
     color: var(--text-soft);
@@ -337,7 +363,31 @@ html[lang="ko-KR"] body {
     background: var(--sidebar-bg);
 }
 
+.navbar-sidebar__back {
+    margin: var(--space-2) var(--space-2) var(--space-1);
+    width: calc(100% - 2 * var(--space-2));
+    height: var(--sidebar-row-height);
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--text-soft);
+    font:
+        500 0.8125rem/1.25 var(--font-family),
+        system-ui,
+        sans-serif;
+}
+
+.navbar-sidebar__back:hover {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 12%, transparent);
+}
+
+.navbar-sidebar__items .menu {
+    padding: var(--space-1) var(--space-2) var(--space-6);
+}
+
 .navbar-sidebar__brand {
+    height: var(--nav-height);
     border-bottom: 0.5px solid var(--panel-border);
 }
 
@@ -427,24 +477,56 @@ html[lang="ko-KR"] body {
     background: color-mix(in oklab, var(--input-bg) 82%, transparent 18%);
 }
 
-/* ---------- Docs sidebar (B4React AppSidebar, expanded) ---------- */
+/* ---------- Docs sidebar (B4React AppSidebar) ---------- */
 
 .theme-doc-sidebar-container {
     border-right: 0.5px solid var(--panel-border) !important;
     background: var(--sidebar-bg);
 }
 
-.theme-doc-sidebar-container [class*="sidebarViewport"] {
+/* Expanded: header (title + PanelLeftClose) above a scrolling menu. */
+.app-sidebar {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    padding-top: var(--nav-height);
+    width: var(--doc-sidebar-width);
+    background: var(--sidebar-bg);
+}
+
+.app-sidebar--hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.app-sidebar__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-2) var(--space-1);
+}
+
+.app-sidebar__title {
+    padding-inline: var(--space-3);
+    color: var(--text);
+    font:
+        500 0.875rem/1.25 var(--font-family),
+        system-ui,
+        sans-serif;
+    letter-spacing: -0.02em;
 }
 
 .theme-doc-sidebar-container nav.menu {
-    padding: var(--space-3) var(--space-2);
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-1) var(--space-2) var(--space-6);
 }
 
 .theme-doc-sidebar-menu.menu__list {
-    padding: 0 0 var(--space-6);
+    padding: 0;
 }
 
 .menu__list {
@@ -533,18 +615,7 @@ html[lang="ko-KR"] body {
     animation: sidebar-label-in 150ms ease both;
 }
 
-/* Footer and rail with the B4React sidebar toggle (32px, PanelLeftClose/Open). */
-.sidebar-footer {
-    position: sticky;
-    bottom: 0;
-    margin-top: auto;
-    display: flex;
-    justify-content: flex-end;
-    padding: var(--space-2);
-    border-top: 0.5px solid var(--panel-border);
-    background: var(--sidebar-bg);
-}
-
+/* B4React .app-sidebar__toggle (32px, 16px icon). */
 .sidebar-toggle {
     display: inline-flex;
     align-items: center;
@@ -569,20 +640,21 @@ html[lang="ko-KR"] body {
     background: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
-.sidebar-rail {
-    position: sticky;
-    top: var(--nav-height);
-    display: flex;
-    justify-content: center;
-    width: 3rem;
-    height: calc(100vh - var(--nav-height));
-    padding-top: var(--space-3);
-    border-right: 0.5px solid var(--panel-border);
-    background: var(--sidebar-bg);
+/* Collapsed: a 48px rail (B4React --sidebar-width) with the open toggle on top. */
+@media (min-width: 997px) {
+    .theme-doc-sidebar-container[class*="docSidebarContainerHidden"] {
+        width: 3rem !important;
+        cursor: default;
+    }
 }
 
-[class*="docSidebarContainer"][class*="docSidebarContainerHidden"] {
-    width: 3rem !important;
+.sidebar-rail {
+    position: absolute;
+    inset: var(--nav-height) 0 0 0;
+    display: flex;
+    justify-content: center;
+    padding-top: var(--space-3);
+    background: var(--sidebar-bg);
 }
 
 /* ---------- Doc layout ---------- */
@@ -600,6 +672,13 @@ html[lang="ko-KR"] body {
 @layer docusaurus.theme-classic {
     main[class*="docMainContainer"] > .container > .row > .col {
         max-width: none !important;
+    }
+
+    /* Keep the reading grid centered when the sidebar is collapsed. */
+    main[class*="docMainContainer"] > .container[class*="docItemWrapperEnhanced"] {
+        max-width: calc(
+            var(--doc-column) + var(--doc-gap) + var(--doc-toc) + 2 * var(--doc-gutter)
+        ) !important;
     }
 }
 
@@ -1600,15 +1679,6 @@ h1 .ui-status-badge {
 
     .theme-toggle-button__title {
         display: none;
-    }
-
-    .navbar__logo {
-        width: 34px;
-        height: 34px;
-    }
-
-    .navbar__title {
-        font-size: 20px;
     }
 
     /* Infima hides navbar items on mobile; keep that for links too. */
