@@ -16,6 +16,15 @@ description: 스크립트와 서비스에서 API를 호출하기 위한 개인 A
 
 ## 키 사용
 
+```mermaid
+flowchart LR
+    C["스크립트·서비스"] -- "X-API-Key" --> D["deps.get_current_user"]
+    B["브라우저"] -- "Bearer 토큰" --> D
+    D -- "유효, 폐기·만료 아님" --> U["현재 사용자"]
+    D -- "서로 다른 사용자" --> X["API_KEY_USER_MISMATCH"]
+    D -- "폐기 또는 만료" --> Y["API_KEY_INVALID"]
+```
+
 키는 `X-API-Key` 헤더로 보냅니다. 로그인이 필요한 모든 엔드포인트가 Bearer 토큰 대신 이 헤더를 받습니다.
 
 ```bash

@@ -10,6 +10,19 @@ Every task in B4Agent follows the same loop, whether a person or an agent does t
 
 ## Task loop
 
+```mermaid
+flowchart LR
+    R["Read guides"] --> B["Branch"]
+    B --> P["Draft worklog"]
+    P --> I["Implement"]
+    I --> V["make verify-plan<br/>make verify"]
+    V -- "fail" --> I
+    V -- "pass" --> W["Record results"]
+    W --> G["git-governance-check"]
+    G --> C["Commit + ready PR"]
+    C --> CI["CI re-verifies PR range"]
+```
+
 1. **Read.** `AGENTS.md`, then the domain guide (`src/backend/BACKEND.md` or `src/frontend/FRONTEND.md`), then the relevant README or test guide.
 2. **Branch.** Create `<type>/<short-kebab-title>`.
 3. **Plan.** Draft `worklog/NNNN-title.md` from `.github/WORKLOG_TEMPLATE.md`: reason, design, verification plan, and the runtime loops involved.
@@ -27,6 +40,16 @@ make verify        # run them
 ```
 
 `scripts/verification.py` classifies the changed files. Local runs and CI use the same planner.
+
+```mermaid
+flowchart LR
+    F["Changed files"] --> P["scripts/verification.py<br/>strongest scope wins"]
+    P -- "auth, API, contracts, deps,<br/>config, CI, unknown" --> FULL["Full"]
+    P -- "components, pages,<br/>styles, assets" --> UI["UI"]
+    P -- "runtime code, tests" --> BEH["Behavior"]
+    P -- "locale string values" --> COPY["Copy"]
+    P -- "Markdown docs, worklogs" --> DOCS["Docs"]
+```
 
 | Scope    | Changes                                                                                              | Verification                                                                     |
 | -------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |

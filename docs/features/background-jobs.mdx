@@ -15,6 +15,14 @@ Celery 5.6 runs slow, retryable work outside the API process. Authentication ema
 | **Local**    | `make celery-worker`, `make celery-beat`, `make celery-ping`, `make celery-probe` |
 | **Docker**   | `make docker-celery-up`, `make docker-celery-down` (`celery` Compose profile)     |
 
+```mermaid
+flowchart LR
+    SV["Service<br/>await publish_task"] --> Q[("Redis<br/>CELERY_QUEUE")]
+    B["celery-beat<br/>optional, one per deployment"] --> Q
+    Q --> W["celery-worker<br/>solo locally, prefork in production"]
+    W --> L["Logs with task and trace IDs"]
+```
+
 ## Run locally
 
 Start Redis, then use separate terminals:

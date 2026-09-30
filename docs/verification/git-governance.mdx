@@ -71,4 +71,15 @@ With `COMMIT_TITLE`, the check validates the staged snapshot; without it, it che
 
 ## Across repositories
 
+```mermaid
+flowchart LR
+    subgraph fe["B4React"]
+        F1["Branch + commits + worklogs"] --> F2["PR checks"] --> F3["Merge commit"]
+    end
+    subgraph be["B4FastAPI"]
+        B1["Update gitlink + worklog"] --> B2["Backend, Frontend,<br/>Git governance checks"] --> B3["Merge commit"]
+    end
+    F3 --> B1
+```
+
 B4React has the same rules and its own harness. Frontend changes are committed and merged in B4React first; B4FastAPI then commits the updated gitlink with its own worklog. This manual repository uses the same branch, commit, worklog, and PR rules.

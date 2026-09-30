@@ -58,6 +58,25 @@ The organization also maintains [B4Bot](https://github.com/Blueprint4Agent/B4Bot
 
 ## How the pieces connect
 
+```mermaid
+flowchart LR
+    subgraph backend["Backend repository"]
+        API["B4FastAPI"]
+        SB["B4SpringBoot (planned)"]
+    end
+    subgraph frontend["B4React"]
+        C["contracts/openapi.json"]
+        T["Generated TypeScript types"]
+        D["dist/"]
+    end
+    API -- "make contract-export" --> C
+    SB -. "same contract" .-> C
+    C -- "make api-generate" --> T
+    T --> D
+    D -- "pinned submodule + make frontend-package" --> S["One server: API + SPA"]
+    API --> S
+```
+
 1. The backend exports its OpenAPI schema to `contracts/openapi.json`.
 2. B4React adopts that snapshot, generates TypeScript types, and builds `dist/`.
 3. The backend pins a reviewed B4React commit and packages its `dist/` into the backend static directory, so one server serves both the API and the SPA.

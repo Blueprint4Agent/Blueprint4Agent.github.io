@@ -10,6 +10,37 @@ description: Compose 서비스, 배포 모드, 호스트 포트, 배포 명령, 
 
 ## 서비스
 
+```mermaid
+flowchart LR
+    subgraph core["기본 서비스"]
+        APP["app :8000"]
+        PG[("postgres")]
+        RD[("redis")]
+    end
+    subgraph jobs["celery 프로필"]
+        W["celery-worker"]
+        BT["celery-beat"]
+    end
+    subgraph obs["observability 프로필"]
+        OC["otel-collector"]
+        TP[("tempo")]
+        LK[("loki")]
+        PR[("prometheus")]
+        GF["grafana :3000"]
+    end
+    APP --> PG
+    APP --> RD
+    W --> RD
+    BT --> RD
+    APP -- "OTLP" --> OC
+    OC --> TP
+    OC --> LK
+    APP -. "/metrics" .-> PR
+    TP --> GF
+    LK --> GF
+    PR --> GF
+```
+
 | 서비스           | 이미지                                         | 시작 조건                                                      | 용도                                        |
 | ---------------- | ---------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------- |
 | `app`            | `APP_IMAGE`(기본 `blueprint4fastapi:local`)    | `make docker-up`                                               | FastAPI API와 SPA                           |
@@ -37,6 +68,15 @@ description: Compose 서비스, 배포 모드, 호스트 포트, 배포 명령, 
 `make docker-up`은 해석된 앱 환경을 읽고 모드에 필요한 인프라만 시작합니다.
 
 ## 배포
+
+```mermaid
+flowchart LR
+    A["env 검사 + 빌드"] --> C["인프라 시작<br/>기존 컨테이너 유지"]
+    C --> D["앱 재생성"]
+    D --> E["/health/ready"]
+    E -- "정상" --> F["이미지 내보내기"]
+    E -- "시간 초과" --> X["중단, 롤백 없음"]
+```
 
 ```bash
 make init                 # 최초 1회: docker/.env 생성

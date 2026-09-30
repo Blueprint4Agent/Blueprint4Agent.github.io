@@ -17,6 +17,19 @@ A per-user Server-Sent Events stream pushes domain events to every open tab, so 
 
 ## How it works
 
+```mermaid
+sequenceDiagram
+    participant S as Service
+    participant R as Redis pub/sub
+    participant E as /api/v1/events/stream
+    participant H as B4React realtime hook
+    S->>S: Commit state change
+    S->>R: Publish typed domain event
+    R->>E: Deliver to user channel
+    E-->>H: SSE event (heartbeat every SSE_HEARTBEAT_SECONDS)
+    H->>H: Refresh affected state
+```
+
 1. A service finishes a state change, for example creating an API key.
 2. It publishes a typed domain event (`app/core/realtime/domain_events/`) through the Redis broker.
 3. The stream sends it to the user's connections, with heartbeats every `SSE_HEARTBEAT_SECONDS`.

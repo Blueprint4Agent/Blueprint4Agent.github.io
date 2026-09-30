@@ -16,6 +16,15 @@ Personal API keys let scripts and services call the API as a user without a brow
 
 ## Using a key
 
+```mermaid
+flowchart LR
+    C["Script or service"] -- "X-API-Key" --> D["deps.get_current_user"]
+    B["Browser"] -- "Bearer token" --> D
+    D -- "valid, not revoked or expired" --> U["Current user"]
+    D -- "different users" --> X["API_KEY_USER_MISMATCH"]
+    D -- "revoked or expired" --> Y["API_KEY_INVALID"]
+```
+
 Send the key in the `X-API-Key` header. Any endpoint that requires a signed-in user accepts it instead of a Bearer token:
 
 ```bash

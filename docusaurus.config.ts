@@ -27,6 +27,11 @@ const config: Config = {
 
     onBrokenLinks: "throw",
 
+    markdown: {
+        mermaid: true,
+    },
+    themes: ["@docusaurus/theme-mermaid"],
+
     // Even if you don't use internationalization, you can use this field to set
     // useful metadata like html lang. For example, if your site is Chinese, you
     // may want to replace "en" with "zh-Hans".
@@ -97,6 +102,15 @@ const config: Config = {
                     position: "right",
                 },
             ],
+        },
+        mermaid: {
+            theme: { light: "neutral", dark: "dark" },
+            options: {
+                fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+                fontSize: 13,
+                flowchart: { curve: "basis", padding: 12, nodeSpacing: 36, rankSpacing: 44 },
+                sequence: { actorMargin: 48, boxMargin: 8, messageMargin: 28, mirrorActors: false },
+            },
         },
         prism: {
             theme: prismThemes.github,

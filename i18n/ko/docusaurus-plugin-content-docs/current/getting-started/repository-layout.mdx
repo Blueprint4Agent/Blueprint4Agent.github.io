@@ -53,7 +53,29 @@ src/backend/app/
 
 라우터는 서비스에 위임하고, 하위 계층은 라우터를 import하지 않습니다. `make architecture-check`가 이 경계를 강제합니다.
 
+```mermaid
+flowchart LR
+    R["routers/v1"] --> D["deps.py<br/>인증, 세션"]
+    R --> S["services"]
+    S --> M["models"]
+    S --> U["utils"]
+    S --> C["core<br/>db, cache, celery, mail, realtime"]
+    S -. "도메인 예외" .-> H["전역 핸들러"]
+```
+
 ## 서브모듈 작업
+
+```mermaid
+sequenceDiagram
+    participant Dev as 개발자
+    participant FE as B4React
+    participant BE as B4FastAPI
+    Dev->>FE: src/frontend에서 브랜치 생성, PR 열기
+    FE-->>Dev: 검사 통과, 병합
+    Dev->>BE: src/frontend를 병합된 커밋으로 체크아웃
+    Dev->>BE: make verify, gitlink와 worklog 커밋
+    BE-->>Dev: Backend, Frontend, Git governance 검사 통과
+```
 
 서브모듈은 분리된(detached) 커밋으로 체크아웃됩니다. 프론트엔드 변경은 B4React에 먼저 반영합니다.
 

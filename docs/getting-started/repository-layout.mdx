@@ -53,7 +53,29 @@ src/backend/app/
 
 Routers delegate to services, and lower layers never import routers. `make architecture-check` enforces these boundaries.
 
+```mermaid
+flowchart LR
+    R["routers/v1"] --> D["deps.py<br/>auth, session"]
+    R --> S["services"]
+    S --> M["models"]
+    S --> U["utils"]
+    S --> C["core<br/>db, cache, celery, mail, realtime"]
+    S -. "domain exception" .-> H["global handlers"]
+```
+
 ## Working with the submodule
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant FE as B4React
+    participant BE as B4FastAPI
+    Dev->>FE: Branch in src/frontend, open PR
+    FE-->>Dev: Checks pass, merge
+    Dev->>BE: Checkout merged commit in src/frontend
+    Dev->>BE: make verify, commit gitlink + worklog
+    BE-->>Dev: Backend, Frontend, Git governance checks pass
+```
 
 The submodule is checked out at a detached commit. Frontend changes go to B4React first:
 

@@ -27,6 +27,14 @@ description: Celery 워커가 SMTP로 발송하는 이메일 인증과 비밀번
 
 ## 발송
 
+```mermaid
+flowchart LR
+    A["AuthService<br/>가입, 재발송, 비밀번호 찾기"] -- "b4fastapi.mail.send 발행" --> Q[("Redis 브로커")]
+    Q --> W["Celery 워커"]
+    W -- "1회 시도 + 최대 EMAIL_QUEUE_MAX_RETRIES" --> S["SMTP"]
+    W -- "만료, 형식 오류, 최종 실패" --> F[("mail:failures 해시")]
+```
+
 1. API는 `b4fastapi.mail.send` 작업을 발행하며 SMTP를 직접 보내지 않습니다.
 2. 워커는 SMTP를 한 번 시도하고, 실패하면 `EMAIL_QUEUE_RETRY_DELAY_SECONDS` 간격으로 최대 `EMAIL_QUEUE_MAX_RETRIES`(기본 3)회 재시도합니다.
 3. 만료되었거나 형식이 잘못된 작업은 발송하지 않고 보관합니다.

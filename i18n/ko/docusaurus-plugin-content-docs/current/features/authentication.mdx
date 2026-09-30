@@ -17,6 +17,20 @@ description: 이메일·비밀번호 계정, 세션, 로그인 잠금, 로그인
 
 ## 세션
 
+```mermaid
+sequenceDiagram
+    participant UI as B4React
+    participant API as FastAPI
+    participant R as Redis
+    UI->>API: POST /api/v1/auth/login
+    API->>R: 클라이언트 IP 실패 횟수 확인·초기화
+    API-->>UI: 액세스 토큰 + 사용자, refresh 쿠키 설정
+    UI->>API: Authorization: Bearer로 API 호출
+    API-->>UI: 액세스 토큰 만료 시 401
+    UI->>API: POST /api/v1/auth/refresh (쿠키)
+    API-->>UI: 새 액세스 토큰
+```
+
 1. `POST /api/v1/auth/login`은 본문으로 액세스 토큰과 사용자 정보를 반환합니다.
 2. 동시에 HttpOnly 쿠키 `template_refresh_token`, `template_refresh_sid` 두 개를 설정합니다. HTTPS에서는 `Secure`, `SameSite=None`, HTTP에서는 `SameSite=Lax`를 사용합니다.
 3. `remember_me=true`이면 쿠키가 `REFRESH_TOKEN_EXPIRE_DAYS` 동안 유지되고, 아니면 브라우저 세션 동안만 유지됩니다.

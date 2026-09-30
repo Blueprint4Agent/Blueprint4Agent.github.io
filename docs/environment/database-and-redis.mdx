@@ -10,6 +10,15 @@ The backend runs on SQLite with an in-memory Redis for local development, and on
 
 ## Choosing a database
 
+```mermaid
+flowchart LR
+    Q["Where the backend runs"]
+    Q -- "host, no Docker" --> L["SQLite + in-memory Redis<br/>(defaults)"]
+    Q -- "host + Docker services" --> H["PostgreSQL + Redis<br/>DB_HOST=localhost"]
+    Q -- "Docker app" --> C["PostgreSQL + Redis<br/>DB_HOST=postgres, REDIS_HOST=redis"]
+    Q -- "managed services" --> E["External PostgreSQL + Redis"]
+```
+
 | Runtime                             | `DB_DRIVER`          | `DB_NAME`             | `DB_HOST`   |
 | ----------------------------------- | -------------------- | --------------------- | ----------- |
 | Local SQLite (development default)  | `sqlite+aiosqlite`   | `template.db` (file)  | Ignored     |

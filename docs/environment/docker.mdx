@@ -10,6 +10,37 @@ One app image serves the API and the packaged B4React frontend. Docker Compose a
 
 ## Services
 
+```mermaid
+flowchart LR
+    subgraph core["Default services"]
+        APP["app :8000"]
+        PG[("postgres")]
+        RD[("redis")]
+    end
+    subgraph jobs["celery profile"]
+        W["celery-worker"]
+        BT["celery-beat"]
+    end
+    subgraph obs["observability profile"]
+        OC["otel-collector"]
+        TP[("tempo")]
+        LK[("loki")]
+        PR[("prometheus")]
+        GF["grafana :3000"]
+    end
+    APP --> PG
+    APP --> RD
+    W --> RD
+    BT --> RD
+    APP -- "OTLP" --> OC
+    OC --> TP
+    OC --> LK
+    APP -. "/metrics" .-> PR
+    TP --> GF
+    LK --> GF
+    PR --> GF
+```
+
 | Service          | Image                                           | Starts with                                                       | Purpose                                               |
 | ---------------- | ----------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
 | `app`            | `APP_IMAGE` (default `blueprint4fastapi:local`) | `make docker-up`                                                  | FastAPI API and SPA                                   |
@@ -37,6 +68,15 @@ Choose a mode in `docker/.env`:
 `make docker-up` reads the resolved app environment and starts only the infrastructure the mode needs.
 
 ## Deploy
+
+```mermaid
+flowchart LR
+    A["env check + build"] --> C["Start infra<br/>keep existing containers"]
+    C --> D["Recreate app"]
+    D --> E["/health/ready"]
+    E -- "healthy" --> F["Export image"]
+    E -- "timeout" --> X["Stop, no rollback"]
+```
 
 ```bash
 make init                 # once: creates docker/.env

@@ -27,6 +27,14 @@ Request confirmations never reveal whether an account exists.
 
 ## Delivery
 
+```mermaid
+flowchart LR
+    A["AuthService<br/>signup, resend, forgot"] -- "publish b4fastapi.mail.send" --> Q[("Redis broker")]
+    Q --> W["Celery worker"]
+    W -- "attempt + up to EMAIL_QUEUE_MAX_RETRIES" --> S["SMTP"]
+    W -- "expired, malformed, or final failure" --> F[("mail:failures hash")]
+```
+
 1. The API publishes a `b4fastapi.mail.send` task; it never sends SMTP itself.
 2. The worker makes one SMTP attempt plus up to `EMAIL_QUEUE_MAX_RETRIES` delayed retries (default 3, `EMAIL_QUEUE_RETRY_DELAY_SECONDS` apart).
 3. Expired or malformed jobs are archived without sending.

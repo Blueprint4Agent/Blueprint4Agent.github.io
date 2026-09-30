@@ -10,6 +10,16 @@ description: project.json으로 복사한 블루프린트의 이름, 브랜드, 
 
 ## 작업 흐름
 
+```mermaid
+flowchart LR
+    M["project.json"] --> P["make project-plan<br/>검증, 파일 목록"]
+    P --> I["make project-init<br/>백업 후 적용"]
+    I --> E["src/backend/.env<br/>docker/.env"]
+    I --> F["src/frontend/.env<br/>project.local.json<br/>public/project-brand/"]
+    E --> K["make project-check"]
+    F --> K
+```
+
 ```bash
 make frontend-init
 make install

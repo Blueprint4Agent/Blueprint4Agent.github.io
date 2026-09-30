@@ -8,11 +8,15 @@ description: Metrics, traces, and logs with Prometheus, Tempo, Loki, and Grafana
 
 The backend exposes Prometheus metrics and exports OpenTelemetry traces and logs. A local stack of the Collector, Tempo, Loki, Prometheus, and Grafana runs under the `observability` Compose profile.
 
-```text
-Backend ──OTLP gRPC──▶ OTel Collector ──▶ Tempo (traces)
-        │                             └─▶ Loki  (logs)
-        └── /metrics ◀── Prometheus
-                               Grafana queries Tempo, Loki, and Prometheus
+```mermaid
+flowchart LR
+    B["Backend"] -- "OTLP gRPC :4317" --> C["OTel Collector"]
+    C -- "traces" --> T[("Tempo")]
+    C -- "logs" --> L[("Loki")]
+    P[("Prometheus")] -- "scrape /metrics" --> B
+    G["Grafana :3000"] --> T
+    G --> L
+    G --> P
 ```
 
 | Signal  | Enable                           | Store                  | Query in Grafana                 |

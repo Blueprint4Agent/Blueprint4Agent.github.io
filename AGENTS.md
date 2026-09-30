@@ -24,6 +24,8 @@ It is a **Docusaurus** site deployed with **GitHub Pages**.
 - Use clear section headings and short actionable paragraphs.
 - Keep navigation predictable and avoid duplicate content across pages.
 - When adding or changing pages, ensure sidebar/category structure stays consistent.
+- Draw flows, sequences, states, and topology with Mermaid code blocks, not ASCII art. Prefer left-to-right flowcharts with short labels, avoid large decision diamonds, and never use reserved words such as `default` as subgraph IDs. Check every diagram renders in light and dark themes.
+- Use the B4React-based MDX components (`Card`, `CardGrid`, `Badge`) and admonitions instead of raw HTML.
 
 ## Required Baseline Content
 

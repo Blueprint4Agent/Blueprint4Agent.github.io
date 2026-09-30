@@ -58,6 +58,25 @@ B4Agent는 에이전틱 코딩을 위한 풀스택 웹 서버 블루프린트입
 
 ## 구성 요소의 연결 방식
 
+```mermaid
+flowchart LR
+    subgraph backend["백엔드 저장소"]
+        API["B4FastAPI"]
+        SB["B4SpringBoot (예정)"]
+    end
+    subgraph frontend["B4React"]
+        C["contracts/openapi.json"]
+        T["생성된 TypeScript 타입"]
+        D["dist/"]
+    end
+    API -- "make contract-export" --> C
+    SB -. "같은 계약" .-> C
+    C -- "make api-generate" --> T
+    T --> D
+    D -- "고정된 서브모듈 + make frontend-package" --> S["하나의 서버: API + SPA"]
+    API --> S
+```
+
 1. 백엔드가 OpenAPI 스키마를 `contracts/openapi.json`으로 내보냅니다.
 2. B4React가 그 스냅샷을 채택하고 TypeScript 타입을 생성한 뒤 `dist/`를 빌드합니다.
 3. 백엔드는 검토된 B4React 커밋을 고정하고 그 `dist/`를 백엔드 정적 디렉터리에 패키징합니다. 그래서 하나의 서버가 API와 SPA를 함께 제공합니다.

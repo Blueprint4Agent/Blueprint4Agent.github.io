@@ -26,6 +26,20 @@ The authorize, token, and user-info URLs default to each provider's public endpo
 
 ## Flow
 
+```mermaid
+sequenceDiagram
+    participant UI as B4React
+    participant API as FastAPI
+    participant P as Google / GitHub
+    UI->>API: GET /oauth/providers
+    UI->>API: GET /oauth/{provider}/start
+    API-->>UI: Redirect with state
+    UI->>P: Authorize
+    P-->>API: GET /oauth/{provider}/callback
+    API->>API: Match or link user by verified email
+    API-->>UI: Refresh cookie, redirect to success path
+```
+
 1. The login dialog lists enabled providers from `/oauth/providers`. Disabled providers stay hidden.
 2. `/oauth/{provider}/start` redirects to the provider with a state value valid for `OAUTH_STATE_EXPIRE_MINUTES`.
 3. The callback signs the user in with the refresh cookie and redirects to `OAUTH_FRONTEND_SUCCESS_PATH`, or to `OAUTH_FRONTEND_FAILURE_PATH` on failure.

@@ -10,6 +10,15 @@ description: SQLite와 PostgreSQL, Alembic 마이그레이션, 백업과 복구,
 
 ## 데이터베이스 선택
 
+```mermaid
+flowchart LR
+    Q["백엔드 실행 위치"]
+    Q -- "호스트, Docker 없음" --> L["SQLite + 인메모리 Redis<br/>(기본값)"]
+    Q -- "호스트 + Docker 서비스" --> H["PostgreSQL + Redis<br/>DB_HOST=localhost"]
+    Q -- "Docker 앱" --> C["PostgreSQL + Redis<br/>DB_HOST=postgres, REDIS_HOST=redis"]
+    Q -- "관리형 서비스" --> E["외부 PostgreSQL + Redis"]
+```
+
 | 실행 환경                         | `DB_DRIVER`          | `DB_NAME`                | `DB_HOST`   |
 | --------------------------------- | -------------------- | ------------------------ | ----------- |
 | 로컬 SQLite(개발 기본값)          | `sqlite+aiosqlite`   | `template.db`(파일)      | 무시        |

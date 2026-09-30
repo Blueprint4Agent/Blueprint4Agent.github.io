@@ -10,6 +10,16 @@ After copying the blueprint, describe the new project once in `project.json`. Th
 
 ## Workflow
 
+```mermaid
+flowchart LR
+    M["project.json"] --> P["make project-plan<br/>validate, list files"]
+    P --> I["make project-init<br/>back up, then apply"]
+    I --> E["src/backend/.env<br/>docker/.env"]
+    I --> F["src/frontend/.env<br/>project.local.json<br/>public/project-brand/"]
+    E --> K["make project-check"]
+    F --> K
+```
+
 ```bash
 make frontend-init
 make install

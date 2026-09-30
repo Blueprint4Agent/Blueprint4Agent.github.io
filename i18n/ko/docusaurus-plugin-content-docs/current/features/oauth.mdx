@@ -26,6 +26,20 @@ authorize, token, user-info URL은 각 제공자의 공개 엔드포인트가 �
 
 ## 흐름
 
+```mermaid
+sequenceDiagram
+    participant UI as B4React
+    participant API as FastAPI
+    participant P as Google / GitHub
+    UI->>API: GET /oauth/providers
+    UI->>API: GET /oauth/{provider}/start
+    API-->>UI: state와 함께 리다이렉트
+    UI->>P: 권한 승인
+    P-->>API: GET /oauth/{provider}/callback
+    API->>API: 인증된 이메일로 사용자 매칭 또는 연결
+    API-->>UI: refresh 쿠키, 성공 경로로 리다이렉트
+```
+
 1. 로그인 대화상자는 `/oauth/providers`에서 활성화된 제공자를 표시합니다. 비활성화된 제공자는 숨겨집니다.
 2. `/oauth/{provider}/start`는 `OAUTH_STATE_EXPIRE_MINUTES` 동안 유효한 state 값과 함께 제공자로 리다이렉트합니다.
 3. 콜백은 refresh 쿠키로 로그인시키고 `OAUTH_FRONTEND_SUCCESS_PATH`로, 실패하면 `OAUTH_FRONTEND_FAILURE_PATH`로 리다이렉트합니다.

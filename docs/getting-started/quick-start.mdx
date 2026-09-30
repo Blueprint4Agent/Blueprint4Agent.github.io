@@ -38,6 +38,14 @@ make install    # backend (uv) and frontend (npm) dependencies
 
 ## 3. Run the backend and frontend
 
+```mermaid
+flowchart LR
+    B["Browser"] --> V["Vite dev server :5173<br/>make frontend-dev"]
+    V -- "API calls" --> A["FastAPI :8000<br/>make backend-dev"]
+    A --> DB[("SQLite template.db")]
+    A --> R[("In-memory Redis")]
+```
+
 Use two terminals:
 
 ```bash

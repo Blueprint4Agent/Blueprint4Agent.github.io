@@ -8,11 +8,15 @@ description: Prometheus, Tempo, Loki, Grafana로 메트릭, 트레이스, 로그
 
 백엔드는 Prometheus 메트릭을 제공하고 OpenTelemetry 트레이스와 로그를 내보냅니다. Collector, Tempo, Loki, Prometheus, Grafana로 이루어진 로컬 스택은 `observability` Compose 프로필로 실행됩니다.
 
-```text
-Backend ──OTLP gRPC──▶ OTel Collector ──▶ Tempo (traces)
-        │                             └─▶ Loki  (logs)
-        └── /metrics ◀── Prometheus
-                               Grafana가 Tempo, Loki, Prometheus를 조회
+```mermaid
+flowchart LR
+    B["백엔드"] -- "OTLP gRPC :4317" --> C["OTel Collector"]
+    C -- "트레이스" --> T[("Tempo")]
+    C -- "로그" --> L[("Loki")]
+    P[("Prometheus")] -- "/metrics 수집" --> B
+    G["Grafana :3000"] --> T
+    G --> L
+    G --> P
 ```
 
 | 신호     | 활성화                         | 저장소         | Grafana에서 조회               |

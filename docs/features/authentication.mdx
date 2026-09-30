@@ -17,6 +17,20 @@ Email and password accounts with short-lived access tokens, a refresh cookie, lo
 
 ## Sessions
 
+```mermaid
+sequenceDiagram
+    participant UI as B4React
+    participant API as FastAPI
+    participant R as Redis
+    UI->>API: POST /api/v1/auth/login
+    API->>R: Check and reset failures for client IP
+    API-->>UI: access token + user, Set-Cookie refresh cookies
+    UI->>API: API calls with Authorization: Bearer
+    API-->>UI: 401 when the access token expires
+    UI->>API: POST /api/v1/auth/refresh (cookie)
+    API-->>UI: New access token
+```
+
 1. `POST /api/v1/auth/login` returns an access token and the user in the body.
 2. It also sets two HttpOnly cookies, `template_refresh_token` and `template_refresh_sid`. Over HTTPS they are `Secure` with `SameSite=None`; over HTTP they use `SameSite=Lax`.
 3. With `remember_me=true` the cookies persist for `REFRESH_TOKEN_EXPIRE_DAYS`; otherwise they last for the browser session.

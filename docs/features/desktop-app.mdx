@@ -21,6 +21,15 @@ A packaged app has no same-origin backend, so set `VITE_API_BASE_URL` to the dep
 
 ## Connectivity recovery
 
+```mermaid
+stateDiagram-v2
+    [*] --> Online
+    Online --> Offline: /health/ready fails
+    Offline --> Recovering: manual retry or backoff
+    Recovering --> Offline: still unavailable
+    Recovering --> Online: reload /config, revalidate session, restart realtime
+```
+
 1. The app polls `/health/ready` to track server availability.
 2. While the server is unavailable, API and realtime work pause and the UI shows the disconnected state. The local session is kept.
 3. Manual retry and backoff reconnect.

@@ -17,6 +17,19 @@ description: 열린 화면을 백엔드 변경과 동기화하는 Server-Sent Ev
 
 ## 동작 방식
 
+```mermaid
+sequenceDiagram
+    participant S as 서비스
+    participant R as Redis pub/sub
+    participant E as /api/v1/events/stream
+    participant H as B4React 실시간 훅
+    S->>S: 상태 변경 커밋
+    S->>R: 타입이 있는 도메인 이벤트 발행
+    R->>E: 사용자 채널로 전달
+    E-->>H: SSE 이벤트 (SSE_HEARTBEAT_SECONDS마다 heartbeat)
+    H->>H: 영향받는 상태 갱신
+```
+
 1. 서비스가 API 키 생성 같은 상태 변경을 완료합니다.
 2. 타입이 정의된 도메인 이벤트(`app/core/realtime/domain_events/`)를 Redis 브로커로 발행합니다.
 3. 스트림이 사용자 연결로 이벤트를 보내고, `SSE_HEARTBEAT_SECONDS`마다 heartbeat를 보냅니다.

@@ -71,4 +71,15 @@ make git-governance-check
 
 ## 저장소 간 작업
 
+```mermaid
+flowchart LR
+    subgraph fe["B4React"]
+        F1["브랜치 + 커밋 + worklog"] --> F2["PR 검사"] --> F3["merge commit"]
+    end
+    subgraph be["B4FastAPI"]
+        B1["gitlink + worklog 갱신"] --> B2["Backend, Frontend,<br/>Git governance 검사"] --> B3["merge commit"]
+    end
+    F3 --> B1
+```
+
 B4React도 같은 규칙과 자체 하네스를 가집니다. 프론트엔드 변경은 B4React에서 먼저 커밋하고 병합하며, B4FastAPI는 갱신된 gitlink를 자체 worklog와 함께 커밋합니다. 이 매뉴얼 저장소도 같은 브랜치, 커밋, worklog, PR 규칙을 사용합니다.

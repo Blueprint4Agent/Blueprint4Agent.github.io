@@ -10,6 +10,16 @@ description: What make check, test, and build run, the test suites, and the runt
 
 ## Aggregate targets
 
+```mermaid
+flowchart LR
+    CI["make ci"] --> CH["make check"]
+    CI --> TE["make test"]
+    CI --> BU["make build"]
+    CH --> A["architecture, env contract,<br/>lint, types, API contracts"]
+    TE --> T2["project-init, backend pytest,<br/>frontend Vitest"]
+    BU --> B2["backend env,<br/>frontend package"]
+```
+
 | Target       | Runs                                                                                                                                                                     |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `make check` | `project-init-check`, `architecture-check`, `env-contract-check`, `backend-check`, `frontend-format-check`, `frontend-typecheck`, `contract-check`, `frontend-api-check` |
