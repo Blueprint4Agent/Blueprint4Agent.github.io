@@ -396,6 +396,43 @@ html[lang="ko-KR"] body {
         display: inline-flex;
         align-items: center;
     }
+
+    /*
+     * Desktop: no navbar bar. The right-hand controls float in place without a
+     * background; the brand lives in the sidebar header on docs pages.
+     */
+    :root {
+        --ifm-navbar-height: 0px;
+    }
+
+    .navbar {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 40;
+        border: 0;
+        background: transparent;
+        pointer-events: none;
+    }
+
+    .navbar__items > * {
+        pointer-events: auto;
+    }
+
+    html.docs-wrapper .navbar__items:not(.navbar__items--right) {
+        visibility: hidden;
+    }
+
+    /* Floating controls carry their own B4React pill surfaces. */
+    .navbar__items--right .dropdown > .navbar__link,
+    .navbar__items--right > .navbar-icon-link {
+        border: 0.5px solid var(--panel-border);
+        border-radius: var(--radius-pill);
+        background: var(--panel);
+    }
+
+    .navbar__items--right .theme-toggle-button {
+        background: var(--panel);
+    }
 }
 
 /* Dropdown (B4React DropdownMenu) */
@@ -489,7 +526,7 @@ html[lang="ko-KR"] body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-top: var(--nav-height);
+    padding-top: var(--ifm-navbar-height);
     width: var(--doc-sidebar-width);
     background: var(--sidebar-bg);
 }
@@ -507,14 +544,29 @@ html[lang="ko-KR"] body {
     padding: var(--space-3) var(--space-2) var(--space-1);
 }
 
-.app-sidebar__title {
+/* B4React expanded header: left-aligned text brand, close toggle on the right. */
+.app-sidebar__brand {
+    display: inline-flex;
+    align-items: center;
+    height: var(--rail-control-size);
+    min-width: 0;
     padding-inline: var(--space-3);
+    border-radius: var(--radius-control);
+    text-decoration: none !important;
+}
+
+.app-sidebar__brand-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--text);
     font:
         500 0.875rem/1.25 var(--font-family),
         system-ui,
         sans-serif;
     letter-spacing: -0.02em;
+    animation: sidebar-label-in 150ms ease both;
 }
 
 .theme-doc-sidebar-container nav.menu {
@@ -650,11 +702,118 @@ html[lang="ko-KR"] body {
 
 .sidebar-rail {
     position: absolute;
-    inset: var(--nav-height) 0 0 0;
+    inset: var(--ifm-navbar-height) 0 0 0;
     display: flex;
-    justify-content: center;
-    padding-top: var(--space-3);
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-2);
     background: var(--sidebar-bg);
+}
+
+/* Brand toggle: robot mark, swapped for PanelLeftOpen on hover or focus. */
+.sidebar-rail__brand {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.sidebar-rail__brand .brand-mark {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.sidebar-rail__brand .sidebar-rail__expand-icon {
+    position: absolute;
+    width: 1.125rem;
+    height: 1.125rem;
+    opacity: 0;
+}
+
+.sidebar-rail__brand:hover .brand-mark,
+.sidebar-rail__brand:focus-visible .brand-mark {
+    opacity: 0;
+}
+
+.sidebar-rail__brand:hover .sidebar-rail__expand-icon,
+.sidebar-rail__brand:focus-visible .sidebar-rail__expand-icon {
+    opacity: 1;
+}
+
+.sidebar-rail__nav {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.sidebar-rail__group {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.sidebar-rail__group + .sidebar-rail__group {
+    padding-top: var(--space-3);
+    border-top: 0.5px solid var(--panel-border);
+}
+
+.sidebar-rail__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--rail-control-size);
+    height: var(--rail-control-size);
+    border-radius: var(--radius-control);
+    color: var(--text-soft);
+    text-decoration: none !important;
+    transition:
+        background-color 120ms ease,
+        color 120ms ease;
+}
+
+.sidebar-rail__item svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    stroke-width: 1.75;
+}
+
+.sidebar-rail__item:hover {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 12%, transparent);
+}
+
+.sidebar-rail__item--active {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
+}
+
+/* ---------- Tooltip (B4React ui-tooltip) ---------- */
+
+.ui-tooltip {
+    display: inline-flex;
+    vertical-align: middle;
+    max-width: 100%;
+}
+
+.ui-tooltip__content {
+    position: fixed;
+    z-index: 100;
+    pointer-events: none;
+    width: max-content;
+    max-width: min(16rem, calc(100vw - 1rem));
+    overflow-wrap: anywhere;
+    transform: translateY(-50%);
+    border-radius: 0.375rem;
+    padding: var(--space-1) var(--space-2);
+    font:
+        500 0.75rem/1rem var(--font-family),
+        system-ui,
+        sans-serif;
+    color: var(--tooltip-fg);
+    background: var(--tooltip-bg);
+    box-shadow: var(--shadow);
 }
 
 /* ---------- Doc layout ---------- */
@@ -665,7 +824,7 @@ html[lang="ko-KR"] body {
  */
 @layer docusaurus.infima {
     main[class*="docMainContainer"] > .container {
-        padding: 2.5rem var(--doc-gutter) 4rem !important;
+        padding: 3.5rem var(--doc-gutter) 4rem !important;
     }
 }
 
@@ -705,8 +864,8 @@ html[lang="ko-KR"] body {
         max-width: none;
     }
 
-    .theme-doc-toc-desktop {
-        top: calc(var(--nav-height) + 2.5rem);
+    .toc-panel.theme-doc-toc-desktop {
+        top: 3.5rem;
     }
 }
 
@@ -1083,26 +1242,65 @@ a.breadcrumbs__link:hover {
     display: block;
 }
 
-.table-of-contents {
+/* Right TOC: small title, one hairline rail, active item marked on the rail. */
+.toc-panel {
+    position: sticky;
+    top: calc(var(--ifm-navbar-height) + 1rem);
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+}
+
+.toc-panel__title {
+    margin: 0 0 var(--space-2);
+    color: var(--text);
+    font:
+        500 0.75rem/1.5 var(--font-family),
+        system-ui,
+        sans-serif;
+}
+
+.toc-list {
+    margin: 0;
+    padding: 0;
+    border-left: 0.5px solid var(--panel-border);
     font-size: 0.8125rem;
+    line-height: 1.4;
 }
 
-.table-of-contents__link {
+.toc-list ul {
+    margin: 0;
+    padding: 0;
+}
+
+.toc-list li {
+    margin: 0;
+}
+
+.toc-list .table-of-contents__link {
+    display: block;
+    margin-left: -1px;
+    padding: 0.3125rem 0 0.3125rem var(--space-3);
+    border-left: 1.5px solid transparent;
     color: var(--text-soft);
+    text-decoration: none;
+    transition:
+        color 120ms ease,
+        border-color 120ms ease;
 }
 
-.table-of-contents__link:hover,
-.table-of-contents__link--active {
+.toc-list ul .table-of-contents__link {
+    padding-left: calc(var(--space-3) * 2);
+    font-size: 0.78125rem;
+}
+
+.toc-list .table-of-contents__link:hover {
     color: var(--text);
 }
 
-.table-of-contents__link--active {
+.toc-list .table-of-contents__link--active {
+    color: var(--text);
     font-weight: 500;
-}
-
-.theme-doc-toc-desktop {
-    border-left: 0.5px solid var(--panel-border);
-    padding-left: var(--space-2);
+    border-left-color: var(--text);
 }
 
 .theme-doc-toc-mobile {

@@ -440,7 +440,7 @@
     "theme.toggle.title": {
         "message": "테마"
     },
-    "sidebar.header.title": {
-        "message": "목차"
+    "toc.title": {
+        "message": "이 페이지 목차"
     }
 }
