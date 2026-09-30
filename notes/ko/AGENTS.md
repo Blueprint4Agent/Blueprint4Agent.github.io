@@ -45,6 +45,18 @@
 2. 설정, `make` 타깃, 배포는 `README.md`
 3. `docs/` 하위 기능별 문서
 
+## Harness
+
+모든 변경은 같은 하네스를 따릅니다.
+
+1. 작업 단위 하나를 구현합니다.
+2. `make verify`를 실행합니다(포맷, 타입 검사, 영·한 빌드).
+3. Commit Title이 커밋 제목과 같은 `worklog/NNNN-title.md`를 추가합니다.
+4. `COMMIT_TITLE=... COMMIT_BODY_FILE=... make git-governance-check`로 검증한 뒤 커밋합니다.
+5. `main`에 바로 커밋하거나 `<type>/<kebab-title>` 브랜치에서 커밋하고 push합니다. `main`에 push하면 배포 전에 검증과 Git 거버넌스 검사가 실행됩니다.
+
+UI: 현재 B4React 기반 스타일을 유지합니다. 새 시각 스타일을 만들지 말고 `src/css/custom.css`, `src/components/`, `src/theme/`의 기존 토큰과 컴포넌트를 재사용합니다.
+
 ## Repository Hygiene
 
 - 생성된 Docusaurus 산출물과 로컬 의존성 폴더는 커밋하지 않습니다.
@@ -88,12 +100,12 @@ PR_TITLE="[docs] Add feature pages" PR_BODY_FILE=<file> make git-governance-chec
 
 `COMMIT_TITLE` 없이 실행하면 현재 `HEAD` 커밋을 검증합니다. `make governance-test`는 검증기 자체를 테스트합니다.
 
-- 브랜치 이름: `<type>/<short-kebab-title>`. 허용 type: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
+- 브랜치 이름: 직접 작업은 `main`, 또는 `<type>/<short-kebab-title>`. 허용 type: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
 - 커밋 제목: Conventional Commits, `<type>(optional-scope): <imperative summary>`.
 - 커밋 본문에는 `Changes:`, `Affected Files:`, `Verification:` 섹션이 있어야 합니다.
 - PR 제목: `[type] Concise PR title`. PR 설명에는 Summary, Scope, Reason, Verification, Documentation, Risk / Impact가 있어야 합니다(`.github/pull_request_template.md`).
 - PR은 기본적으로 ready for review로 생성합니다. merge commit(`gh pr merge <number> --auto --merge`)을 사용하며, squash/rebase는 사용자의 명시적 요청이 있을 때만 사용합니다.
-- PR에서는 `.github/workflows/check.yml`(`make verify`)과 `.github/workflows/governance.yml`(`make git-governance-pr-check`)이 실행됩니다. `main`에 push하면 `.github/workflows/deploy.yml`로 배포됩니다.
+- PR에서는 `.github/workflows/check.yml`(`make verify`)과 `.github/workflows/governance.yml`(`make git-governance-pr-check`)이 실행됩니다. `main`에 push하면 `.github/workflows/deploy.yml`에서 `make verify`와 `make git-governance-check`를 실행한 뒤 배포합니다.
 
 ## Documentation Sync
 

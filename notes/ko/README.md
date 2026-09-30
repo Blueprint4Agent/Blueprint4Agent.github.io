@@ -64,7 +64,8 @@ make governance-test         # 거버넌스 검증기 테스트
 
 ## Contribution Workflow
 
-작업은 작업 단위로 나누고, `<type>/<kebab-title>` 브랜치에서 단위별로 커밋합니다.
+작업은 작업 단위로 나누고, `main`에 바로 또는 `<type>/<kebab-title>` 브랜치에서 단위별로 커밋합니다. `main`에 push하면 배포 전에 `make verify`와 Git 거버넌스 검사가 실행됩니다.
+UI 변경은 현재 B4React 기반 스타일을 유지합니다.
 모든 커밋에는 `.github/WORKLOG_TEMPLATE.md` 기반의 `worklog/NNNN-title.md` 항목이 포함됩니다.
 PR은 `.github/pull_request_template.md`를 사용하며 `.github/workflows/check.yml`과 `.github/workflows/governance.yml`로 검증됩니다.
 전체 규칙은 `AGENTS.md`를 참고합니다.

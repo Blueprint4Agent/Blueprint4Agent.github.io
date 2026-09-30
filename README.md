@@ -63,7 +63,8 @@ Run `make verify` before every commit.
 
 ## Contribution Workflow
 
-Work is split into work units, and each unit is committed separately on a `<type>/<kebab-title>` branch.
+Work is split into work units, and each unit is committed separately, directly on `main` or on a `<type>/<kebab-title>` branch. Pushing to `main` runs `make verify` and git governance before deploying.
+UI changes keep the current B4React-based style.
 Every commit includes a matching `worklog/NNNN-title.md` entry based on `.github/WORKLOG_TEMPLATE.md`.
 Pull requests use `.github/pull_request_template.md` and are validated by `.github/workflows/check.yml` and `.github/workflows/governance.yml`.
 See `AGENTS.md` for the complete rules.

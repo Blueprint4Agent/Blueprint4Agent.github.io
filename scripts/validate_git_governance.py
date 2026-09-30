@@ -150,9 +150,10 @@ def main():
         print(f"git governance check passed ({len(commits)} PR commits)")
         return
 
+    branch = git("branch", "--show-current")
     require(
-        BRANCH.fullmatch(git("branch", "--show-current")),
-        "use a named <type>/<kebab-description> branch",
+        branch == "main" or BRANCH.fullmatch(branch),
+        "use main or a named <type>/<kebab-description> branch",
     )
     if args.commit_title:
         require(args.commit_body_file, "planned commits require COMMIT_BODY_FILE")

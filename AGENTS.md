@@ -45,6 +45,18 @@ Describe behavior as implemented in the current B4FastAPI `main` and its pinned 
 2. `README.md` for setup, `make` targets, and deployment
 3. Feature-specific documentation under `docs/`
 
+## Harness
+
+Every change follows the same harness:
+
+1. Implement one work unit.
+2. Run `make verify` (format, typecheck, en/ko build).
+3. Add a `worklog/NNNN-title.md` entry whose Commit Title matches the commit.
+4. Validate with `COMMIT_TITLE=... COMMIT_BODY_FILE=... make git-governance-check`, then commit.
+5. Commit directly on `main` or on a `<type>/<kebab-title>` branch, and push. Pushing to `main` runs verification and git governance before deploying.
+
+UI: keep the current B4React-based style. Reuse the existing tokens and components in `src/css/custom.css`, `src/components/`, and `src/theme/` instead of introducing new visual styles.
+
 ## Repository Hygiene
 
 - Do not commit generated Docusaurus output or local dependency folders.
@@ -88,12 +100,12 @@ PR_TITLE="[docs] Add feature pages" PR_BODY_FILE=<file> make git-governance-chec
 
 Without `COMMIT_TITLE`, the check validates the current `HEAD` commit. `make governance-test` tests the validator itself.
 
-- Branch names: `<type>/<short-kebab-title>`. Allowed types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
+- Branch names: `main` for direct work, or `<type>/<short-kebab-title>`. Allowed types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
 - Commit titles: Conventional Commits, `<type>(optional-scope): <imperative summary>`.
 - Commit bodies must include `Changes:`, `Affected Files:`, and `Verification:` sections.
 - PR titles: `[type] Concise PR title`. PR descriptions must include Summary, Scope, Reason, Verification, Documentation, and Risk / Impact (`.github/pull_request_template.md`).
 - Create PRs as ready for review by default. Use merge commits (`gh pr merge <number> --auto --merge`); squash or rebase merges require an explicit user request.
-- Pull requests run `.github/workflows/check.yml` (`make verify`) and `.github/workflows/governance.yml` (`make git-governance-pr-check`). Pushing to `main` deploys through `.github/workflows/deploy.yml`.
+- Pull requests run `.github/workflows/check.yml` (`make verify`) and `.github/workflows/governance.yml` (`make git-governance-pr-check`). Pushing to `main` runs `make verify` and `make git-governance-check` in `.github/workflows/deploy.yml`, then deploys.
 
 ## Documentation Sync
 
