@@ -397,7 +397,7 @@ html[lang="ko-KR"] body {
 }
 
 .theme-doc-sidebar-menu.menu__list {
-    padding: var(--space-3) var(--space-3) var(--space-8);
+    padding: var(--space-6) var(--space-1) var(--space-8);
 }
 
 .menu {
@@ -406,10 +406,9 @@ html[lang="ko-KR"] body {
 }
 
 .menu__list .menu__list {
-    margin-top: var(--space-1);
-    padding-left: var(--space-3);
+    margin: 0.125rem 0 0 1.125rem;
+    padding-left: var(--space-2);
     border-left: 1px solid var(--panel-border);
-    margin-left: var(--space-3);
 }
 
 .menu__list-item:not(:first-child) {
@@ -436,7 +435,7 @@ html[lang="ko-KR"] body {
 }
 
 .theme-doc-sidebar-item-category-level-1:not(:first-child) {
-    margin-top: var(--space-3);
+    margin-top: var(--space-4);
 }
 
 .menu__list-item-collapsible:hover {
@@ -476,46 +475,132 @@ html[lang="ko-KR"] body {
     color: var(--text-soft);
 }
 
+/* ---------- Doc layout ---------- */
+
+/*
+ * Reading column (46rem) + TOC (13rem), centered in the space right of the sidebar.
+ * Gutters: 48px desktop, 20px mobile. Vertical rhythm: 20px between blocks,
+ * 24px around cards/tables/code/admonitions, 48px before h2.
+ */
+:root {
+    --doc-column: 46rem;
+    --doc-toc: 13rem;
+    --doc-gap: 3rem;
+    --doc-gutter: 3rem;
+    --block-gap: 1.25rem;
+    --figure-gap: 1.5rem;
+}
+
+/*
+ * Infima utilities and the theme's docItemCol width use !important inside cascade
+ * layers, which outrank unlayered !important rules. Override them in the same layers.
+ */
+@layer docusaurus.infima {
+    main[class*="docMainContainer"] > .container {
+        padding: 2.5rem var(--doc-gutter) 4rem !important;
+    }
+}
+
+@layer docusaurus.theme-classic {
+    main[class*="docMainContainer"] > .container > .row > .col {
+        max-width: none !important;
+    }
+}
+
+@media (min-width: 997px) {
+    main[class*="docMainContainer"] > .container {
+        max-width: calc(
+            var(--doc-column) + var(--doc-gap) + var(--doc-toc) + 2 * var(--doc-gutter)
+        );
+    }
+
+    main[class*="docMainContainer"] > .container > .row {
+        display: grid;
+        grid-template-columns: minmax(0, var(--doc-column)) var(--doc-toc);
+        column-gap: var(--doc-gap);
+        margin: 0;
+    }
+
+    main[class*="docMainContainer"] > .container > .row > .col {
+        padding: 0;
+        width: auto;
+    }
+
+    main[class*="docMainContainer"] [class*="docItemContainer"] {
+        max-width: none;
+    }
+
+    .theme-doc-toc-desktop {
+        top: calc(var(--nav-height) + 2.5rem);
+    }
+}
+
+@media (max-width: 996px) {
+    :root {
+        --doc-gutter: 1.25rem;
+    }
+
+    @layer docusaurus.infima {
+        main[class*="docMainContainer"] > .container {
+            padding-top: 1.5rem !important;
+        }
+    }
+}
+
 /* ---------- Doc content ---------- */
 
 .theme-doc-markdown {
     font-size: 0.975rem;
+    line-height: 1.75;
 }
 
-.theme-doc-markdown > p:first-child:has(.b4-badge) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-3);
+.theme-doc-markdown > * {
+    margin-top: 0;
+}
+
+.theme-doc-markdown p,
+.theme-doc-markdown ul,
+.theme-doc-markdown ol {
+    margin-bottom: var(--block-gap);
+}
+
+.theme-doc-markdown li + li {
+    margin-top: 0.25rem;
 }
 
 .theme-doc-markdown h1 {
-    font-size: clamp(1.9rem, 3.4vw, 2.4rem);
+    font-size: clamp(1.9rem, 3.4vw, 2.35rem);
     font-weight: 700;
     letter-spacing: -0.035em;
-    line-height: 1.12;
-    margin-bottom: var(--space-4);
+    line-height: 1.15;
+    margin: 0 0 var(--space-3);
 }
 
-.theme-doc-markdown h1 + p {
+.theme-doc-markdown header + p {
     color: var(--text-soft);
     font-size: 1.075rem;
+    line-height: 1.65;
+    margin-bottom: var(--figure-gap);
 }
 
 .theme-doc-markdown h2 {
-    font-size: 1.45rem;
+    font-size: 1.4rem;
     font-weight: 650;
     letter-spacing: -0.025em;
-    margin-top: 2.5rem;
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--panel-border);
+    line-height: 1.3;
+    margin: 3rem 0 var(--space-3);
 }
 
 .theme-doc-markdown h3 {
-    font-size: 1.1rem;
+    font-size: 1.075rem;
     font-weight: 600;
     letter-spacing: -0.015em;
-    margin-top: var(--space-8);
+    line-height: 1.4;
+    margin: 2rem 0 var(--space-2);
+}
+
+.theme-doc-markdown h2 + h3 {
+    margin-top: var(--space-4);
 }
 
 .theme-doc-markdown a:not(.b4-card) {
@@ -533,6 +618,22 @@ html[lang="ko-KR"] body {
     color: var(--text);
     padding: 0.08rem 0.35rem;
     vertical-align: 0.04em;
+}
+
+.theme-doc-markdown table,
+.theme-doc-markdown .theme-code-block,
+.theme-doc-markdown .theme-admonition,
+.theme-doc-markdown details,
+.theme-doc-markdown .tabs-container {
+    margin-top: var(--figure-gap);
+    margin-bottom: var(--figure-gap);
+}
+
+.theme-doc-markdown h2 + table,
+.theme-doc-markdown h3 + table,
+.theme-doc-markdown h2 + .theme-code-block,
+.theme-doc-markdown h3 + .theme-code-block {
+    margin-top: var(--space-3);
 }
 
 /* Tables are used heavily for env vars and make targets. */
@@ -671,6 +772,16 @@ html[lang="ko-KR"] body {
     --ifm-alert-foreground-color: var(--error-text);
 }
 
+.theme-admonition [class*="admonitionContent"] > :last-child,
+.theme-doc-markdown details > div > :last-child,
+.theme-doc-markdown li > :last-child {
+    margin-bottom: 0;
+}
+
+.theme-admonition [class*="admonitionHeading"] {
+    margin-bottom: var(--space-2);
+}
+
 .theme-admonition.alert a {
     color: inherit;
 }
@@ -686,15 +797,36 @@ html[lang="ko-KR"] body {
 
 /* Breadcrumbs */
 .breadcrumbs {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-left: -0.5rem;
+}
+
+.breadcrumbs__item {
+    display: inline-flex;
+    align-items: center;
 }
 
 .breadcrumbs__link {
+    display: inline-flex;
+    align-items: center;
+    height: 1.75rem;
     border-radius: var(--radius-control);
     color: var(--text-soft);
     font-size: 0.8125rem;
     font-weight: 500;
-    padding: 0.25rem 0.5rem;
+    line-height: 1;
+    padding: 0 0.5rem;
+}
+
+.breadcrumbs__item:not(:last-child)::after {
+    margin: 0 0.125rem;
+    opacity: 0.6;
 }
 
 .breadcrumbs__item--active .breadcrumbs__link {
@@ -812,8 +944,8 @@ html[lang="ko-KR"] body {
 }
 
 .b4-icon-tile {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -832,7 +964,7 @@ html[lang="ko-KR"] body {
 .b4-card-grid {
     display: grid;
     gap: var(--space-3);
-    margin: var(--space-6) 0;
+    margin: var(--figure-gap) 0;
 }
 
 .b4-card-grid--2 {
@@ -840,15 +972,38 @@ html[lang="ko-KR"] body {
 }
 
 .b4-card-grid--3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+}
+
+/* Three-up cards stack the icon above the title so narrow columns stay compact. */
+.b4-card-grid--3 .b4-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "icon aside"
+        "title title"
+        "body body";
+    row-gap: 0.25rem;
+}
+
+.b4-card-grid--3 .b4-card .b4-icon-tile {
+    margin-bottom: var(--space-3);
+}
+
+.b4-card-grid--3 .b4-card__aside {
+    align-self: start;
 }
 
 .b4-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding: var(--space-5);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "icon title aside"
+        "icon body body";
+    column-gap: var(--space-3);
+    row-gap: 0.125rem;
+    align-items: start;
+    align-content: start;
+    padding: var(--space-4);
     border: 1px solid var(--panel-border);
     border-radius: var(--radius-card);
     background: var(--panel);
@@ -857,50 +1012,56 @@ html[lang="ko-KR"] body {
     line-height: 1.55;
 }
 
+.b4-card .b4-icon-tile {
+    grid-area: icon;
+}
+
+.b4-card__title {
+    grid-area: title;
+    align-self: center;
+    color: var(--text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    min-height: 1.35rem;
+}
+
+.b4-card__aside {
+    grid-area: aside;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    align-self: center;
+}
+
+.b4-card__body {
+    grid-area: body;
+}
+
 .b4-card--link {
     text-decoration: none !important;
     transition:
         border-color 150ms ease,
-        transform 150ms ease;
+        background-color 150ms ease;
 }
 
 .b4-card--link:hover {
-    border-color: color-mix(in oklab, var(--text) 32%, transparent);
+    border-color: color-mix(in oklab, var(--text) 30%, transparent);
+    background: var(--input-bg);
     color: var(--text-soft);
-    transform: translateY(-1px);
-}
-
-.b4-card__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
-}
-
-.b4-card__title {
-    color: var(--text);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.015em;
-}
-
-.b4-card__body {
-    display: block;
 }
 
 .b4-card__arrow {
     width: 1rem;
     height: 1rem;
-    margin-top: auto;
-    align-self: flex-end;
     color: var(--text-soft);
     transition: transform 160ms ease;
 }
 
 .b4-card--link:hover .b4-card__arrow {
     color: var(--text);
-    transform: translateX(3px);
+    transform: translateX(2px);
 }
 
 .b4-button {
@@ -953,9 +1114,9 @@ html[lang="ko-KR"] body {
 /* ---------- Home (B4React landing layout) ---------- */
 
 .home {
-    width: min(64rem, 100%);
+    width: min(60rem + 2 * var(--doc-gutter), 100%);
     margin: 0 auto;
-    padding: clamp(2.5rem, 8vw, 5.5rem) var(--space-4) var(--space-8);
+    padding: clamp(3rem, 9vw, 6rem) var(--doc-gutter) 5rem;
 }
 
 .home-hero {
@@ -1012,7 +1173,7 @@ html[lang="ko-KR"] body {
 }
 
 .home-section {
-    margin-top: clamp(3.5rem, 8vw, 5rem);
+    margin-top: clamp(3.5rem, 8vw, 4.5rem);
 }
 
 .home-section__title {
@@ -1026,38 +1187,6 @@ html[lang="ko-KR"] body {
 
 .home-section .b4-card-grid {
     margin: 0;
-}
-
-.home-highlights {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.home-highlight {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-4);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-card);
-    background: var(--panel);
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-.home-highlight strong {
-    display: block;
-    margin-bottom: 0.15rem;
-    color: var(--text);
-    font-weight: 600;
-}
-
-.home-highlight span span {
-    color: var(--text-soft);
 }
 
 @keyframes rise {
@@ -1086,9 +1215,7 @@ html[lang="ko-KR"] body {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 996px) {
-    .b4-card-grid--2,
-    .b4-card-grid--3,
-    .home-highlights {
+    .b4-card-grid--2 {
         grid-template-columns: 1fr;
     }
 

@@ -4,7 +4,7 @@ import Translate, { translate } from "@docusaurus/Translate";
 import Layout from "@theme/Layout";
 import { ArrowRight } from "lucide-react";
 import BrandMark from "@site/src/components/brand/BrandMark";
-import { Card, CardGrid, IconTile } from "@site/src/components/docs";
+import { Card, CardGrid } from "@site/src/components/docs";
 import GitHubMark from "@site/src/components/icons/GitHubMark";
 import type { IconName } from "@site/src/components/icons/registry";
 
@@ -164,17 +164,13 @@ function Highlights() {
             <h2 id="home-highlights" className="home-section__title">
                 <Translate id="home.highlights.title">Built in from day one</Translate>
             </h2>
-            <ul className="home-highlights">
+            <CardGrid columns={2}>
                 {highlights.map((item) => (
-                    <li key={item.icon} className="home-highlight">
-                        <IconTile icon={item.icon} />
-                        <span>
-                            <strong>{item.title}</strong>
-                            <span>{item.description}</span>
-                        </span>
-                    </li>
+                    <Card key={item.icon} icon={item.icon} title={item.title}>
+                        {item.description}
+                    </Card>
                 ))}
-            </ul>
+            </CardGrid>
         </section>
     );
 }

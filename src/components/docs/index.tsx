@@ -31,13 +31,15 @@ type CardProps = {
 export function Card({ title, icon, href, badge, badgeTone, children }: CardProps) {
     const body = (
         <>
-            <span className="b4-card__head">
-                {icon && <IconTile icon={icon} />}
-                {badge && <Badge tone={badgeTone}>{badge}</Badge>}
-            </span>
+            {icon && <IconTile icon={icon} />}
             <strong className="b4-card__title">{title}</strong>
+            {(badge || href) && (
+                <span className="b4-card__aside">
+                    {badge && <Badge tone={badgeTone}>{badge}</Badge>}
+                    {href && <ArrowRight className="b4-card__arrow" aria-hidden="true" />}
+                </span>
+            )}
             {children && <span className="b4-card__body">{children}</span>}
-            {href && <ArrowRight className="b4-card__arrow" aria-hidden="true" />}
         </>
     );
     if (href) {
