@@ -19,7 +19,10 @@ function HomepageHeader() {
                 </Heading>
                 <p className="hero__subtitle">{siteConfig.tagline}</p>
                 <div className={styles.buttons}>
-                    <Link className="button button--secondary button--lg hero-cta" to="/docs/about-b4a/what-is-b4a">
+                    <Link
+                        className="button button--secondary button--lg hero-cta"
+                        to="/docs/about-b4a/what-is-b4a"
+                    >
                         <span className="hero-cta__icon hero-cta__icon--b4a" aria-hidden="true" />
                         <Translate id="homepage.cta.exploreB4A">Explore B4A</Translate>
                     </Link>
@@ -27,7 +30,10 @@ function HomepageHeader() {
                         className="button button--secondary button--lg hero-cta hero-cta--ghost"
                         href="https://github.com/Blueprint4Agent"
                     >
-                        <span className="hero-cta__icon hero-cta__icon--github" aria-hidden="true" />
+                        <span
+                            className="hero-cta__icon hero-cta__icon--github"
+                            aria-hidden="true"
+                        />
                         <Translate id="homepage.cta.startOnGithub">Start on GitHub</Translate>
                     </Link>
                 </div>

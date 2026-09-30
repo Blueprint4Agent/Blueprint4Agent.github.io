@@ -38,7 +38,7 @@
 ## Required Read Order
 
 1. `AGENTS.md`
-2. 이 저장소에 추가될 Docusaurus 설정 및 빌드/배포 가이드
+2. 설정, `make` 타깃, 배포는 `README.md`
 3. `docs/` 하위 기능별 문서
 
 ## Repository Hygiene
@@ -50,9 +50,46 @@
 
 ## Verification
 
-- Docusaurus 설정, 내비게이션, 스타일, 문서 구조를 변경한 뒤에는 `npm run build`를 실행합니다.
-- 레이아웃이나 시각적 변경은 영향을 받은 페이지를 데스크톱 뷰포트와 모바일 뷰포트에서 확인합니다.
-- 검증을 완료하지 못한 경우 handoff 또는 pull request notes에 이유를 남깁니다.
+검증은 루트 `Makefile`로 실행합니다(`make help`로 전체 타깃 확인).
+
+1. 모든 커밋 전에 `make verify`를 실행합니다. `make check`(Prettier 포맷 검사, TypeScript)와 `make build`(모든 locale 빌드)를 함께 실행합니다.
+2. `make check`가 포맷 문제를 보고하면 `make format`을 실행합니다. 검사를 통과시키기 위해 포맷을 수동으로 맞추지 않습니다.
+3. 레이아웃이나 시각적 변경은 영향을 받은 페이지를 데스크톱·모바일 뷰포트와 라이트·다크 테마에서 확인합니다.
+4. 실행한 명령과 결과를 커밋 worklog에 기록합니다. 검증을 완료하지 못한 경우 worklog와 pull request notes에 이유를 남깁니다.
+
+## Work Units
+
+작업은 리뷰 가능한 작업 단위로 나누고, 단위별로 커밋합니다.
+
+1. 하나의 작업 단위는 하나의 의도를 다룹니다. 예: 하네스, UI/테마, 문서 섹션 하나, locale 동기화.
+2. 각 단위는 단독으로 빌드되어야 하며, 커밋 전에 `make verify`를 실행합니다.
+3. 영어 문서와 `ko` 번역은 같은 단위에 포함하여 모든 커밋에서 locale 동기화를 유지합니다.
+4. 관련 없는 포맷, 의존성, 콘텐츠 변경을 한 단위에 섞지 않습니다.
+
+## Worklog Policy (Required)
+
+1. 모든 커밋에는 대응되는 `worklog/` 항목 파일이 있어야 합니다.
+2. 파일명 형식: `<number>-<short-kebab-title>.md` (네 자리 번호, 예: `0002-b4react-theme.md`).
+3. `.github/WORKLOG_TEMPLATE.md`를 사용합니다. 최소한 `# Commit Title`, `# Changed File Scope`, `# Reason`, `# Impact`, `# Verification`을 기록합니다.
+4. `# Commit Title`은 실제 커밋 제목과 같아야 합니다.
+
+## Git Governance
+
+커밋하거나 PR을 열기 전에 저장소 하네스로 메타데이터를 검증합니다.
+
+```sh
+COMMIT_TITLE="docs: add feature pages" COMMIT_BODY_FILE=<file> make git-governance-check
+PR_TITLE="[docs] Add feature pages" PR_BODY_FILE=<file> make git-governance-check
+```
+
+`COMMIT_TITLE` 없이 실행하면 현재 `HEAD` 커밋을 검증합니다. `make governance-test`는 검증기 자체를 테스트합니다.
+
+- 브랜치 이름: `<type>/<short-kebab-title>`. 허용 type: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
+- 커밋 제목: Conventional Commits, `<type>(optional-scope): <imperative summary>`.
+- 커밋 본문에는 `Changes:`, `Affected Files:`, `Verification:` 섹션이 있어야 합니다.
+- PR 제목: `[type] Concise PR title`. PR 설명에는 Summary, Scope, Reason, Verification, Documentation, Risk / Impact가 있어야 합니다(`.github/pull_request_template.md`).
+- PR은 기본적으로 ready for review로 생성합니다. merge commit(`gh pr merge <number> --auto --merge`)을 사용하며, squash/rebase는 사용자의 명시적 요청이 있을 때만 사용합니다.
+- PR에서는 `.github/workflows/check.yml`(`make verify`)과 `.github/workflows/governance.yml`(`make git-governance-pr-check`)이 실행됩니다. `main`에 push하면 `.github/workflows/deploy.yml`로 배포됩니다.
 
 ## Documentation Sync
 

@@ -30,13 +30,13 @@ The current additional locale is `ko`.
 ## Installation
 
 ```bash
-npm install
+make install
 ```
 
 ## Local Development
 
 ```bash
-npm run start
+make dev
 ```
 
 This starts a local Docusaurus development server. Most content and styling changes are reflected without restarting the server.
@@ -44,24 +44,36 @@ This starts a local Docusaurus development server. Most content and styling chan
 ## Build
 
 ```bash
-npm run build
+make build
 ```
 
 The build command generates static output in `build/`.
 Do not commit `build/`; it is generated output.
 
-## Useful Commands
+## Make Targets
+
+Run `make help` to list every target.
 
 ```bash
-npm run start
-npm run build
-npm run serve
-npm run typecheck
-npm run format:check
-npm run check
+make install                 # Install locked dependencies (npm ci)
+make dev                     # Start the development server
+make build                   # Build every locale into build/
+make serve                   # Serve the production build locally
+make check                   # Prettier format check and TypeScript
+make format                  # Format source and documentation
+make verify                  # Full pre-commit verification: check + build
+make git-governance-check    # Validate branch, commit, worklog, and PR metadata
+make governance-test         # Test the governance validator
 ```
 
-Use `npm run check` before broad changes when practical. Run `npm run build` after Docusaurus configuration, sidebar, navigation, styling, or documentation structure changes.
+Run `make verify` before every commit.
+
+## Contribution Workflow
+
+Work is split into work units, and each unit is committed separately on a `<type>/<kebab-title>` branch.
+Every commit includes a matching `worklog/NNNN-title.md` entry based on `.github/WORKLOG_TEMPLATE.md`.
+Pull requests use `.github/pull_request_template.md` and are validated by `.github/workflows/check.yml` and `.github/workflows/governance.yml`.
+See `AGENTS.md` for the complete rules.
 
 ## Documentation Policy
 

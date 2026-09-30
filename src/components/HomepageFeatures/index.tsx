@@ -26,8 +26,8 @@ const FeatureList: FeatureItem[] = [
         description: (
             <>
                 <Translate id="homepage.feature.agentic.desc">
-                    B4A is built for agentic coding. Non-developers, beginners, or teams wanting
-                    to start without complex setup can launch projects with agentic workflows.
+                    B4A is built for agentic coding. Non-developers, beginners, or teams wanting to
+                    start without complex setup can launch projects with agentic workflows.
                 </Translate>
             </>
         ),

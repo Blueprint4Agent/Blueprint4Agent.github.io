@@ -38,7 +38,7 @@ Repository-specific technical details must be documented in each repository sepa
 ## Required Read Order
 
 1. `AGENTS.md`
-2. Docusaurus setup and build/deploy guides (to be added in this repository)
+2. `README.md` for setup, `make` targets, and deployment
 3. Feature-specific documentation under `docs/`
 
 ## Repository Hygiene
@@ -50,9 +50,46 @@ Repository-specific technical details must be documented in each repository sepa
 
 ## Verification
 
-- Run `npm run build` after Docusaurus configuration, navigation, styling, or documentation structure changes.
-- For layout or visual changes, verify the affected page in a browser-sized desktop viewport and a mobile viewport.
-- If verification cannot be completed, document the reason in the handoff or pull request notes.
+Run validation through the root `Makefile` (`make help` lists every target).
+
+1. Run `make verify` before every commit. It runs `make check` (Prettier format check and TypeScript) and `make build` (every locale).
+2. Run `make format` when `make check` reports formatting issues; do not hand-edit formatting to silence it.
+3. For layout or visual changes, verify the affected page in a desktop viewport and a mobile viewport, in both light and dark themes.
+4. Record the commands and results in the commit worklog. If verification cannot be completed, document the reason in the worklog and pull request notes.
+
+## Work Units
+
+Split work into reviewable work units and commit each unit separately.
+
+1. One work unit covers one intent, for example harness, UI/theme, one documentation section, or locale sync.
+2. Each unit must build on its own: run `make verify` before committing it.
+3. English documents and their `ko` translations belong in the same unit, so every commit keeps locales synchronized.
+4. Do not mix unrelated formatting, dependency, or content changes into a unit.
+
+## Worklog Policy (Required)
+
+1. Every commit must include a matching worklog entry file under `worklog/`.
+2. Worklog filename format: `<number>-<short-kebab-title>.md` (four-digit number, for example `0002-b4react-theme.md`).
+3. Use `.github/WORKLOG_TEMPLATE.md`. A worklog must record at least `# Commit Title`, `# Changed File Scope`, `# Reason`, `# Impact`, and `# Verification`.
+4. `# Commit Title` must equal the actual commit title.
+
+## Git Governance
+
+Validate planned metadata with the repository harness before committing or opening a PR:
+
+```sh
+COMMIT_TITLE="docs: add feature pages" COMMIT_BODY_FILE=<file> make git-governance-check
+PR_TITLE="[docs] Add feature pages" PR_BODY_FILE=<file> make git-governance-check
+```
+
+Without `COMMIT_TITLE`, the check validates the current `HEAD` commit. `make governance-test` tests the validator itself.
+
+- Branch names: `<type>/<short-kebab-title>`. Allowed types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`.
+- Commit titles: Conventional Commits, `<type>(optional-scope): <imperative summary>`.
+- Commit bodies must include `Changes:`, `Affected Files:`, and `Verification:` sections.
+- PR titles: `[type] Concise PR title`. PR descriptions must include Summary, Scope, Reason, Verification, Documentation, and Risk / Impact (`.github/pull_request_template.md`).
+- Create PRs as ready for review by default. Use merge commits (`gh pr merge <number> --auto --merge`); squash or rebase merges require an explicit user request.
+- Pull requests run `.github/workflows/check.yml` (`make verify`) and `.github/workflows/governance.yml` (`make git-governance-pr-check`). Pushing to `main` deploys through `.github/workflows/deploy.yml`.
 
 ## Documentation Sync
 

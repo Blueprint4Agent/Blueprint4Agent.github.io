@@ -30,13 +30,13 @@ Locale별 저장소 notes는 `notes/<locale>/` 아래에서 관리합니다.
 ## Installation
 
 ```bash
-npm install
+make install
 ```
 
 ## Local Development
 
 ```bash
-npm run start
+make dev
 ```
 
 로컬 Docusaurus 개발 서버를 시작합니다.
@@ -45,25 +45,36 @@ npm run start
 ## Build
 
 ```bash
-npm run build
+make build
 ```
 
 빌드 명령은 `build/`에 정적 산출물을 생성합니다.
 `build/`는 생성 산출물이므로 커밋하지 않습니다.
 
-## Useful Commands
+## Make Targets
+
+`make help`로 전체 타깃을 확인합니다.
 
 ```bash
-npm run start
-npm run build
-npm run serve
-npm run typecheck
-npm run format:check
-npm run check
+make install                 # 잠긴 의존성 설치 (npm ci)
+make dev                     # 개발 서버 실행
+make build                   # 모든 locale을 build/에 빌드
+make serve                   # 프로덕션 빌드를 로컬에서 서빙
+make check                   # Prettier 포맷 검사와 TypeScript 검사
+make format                  # 소스와 문서 포맷 적용
+make verify                  # 커밋 전 전체 검증: check + build
+make git-governance-check    # 브랜치, 커밋, worklog, PR 메타데이터 검증
+make governance-test         # 거버넌스 검증기 테스트
 ```
 
-넓은 범위의 변경 전에는 가능하면 `npm run check`를 사용합니다.
-Docusaurus 설정, 사이드바, 내비게이션, 스타일, 문서 구조를 변경한 뒤에는 `npm run build`를 실행합니다.
+모든 커밋 전에 `make verify`를 실행합니다.
+
+## Contribution Workflow
+
+작업은 작업 단위로 나누고, `<type>/<kebab-title>` 브랜치에서 단위별로 커밋합니다.
+모든 커밋에는 `.github/WORKLOG_TEMPLATE.md` 기반의 `worklog/NNNN-title.md` 항목이 포함됩니다.
+PR은 `.github/pull_request_template.md`를 사용하며 `.github/workflows/check.yml`과 `.github/workflows/governance.yml`로 검증됩니다.
+전체 규칙은 `AGENTS.md`를 참고합니다.
 
 ## Documentation Policy
 

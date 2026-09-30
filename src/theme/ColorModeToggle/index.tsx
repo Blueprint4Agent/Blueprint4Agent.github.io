@@ -30,7 +30,11 @@ export default function ColorModeToggle({ className }: Props): React.ReactNode {
     const { colorModeChoice, setColorMode } = useColorMode();
 
     return (
-        <div className={clsx("theme-toggle-button", className)} role="group" aria-label="Theme select">
+        <div
+            className={clsx("theme-toggle-button", className)}
+            role="group"
+            aria-label="Theme select"
+        >
             <span className="theme-toggle-button__title">Theme</span>
             {(["system", "light", "dark"] as ModeOption[]).map((option) => {
                 const active = isSelected(option, colorModeChoice);
