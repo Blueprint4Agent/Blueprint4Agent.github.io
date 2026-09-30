@@ -1,4 +1,8 @@
 import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
+import type { IconName } from "./src/components/icons/registry";
+
+/** A doc row with a lucide icon, rendered like a B4React AppSidebar item. */
+const doc = (id: string, icon: IconName) => ({ type: "doc" as const, id, customProps: { icon } });
 
 const sidebars: SidebarsConfig = {
     manualSidebar: [
@@ -7,10 +11,10 @@ const sidebars: SidebarsConfig = {
             label: "Getting Started",
             collapsible: false,
             items: [
-                "getting-started/overview",
-                "getting-started/quick-start",
-                "getting-started/project-initialization",
-                "getting-started/repository-layout",
+                doc("getting-started/overview", "compass"),
+                doc("getting-started/quick-start", "rocket"),
+                doc("getting-started/project-initialization", "sliders"),
+                doc("getting-started/repository-layout", "folder"),
             ],
         },
         {
@@ -19,16 +23,16 @@ const sidebars: SidebarsConfig = {
             collapsible: false,
             link: { type: "doc", id: "features/index" },
             items: [
-                "features/authentication",
-                "features/email",
-                "features/oauth",
-                "features/api-keys",
-                "features/admin-and-roles",
-                "features/realtime-events",
-                "features/background-jobs",
-                "features/settings-and-profile",
-                "features/showcase-and-style-studio",
-                "features/desktop-app",
+                doc("features/authentication", "shield"),
+                doc("features/email", "mail"),
+                doc("features/oauth", "lock"),
+                doc("features/api-keys", "key"),
+                doc("features/admin-and-roles", "users"),
+                doc("features/realtime-events", "radio"),
+                doc("features/background-jobs", "clock"),
+                doc("features/settings-and-profile", "settings"),
+                doc("features/showcase-and-style-studio", "palette"),
+                doc("features/desktop-app", "monitor"),
             ],
         },
         {
@@ -37,11 +41,11 @@ const sidebars: SidebarsConfig = {
             collapsible: false,
             link: { type: "doc", id: "environment/index" },
             items: [
-                "environment/environment-variables",
-                "environment/database-and-redis",
-                "environment/observability",
-                "environment/docker",
-                "environment/make-commands",
+                doc("environment/environment-variables", "file-code"),
+                doc("environment/database-and-redis", "database"),
+                doc("environment/observability", "activity"),
+                doc("environment/docker", "container"),
+                doc("environment/make-commands", "terminal"),
             ],
         },
         {
@@ -50,16 +54,16 @@ const sidebars: SidebarsConfig = {
             collapsible: false,
             link: { type: "doc", id: "verification/index" },
             items: [
-                "verification/verification-process",
-                "verification/checks-and-tests",
-                "verification/git-governance",
+                doc("verification/verification-process", "workflow"),
+                doc("verification/checks-and-tests", "list-checks"),
+                doc("verification/git-governance", "git-branch"),
             ],
         },
         {
             type: "category",
             label: "Backends",
             collapsible: false,
-            items: ["backends/b4springboot"],
+            items: [doc("backends/b4springboot", "leaf")],
         },
     ],
 };

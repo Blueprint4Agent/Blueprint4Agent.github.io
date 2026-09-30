@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { iconRegistry, type IconName } from "@site/src/components/icons/registry";
 
-type BadgeTone = "neutral" | "info" | "warn" | "planned";
+/** Tones map onto B4React `ui-status-badge` variants. */
+type BadgeTone = "neutral" | "info" | "active" | "warn" | "planned";
+
+const badgeVariant: Record<BadgeTone, string> = {
+    neutral: "inactive",
+    info: "info",
+    active: "active",
+    warn: "warning",
+    planned: "inactive",
+};
 
 export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; children: ReactNode }) {
-    return <span className={clsx("b4-badge", `b4-badge--${tone}`)}>{children}</span>;
-}
-
-export function IconTile({ icon }: { icon: IconName }) {
-    const Icon = iconRegistry[icon];
     return (
-        <span className="b4-icon-tile" aria-hidden="true">
-            <Icon strokeWidth={1.75} />
+        <span className={clsx("ui-status-badge", `ui-status-badge--${badgeVariant[tone]}`)}>
+            {children}
         </span>
     );
 }
@@ -28,15 +32,17 @@ type CardProps = {
     children?: ReactNode;
 };
 
+/** B4React primary-card / settings-row: 0.5px border, 16px radius, plain 18px icon. */
 export function Card({ title, icon, href, badge, badgeTone, children }: CardProps) {
+    const Icon = icon ? iconRegistry[icon] : undefined;
     const body = (
         <>
-            {icon && <IconTile icon={icon} />}
-            <strong className="b4-card__title">{title}</strong>
+            {Icon && <Icon className="b4-card__icon" aria-hidden="true" />}
+            <span className="b4-card__title">{title}</span>
             {(badge || href) && (
                 <span className="b4-card__aside">
                     {badge && <Badge tone={badgeTone}>{badge}</Badge>}
-                    {href && <ArrowRight className="b4-card__arrow" aria-hidden="true" />}
+                    {href && <ChevronRight className="b4-card__arrow" aria-hidden="true" />}
                 </span>
             )}
             {children && <span className="b4-card__body">{children}</span>}
@@ -44,12 +50,12 @@ export function Card({ title, icon, href, badge, badgeTone, children }: CardProp
     );
     if (href) {
         return (
-            <Link className="b4-card b4-card--link" to={href}>
+            <Link className="primary-card b4-card b4-card--link" to={href}>
                 {body}
             </Link>
         );
     }
-    return <div className="b4-card">{body}</div>;
+    return <div className="primary-card b4-card">{body}</div>;
 }
 
 export function CardGrid({ columns = 3, children }: { columns?: 2 | 3; children: ReactNode }) {

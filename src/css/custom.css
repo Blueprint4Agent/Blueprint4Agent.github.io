@@ -2,9 +2,21 @@
 
 /*
  * B4Agent manual theme.
- * Tokens mirror B4React `src/styles/app.css` (palette, 4px spacing scale,
- * 8px control / 12px card / 16px panel radii) and are mapped onto Infima.
+ *
+ * Every token and component below is copied from B4React `src/styles/app.css`
+ * (pinned in B4FastAPI at src/frontend). Keep values in sync with B4React rather
+ * than inventing local variants:
+ *   sidebar      -> .app-sidebar--expanded / .app-sidebar__item
+ *   cards        -> .primary-card, .settings-row
+ *   badges       -> .ui-status-badge
+ *   buttons      -> .ui-button, .ui-button--pill-secondary, .landing-hero__start-button
+ *   tables       -> .developer-key-list / .developer-key-table
+ *   admonitions  -> .status-card
+ *   theme toggle -> .theme-toggle-button
+ *   navbar       -> .public-nav, .brand-banner
  */
+
+/* ---------- B4React tokens ---------- */
 
 :root {
     --font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -22,20 +34,22 @@
     --space-6: 1.5rem;
     --space-8: 2rem;
     --control-height: 2.25rem;
-    --sidebar-width: 16rem;
-
+    --rail-control-size: 2rem;
+    --sidebar-row-height: 2rem;
+    --sidebar-expanded-width: 15rem;
+    --popover-bg: #ffffff;
+    --tooltip-bg: #101010;
+    --tooltip-fg: #ffffff;
     --bg: #f1f3f7;
     --sidebar-bg: #e6eaf0;
     --text: #132033;
     --text-soft: #4a5a6b;
     --panel: rgba(255, 255, 255, 0.97);
-    --panel-solid: #ffffff;
-    --panel-border: rgba(19, 32, 51, 0.14);
+    --panel-border: rgba(19, 32, 51, 0.2);
     --input-bg: rgba(255, 255, 255, 0.99);
+    --input-border: rgba(19, 32, 51, 0.22);
     --accent: #0b4ea8;
     --accent-hover: #063d86;
-    --hover-fill: color-mix(in oklab, var(--text) 7%, transparent);
-    --active-fill: color-mix(in oklab, var(--text) 10%, transparent);
     --shadow: 0 4px 16px rgba(22, 33, 48, 0.06);
     --error-bg: rgba(210, 53, 53, 0.1);
     --error-border: rgba(210, 53, 53, 0.35);
@@ -46,25 +60,30 @@
     --info-bg: rgba(22, 143, 72, 0.12);
     --info-border: rgba(22, 143, 72, 0.38);
     --info-text: #0f6a33;
-    --note-bg: rgba(11, 78, 168, 0.08);
-    --note-border: rgba(11, 78, 168, 0.3);
-    --note-text: #0b3f86;
     --button-bg: #101010;
     --button-hover-bg: #000000;
     --button-fg: #f7f7f7;
     --button-border: #101010;
-    --code-bg: #f6f8fb;
     --scrollbar-size: 0.6rem;
     --scrollbar-thumb: rgba(66, 87, 113, 0.42);
     --scrollbar-thumb-hover: rgba(66, 87, 113, 0.62);
 
+    /* Manual layout (reading column + TOC). */
+    --doc-column: 46rem;
+    --doc-toc: 13rem;
+    --doc-gap: 3rem;
+    --doc-gutter: 3rem;
+    --block-gap: 1.25rem;
+    --figure-gap: 1.5rem;
+
+    /* Infima mapping. */
     --ifm-font-family-base: var(--font-family);
     --ifm-heading-font-family: var(--font-family);
     --ifm-font-family-monospace: var(--font-mono);
     --ifm-font-size-base: 100%;
-    --ifm-line-height-base: 1.7;
+    --ifm-line-height-base: 1.5;
     --ifm-background-color: var(--bg);
-    --ifm-background-surface-color: var(--panel-solid);
+    --ifm-background-surface-color: var(--popover-bg);
     --ifm-font-color-base: var(--text);
     --ifm-font-color-secondary: var(--text-soft);
     --ifm-heading-color: var(--text);
@@ -83,29 +102,22 @@
     --ifm-hr-background-color: var(--panel-border);
     --ifm-global-radius: var(--radius-control);
     --ifm-code-border-radius: 0.375rem;
-    --ifm-code-font-size: 88%;
-    --ifm-code-background: var(--hover-fill);
-    --ifm-pre-background: var(--code-bg);
+    --ifm-code-font-size: 86%;
+    --ifm-code-background: var(--input-bg);
+    --ifm-pre-background: var(--panel);
     --ifm-navbar-height: var(--nav-height);
     --ifm-navbar-background-color: var(--panel);
     --ifm-navbar-shadow: none;
     --ifm-navbar-padding-horizontal: var(--space-4);
+    --ifm-navbar-padding-vertical: 0;
     --ifm-navbar-item-padding-horizontal: var(--space-3);
     --ifm-navbar-link-color: var(--text-soft);
     --ifm-navbar-link-hover-color: var(--text);
     --ifm-menu-color: var(--text-soft);
     --ifm-menu-color-active: var(--text);
-    --ifm-menu-color-background-active: var(--active-fill);
-    --ifm-menu-color-background-hover: var(--hover-fill);
-    --ifm-menu-link-padding-horizontal: var(--space-3);
-    --ifm-menu-link-padding-vertical: 0.375rem;
-    --ifm-table-border-color: var(--panel-border);
-    --ifm-table-stripe-background: transparent;
-    --ifm-table-head-background: var(--hover-fill);
-    --ifm-dropdown-background-color: var(--panel-solid);
-    --ifm-breadcrumb-item-background-active: var(--active-fill);
-    --doc-sidebar-width: var(--sidebar-width);
-    --docusaurus-highlighted-code-line-bg: rgba(11, 78, 168, 0.1);
+    --ifm-dropdown-background-color: var(--popover-bg);
+    --doc-sidebar-width: var(--sidebar-expanded-width);
+    --docusaurus-highlighted-code-line-bg: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
 [data-theme="dark"] {
@@ -114,12 +126,15 @@
     --text: #f3f3f3;
     --text-soft: #a3a3a3;
     --panel: rgba(30, 30, 33, 0.92);
-    --panel-solid: #1e1e21;
     --panel-border: rgba(148, 148, 153, 0.22);
     --input-bg: rgba(38, 38, 41, 0.96);
+    --input-border: rgba(152, 152, 158, 0.38);
     --accent: #d4d4d8;
     --accent-hover: #ececef;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+    --popover-bg: #1e1e21;
+    --tooltip-bg: #ffffff;
+    --tooltip-fg: #101010;
     --error-bg: rgba(248, 97, 97, 0.14);
     --error-border: rgba(248, 97, 97, 0.45);
     --error-text: #ffc4c4;
@@ -129,17 +144,12 @@
     --info-bg: rgba(22, 143, 72, 0.18);
     --info-border: rgba(98, 227, 150, 0.42);
     --info-text: #c9f5d8;
-    --note-bg: rgba(148, 148, 153, 0.12);
-    --note-border: rgba(212, 212, 216, 0.32);
-    --note-text: #e4e4e7;
     --button-bg: #f7f7f7;
     --button-hover-bg: #dedee3;
     --button-fg: #101216;
     --button-border: #f7f7f7;
-    --code-bg: #151518;
     --scrollbar-thumb: rgba(156, 156, 162, 0.46);
     --scrollbar-thumb-hover: rgba(194, 194, 199, 0.62);
-    --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.08);
 }
 
 /* ---------- Base ---------- */
@@ -176,7 +186,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Keep Korean words intact when wrapping. */
 html[lang="ko-KR"] body {
     word-break: keep-all;
     overflow-wrap: break-word;
@@ -191,7 +200,27 @@ html[lang="ko-KR"] body {
     display: none;
 }
 
-/* ---------- Brand ---------- */
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes sidebar-label-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ---------- Brand (B4React BrandMark / BrandBanner) ---------- */
 
 .brand-mark {
     position: relative;
@@ -217,71 +246,70 @@ html[lang="ko-KR"] body {
     display: block;
 }
 
-/* ---------- Navbar ---------- */
+/* ---------- Navbar (B4React PublicNavbar + BrandBanner) ---------- */
 
 .navbar {
-    border-bottom: 1px solid var(--panel-border);
+    border-bottom: 1px solid color-mix(in oklab, var(--panel-border) 85%, transparent 15%);
+    background: var(--panel);
     backdrop-filter: blur(10px);
 }
 
 .navbar__brand {
-    gap: var(--space-2);
+    gap: 10px;
     margin-right: var(--space-4);
 }
 
 .navbar__logo {
-    height: 1.5rem;
+    width: 40px;
+    height: 40px;
     margin-right: 0;
+    padding: 5px;
 }
 
 .navbar__logo img {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 100%;
+    height: 100%;
 }
 
 .navbar__title {
     color: var(--text);
-    font-size: 1.125rem;
+    font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.04em;
+    line-height: 1;
 }
 
+.navbar__items {
+    gap: var(--space-1);
+}
+
+/* Navbar links reuse the sidebar item geometry. */
 .navbar__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: var(--sidebar-row-height);
+    padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-control);
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding-block: 0.375rem;
+    color: var(--text-soft);
+    font:
+        500 0.8125rem/1.25 var(--font-family),
+        system-ui,
+        sans-serif;
     transition:
         background-color 120ms ease,
         color 120ms ease;
 }
 
 .navbar__link:hover {
-    background: var(--hover-fill);
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 12%, transparent);
 }
 
 .navbar__link--active,
 .navbar__link--active:hover {
     color: var(--text);
-    background: var(--active-fill);
-}
-
-.navbar__items--right {
-    gap: var(--space-1);
-}
-
-@media (min-width: 997px) {
-    .navbar__items--right > .navbar__item {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-    }
-}
-
-.navbar__items--right .dropdown > .navbar__link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
 .navbar__items--right .dropdown > .navbar__link::after {
@@ -296,8 +324,7 @@ html[lang="ko-KR"] body {
 }
 
 .navbar__items--right > .navbar-icon-link {
-    width: var(--control-height);
-    height: var(--control-height);
+    width: var(--rail-control-size);
     padding: 0;
 }
 
@@ -311,32 +338,45 @@ html[lang="ko-KR"] body {
 }
 
 .navbar-sidebar__brand {
-    border-bottom: 1px solid var(--panel-border);
+    border-bottom: 0.5px solid var(--panel-border);
 }
 
+@media (min-width: 997px) {
+    .navbar__items--right > .navbar__item {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* Dropdown (B4React DropdownMenu) */
 .dropdown__menu {
     min-width: 9rem;
     padding: var(--space-1);
-    border: 1px solid var(--panel-border);
+    border: 0.5px solid var(--panel-border);
     border-radius: var(--radius-card);
+    background: var(--popover-bg);
     box-shadow: var(--shadow);
 }
 
 .dropdown__link {
-    border-radius: 0.375rem;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-control);
     color: var(--text);
     font-size: 0.8125rem;
-    padding: 0.375rem var(--space-3);
+    font-weight: 400;
 }
 
 .dropdown__link:hover {
-    background: var(--hover-fill);
+    background: color-mix(in oklab, var(--text) 12%, var(--popover-bg));
 }
 
 .dropdown__link--active,
 .dropdown__link--active:hover {
-    background: var(--active-fill);
     color: var(--text);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
 /* ---------- Theme toggle (B4React ThemeToggleButton) ---------- */
@@ -344,152 +384,208 @@ html[lang="ko-KR"] body {
 .theme-toggle-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.24rem;
     padding: 0.2rem 0.35rem;
-    border: 1px solid var(--panel-border);
     border-radius: var(--radius-pill);
-    background: var(--panel);
+    border: 1px solid color-mix(in oklab, var(--panel-border) 82%, transparent 18%);
+    background: color-mix(in oklab, var(--panel) 95%, transparent 5%);
+    gap: 0.24rem;
 }
 
 .theme-toggle-button__title {
     margin: 0 0.2rem 0 0.25rem;
+    font:
+        500 0.76rem/1 var(--font-family),
+        system-ui,
+        sans-serif;
     color: var(--text-soft);
-    font-size: 0.76rem;
-    font-weight: 500;
-    line-height: 1;
     white-space: nowrap;
 }
 
 .theme-toggle-button__option {
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
     width: 1.75rem;
     height: 1.75rem;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
-    border-radius: var(--radius-pill);
-    background: transparent;
+    gap: 0.35rem;
     color: var(--text-soft);
+    background: transparent;
     cursor: pointer;
 }
 
-.theme-toggle-button__option:hover {
-    color: var(--text);
-}
-
 .theme-toggle-button__option svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1.08rem;
+    height: 1.08rem;
 }
 
 .theme-toggle-button__option--active {
     color: var(--text);
-    border-color: var(--panel-border);
-    background: var(--input-bg);
+    border-color: color-mix(in oklab, var(--panel-border) 70%, transparent 30%);
+    background: color-mix(in oklab, var(--input-bg) 82%, transparent 18%);
 }
 
-/* ---------- Docs sidebar ---------- */
+/* ---------- Docs sidebar (B4React AppSidebar, expanded) ---------- */
 
 .theme-doc-sidebar-container {
-    border-right: 1px solid var(--panel-border) !important;
+    border-right: 0.5px solid var(--panel-border) !important;
     background: var(--sidebar-bg);
 }
 
-.theme-doc-sidebar-menu.menu__list {
-    padding: var(--space-6) var(--space-1) var(--space-8);
+.theme-doc-sidebar-container [class*="sidebarViewport"] {
+    display: flex;
+    flex-direction: column;
 }
 
-.menu {
-    font-weight: 500;
-    padding: 0;
+.theme-doc-sidebar-container nav.menu {
+    padding: var(--space-3) var(--space-2);
+}
+
+.theme-doc-sidebar-menu.menu__list {
+    padding: 0 0 var(--space-6);
+}
+
+.menu__list {
+    display: grid;
+    gap: var(--space-1);
 }
 
 .menu__list .menu__list {
-    margin: 0.125rem 0 0 1.125rem;
-    padding-left: var(--space-2);
-    border-left: 1px solid var(--panel-border);
+    margin: 0;
+    padding: 0;
 }
 
 .menu__list-item:not(:first-child) {
-    margin-top: 0.125rem;
+    margin-top: 0;
 }
 
-.menu__link {
-    min-height: 2rem;
+/* Section labels: showcase-item__name style (12px, 500, soft). */
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible:hover {
+    background: transparent;
+}
+
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+    height: auto;
+    min-height: 0;
+    padding: var(--space-2) var(--space-3) var(--space-1);
+    color: var(--text-soft);
+    background: transparent;
+    font:
+        500 0.75rem/1.5 var(--font-family),
+        system-ui,
+        sans-serif;
+}
+
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > a.menu__link[href]:hover {
+    color: var(--text);
+}
+
+.theme-doc-sidebar-item-category-level-1:not(:first-child) {
+    margin-top: var(--space-3);
+}
+
+/* Rows */
+.menu__link.sidebar-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    height: var(--sidebar-row-height);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid transparent;
     border-radius: var(--radius-control);
-    font-size: 0.8125rem;
-    line-height: 1.35;
+    color: var(--text-soft);
+    font:
+        500 0.8125rem/1.25 var(--font-family),
+        system-ui,
+        sans-serif;
+    text-decoration: none;
     transition:
         background-color 120ms ease,
         color 120ms ease;
 }
 
-.menu__link--active:not(.menu__link--sublist) {
-    font-weight: 600;
-}
-
-.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+.menu__link.sidebar-item:hover {
     color: var(--text);
-    font-weight: 600;
+    background: color-mix(in oklab, var(--text) 12%, transparent);
 }
 
-.theme-doc-sidebar-item-category-level-1:not(:first-child) {
-    margin-top: var(--space-4);
+.menu__link.sidebar-item.menu__link--active {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
-.menu__list-item-collapsible:hover {
-    background: var(--hover-fill);
+.sidebar-item__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    stroke-width: 1.75;
 }
 
-.menu__list-item-collapsible--active,
-.menu__list-item-collapsible--active:hover {
-    background: transparent;
+.sidebar-item__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    animation: sidebar-label-in 150ms ease both;
 }
 
-.menu__list-item-collapsible .menu__link--active,
-.menu__list-item-collapsible .menu__link:hover {
-    background: transparent;
-}
-
-.menu__caret::before,
-.menu__link--sublist-caret::after {
-    background-size: 1.1rem 1.1rem;
-    opacity: 0.55;
-}
-
-[class*="collapseSidebarButton"] {
-    border-top: 1px solid var(--panel-border);
-    border-radius: 0;
+/* Footer and rail with the B4React sidebar toggle (32px, PanelLeftClose/Open). */
+.sidebar-footer {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-2);
+    border-top: 0.5px solid var(--panel-border);
     background: var(--sidebar-bg);
+}
+
+.sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--rail-control-size);
+    height: var(--rail-control-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
     color: var(--text-soft);
+    cursor: pointer;
 }
 
-[class*="collapseSidebarButton"]:hover,
-[class*="expandButton"]:hover {
-    background: var(--hover-fill);
+.sidebar-toggle svg {
+    width: 1rem;
+    height: 1rem;
 }
 
-[class*="expandButton"] {
+.sidebar-toggle:hover {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
+}
+
+.sidebar-rail {
+    position: sticky;
+    top: var(--nav-height);
+    display: flex;
+    justify-content: center;
+    width: 3rem;
+    height: calc(100vh - var(--nav-height));
+    padding-top: var(--space-3);
+    border-right: 0.5px solid var(--panel-border);
     background: var(--sidebar-bg);
-    color: var(--text-soft);
+}
+
+[class*="docSidebarContainer"][class*="docSidebarContainerHidden"] {
+    width: 3rem !important;
 }
 
 /* ---------- Doc layout ---------- */
-
-/*
- * Reading column (46rem) + TOC (13rem), centered in the space right of the sidebar.
- * Gutters: 48px desktop, 20px mobile. Vertical rhythm: 20px between blocks,
- * 24px around cards/tables/code/admonitions, 48px before h2.
- */
-:root {
-    --doc-column: 46rem;
-    --doc-toc: 13rem;
-    --doc-gap: 3rem;
-    --doc-gutter: 3rem;
-    --block-gap: 1.25rem;
-    --figure-gap: 1.5rem;
-}
 
 /*
  * Infima utilities and the theme's docItemCol width use !important inside cascade
@@ -550,8 +646,8 @@ html[lang="ko-KR"] body {
 /* ---------- Doc content ---------- */
 
 .theme-doc-markdown {
-    font-size: 0.975rem;
-    line-height: 1.75;
+    font-size: 0.9375rem;
+    line-height: 1.7;
 }
 
 .theme-doc-markdown > * {
@@ -568,35 +664,37 @@ html[lang="ko-KR"] body {
     margin-top: 0.25rem;
 }
 
+/* Page header: B4React panel h1 + settings header subtitle. */
 .theme-doc-markdown h1 {
-    font-size: clamp(1.9rem, 3.4vw, 2.35rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 1.15;
-    margin: 0 0 var(--space-3);
+    margin: 0 0 var(--space-2);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
 }
 
 .theme-doc-markdown header + p {
+    margin-bottom: var(--space-8);
     color: var(--text-soft);
-    font-size: 1.075rem;
-    line-height: 1.65;
-    margin-bottom: var(--figure-gap);
+    font-size: 0.9375rem;
+    line-height: 1.6;
 }
 
+/* Section headings: B4React settings header (1.25rem / 600). */
 .theme-doc-markdown h2 {
-    font-size: 1.4rem;
-    font-weight: 650;
-    letter-spacing: -0.025em;
+    margin: 2.75rem 0 var(--space-3);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     line-height: 1.3;
-    margin: 3rem 0 var(--space-3);
 }
 
 .theme-doc-markdown h3 {
-    font-size: 1.075rem;
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    margin: var(--space-8) 0 var(--space-2);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     line-height: 1.4;
-    margin: 2rem 0 var(--space-2);
 }
 
 .theme-doc-markdown h2 + h3 {
@@ -604,9 +702,10 @@ html[lang="ko-KR"] body {
 }
 
 .theme-doc-markdown a:not(.b4-card) {
+    color: var(--text);
     text-decoration: underline;
-    text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
-    text-underline-offset: 0.18em;
+    text-decoration-color: color-mix(in oklab, var(--text) 30%, transparent);
+    text-underline-offset: 0.2em;
 }
 
 .theme-doc-markdown a:not(.b4-card):hover {
@@ -614,16 +713,31 @@ html[lang="ko-KR"] body {
 }
 
 .theme-doc-markdown :not(pre) > code {
-    border: 1px solid var(--panel-border);
+    border: 0.5px solid var(--panel-border);
+    background: var(--input-bg);
     color: var(--text);
     padding: 0.08rem 0.35rem;
     vertical-align: 0.04em;
 }
 
+.theme-doc-markdown kbd {
+    border: 0.5px solid var(--panel-border);
+    border-radius: 0.375rem;
+    background: var(--input-bg);
+    box-shadow: none;
+    color: var(--text);
+    font:
+        500 0.75rem/1 var(--font-family),
+        system-ui,
+        sans-serif;
+    padding: 0.2rem 0.4rem;
+}
+
 .theme-doc-markdown table,
 .theme-doc-markdown .theme-code-block,
-.theme-doc-markdown .theme-admonition,
+.theme-doc-markdown .status-card,
 .theme-doc-markdown details,
+.theme-doc-markdown .docusaurus-mermaid-container,
 .theme-doc-markdown .tabs-container {
     margin-top: var(--figure-gap);
     margin-bottom: var(--figure-gap);
@@ -632,69 +746,83 @@ html[lang="ko-KR"] body {
 .theme-doc-markdown h2 + table,
 .theme-doc-markdown h3 + table,
 .theme-doc-markdown h2 + .theme-code-block,
-.theme-doc-markdown h3 + .theme-code-block {
+.theme-doc-markdown h3 + .theme-code-block,
+.theme-doc-markdown h2 + .docusaurus-mermaid-container,
+.theme-doc-markdown h3 + .docusaurus-mermaid-container {
     margin-top: var(--space-3);
 }
 
-/* Tables are used heavily for env vars and make targets. */
+/* ---------- Tables (B4React developer-key-list / developer-key-table) ---------- */
+
 .theme-doc-markdown table {
     display: table;
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid var(--panel-border);
+    border: 0.5px solid var(--panel-border);
     border-radius: var(--radius-card);
-    overflow: hidden;
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-.theme-doc-markdown table {
     background: var(--panel);
+    overflow: hidden;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    text-align: left;
 }
 
-.theme-doc-markdown thead tr {
-    background: color-mix(in oklab, var(--text) 4%, var(--panel-solid));
-}
-
+.theme-doc-markdown thead tr,
 .theme-doc-markdown tbody tr {
+    border: 0;
     background: transparent;
 }
 
-/* Key/value "at a glance" tables are written with an empty header row. */
-.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) thead {
-    display: none;
-}
-
-.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) td:first-child {
-    width: 8.5rem;
-    color: var(--text);
+.theme-doc-markdown th {
+    padding: var(--space-2) var(--space-3);
+    border: 0;
+    background: var(--popover-bg);
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    font-weight: 500;
     white-space: nowrap;
 }
 
-.theme-doc-markdown th {
-    color: var(--text);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-align: left;
-    text-transform: uppercase;
-}
-
-.theme-doc-markdown th,
 .theme-doc-markdown td {
+    padding: var(--space-3);
     border: 0;
-    border-bottom: 1px solid var(--panel-border);
-    padding: 0.6rem 0.8rem;
+    border-top: 0.5px solid var(--panel-border);
     vertical-align: top;
 }
 
-.theme-doc-markdown tbody tr:last-child td {
-    border-bottom: 0;
+.theme-doc-markdown tbody tr:hover {
+    background: color-mix(in oklab, var(--text) 6%, transparent);
 }
 
 .theme-doc-markdown td code {
     white-space: nowrap;
+}
+
+/* Key/value tables are written with an empty header row. */
+.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) thead {
+    display: none;
+}
+
+.theme-doc-markdown
+    table:has(thead th:empty):not(:has(thead th:not(:empty)))
+    tbody
+    tr:first-child
+    td {
+    border-top: 0;
+}
+
+.theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) td:first-child {
+    width: 8.5rem;
+    color: var(--text-soft);
+    white-space: nowrap;
+}
+
+.theme-doc-markdown
+    table:has(thead th:empty):not(:has(thead th:not(:empty)))
+    td:first-child
+    strong {
+    font-weight: 500;
 }
 
 @media (max-width: 996px) {
@@ -704,23 +832,27 @@ html[lang="ko-KR"] body {
     }
 }
 
-/* Code blocks */
+/* ---------- Code blocks ---------- */
+
 .theme-code-block {
-    border: 1px solid var(--panel-border);
+    border: 0.5px solid var(--panel-border);
     border-radius: var(--radius-card);
+    background: var(--panel);
     box-shadow: none;
 }
 
-.theme-code-block [class*="codeBlockTitle"] {
-    border-bottom: 1px solid var(--panel-border);
-    color: var(--text-soft);
-    font-size: 0.8125rem;
-    font-weight: 500;
-}
-
 .theme-code-block pre {
+    background: transparent !important;
     font-size: 0.8125rem;
     line-height: 1.6;
+}
+
+.theme-code-block [class*="codeBlockTitle"] {
+    border-bottom: 0.5px solid var(--panel-border);
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 [class*="codeBlockLines"] {
@@ -729,101 +861,110 @@ html[lang="ko-KR"] body {
 
 .clean-btn[class*="copyButton"],
 .clean-btn[class*="wordWrapButton"] {
-    border: 1px solid var(--panel-border);
+    border: 0.5px solid var(--panel-border);
     border-radius: var(--radius-control);
-    background: var(--panel-solid);
+    background: var(--popover-bg);
     color: var(--text-soft);
 }
 
-/* Admonitions use the B4React status palette. */
-.theme-admonition.alert {
-    --ifm-alert-border-width: 1px;
-    --ifm-alert-border-left-width: 1px;
-    --ifm-alert-padding-vertical: var(--space-4);
-    --ifm-alert-padding-horizontal: var(--space-4);
-    border-radius: var(--radius-card);
-    border-style: solid;
-    box-shadow: none;
-    font-size: 0.9rem;
+/* ---------- Admonitions (B4React StatusCard) ---------- */
+
+.status-card {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    color: var(--text);
 }
 
-.theme-admonition [class*="admonitionHeading"] {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 0.8125rem;
-    letter-spacing: 0.02em;
+.status-card__icon {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.status-card__content {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.status-card__title {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
     text-transform: none;
 }
 
-.theme-admonition [class*="admonitionIcon"] {
-    display: inline-flex;
-    margin-right: 0;
+.status-card__message {
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-.theme-admonition [class*="admonitionIcon"] svg {
-    fill: none;
-    stroke: currentColor;
-}
-
-.alert--secondary,
-.alert--info {
-    --ifm-alert-background-color: var(--note-bg);
-    --ifm-alert-border-color: var(--note-border);
-    --ifm-alert-foreground-color: var(--note-text);
-}
-
-.alert--success {
-    --ifm-alert-background-color: var(--info-bg);
-    --ifm-alert-border-color: var(--info-border);
-    --ifm-alert-foreground-color: var(--info-text);
-}
-
-.alert--warning {
-    --ifm-alert-background-color: var(--warn-bg);
-    --ifm-alert-border-color: var(--warn-border);
-    --ifm-alert-foreground-color: var(--warn-text);
-}
-
-.alert--danger {
-    --ifm-alert-background-color: var(--error-bg);
-    --ifm-alert-border-color: var(--error-border);
-    --ifm-alert-foreground-color: var(--error-text);
-}
-
-.theme-admonition [class*="admonitionContent"] > :last-child,
-.theme-doc-markdown details > div > :last-child,
-.theme-doc-markdown li > :last-child {
+.status-card__message > :last-child {
     margin-bottom: 0;
 }
 
-.theme-admonition [class*="admonitionHeading"] {
+.status-card__message p {
     margin-bottom: var(--space-2);
 }
 
-.theme-admonition.alert a {
-    color: inherit;
+.status-card--note,
+.status-card--secondary {
+    border: 0.5px solid var(--panel-border);
+    color: var(--text);
+}
+
+.status-card--note .status-card__icon {
+    color: var(--text-soft);
+}
+
+.status-card--tip,
+.status-card--info,
+.status-card--success {
+    background: var(--info-bg);
+    color: var(--info-text);
+}
+
+.status-card--warning {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+}
+
+.status-card--danger,
+.status-card--caution {
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
+.status-card a,
+.status-card code {
+    color: inherit !important;
 }
 
 /* Details */
 .theme-doc-markdown details {
-    --ifm-alert-background-color: var(--panel-solid);
+    --ifm-alert-background-color: var(--panel);
     --ifm-alert-border-color: var(--panel-border);
     --ifm-alert-foreground-color: var(--text);
+    border-width: 0.5px;
     border-radius: var(--radius-card);
     box-shadow: none;
 }
 
-/* Breadcrumbs */
-.breadcrumbs {
-    margin-bottom: var(--space-5);
-}
+/* ---------- Breadcrumbs, TOC, pager ---------- */
 
 .breadcrumbs {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    margin-left: -0.5rem;
+    margin: 0 0 var(--space-5) -0.5rem;
 }
 
 .breadcrumbs__item {
@@ -835,12 +976,23 @@ html[lang="ko-KR"] body {
     display: inline-flex;
     align-items: center;
     height: 1.75rem;
+    padding: 0 0.5rem;
     border-radius: var(--radius-control);
+    background: transparent;
     color: var(--text-soft);
     font-size: 0.8125rem;
     font-weight: 500;
     line-height: 1;
-    padding: 0 0.5rem;
+}
+
+a.breadcrumbs__link:hover {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 12%, transparent);
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+    color: var(--text);
+    background: color-mix(in oklab, var(--text) 8%, transparent);
 }
 
 .breadcrumbs__item:not(:last-child)::after {
@@ -848,15 +1000,10 @@ html[lang="ko-KR"] body {
     opacity: 0.6;
 }
 
-.breadcrumbs__item--active .breadcrumbs__link {
-    color: var(--text);
-}
-
 .breadcrumbs__link svg {
     display: block;
 }
 
-/* Table of contents */
 .table-of-contents {
     font-size: 0.8125rem;
 }
@@ -871,34 +1018,40 @@ html[lang="ko-KR"] body {
 }
 
 .table-of-contents__link--active {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .theme-doc-toc-desktop {
-    border-left: 1px solid var(--panel-border);
+    border-left: 0.5px solid var(--panel-border);
     padding-left: var(--space-2);
 }
 
-/* Prev / next pager and doc footer */
+.theme-doc-toc-mobile {
+    border: 0.5px solid var(--panel-border);
+    border-radius: var(--radius-card);
+    background: var(--panel);
+}
+
+/* Pager uses B4React settings-row. */
 .pagination-nav {
     gap: var(--space-3);
 }
 
 .pagination-nav__link {
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-card);
+    padding: var(--space-3) var(--space-4);
+    border: 0.5px solid var(--panel-border);
+    border-radius: var(--radius-panel);
     background: var(--panel);
-    padding: var(--space-4);
-    transition:
-        border-color 120ms ease,
-        background-color 120ms ease;
+    transition: background-color 120ms ease;
 }
 
 .pagination-nav__link:hover {
-    border-color: color-mix(in oklab, var(--text) 30%, transparent);
+    border-color: var(--panel-border);
+    background: color-mix(in oklab, var(--text) 6%, var(--panel));
 }
 
 .pagination-nav__sublabel {
+    margin-bottom: 2px;
     color: var(--text-soft);
     font-size: 0.75rem;
     font-weight: 500;
@@ -906,8 +1059,8 @@ html[lang="ko-KR"] body {
 
 .pagination-nav__label {
     color: var(--text);
-    font-size: 0.9375rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .theme-edit-this-page {
@@ -917,6 +1070,11 @@ html[lang="ko-KR"] body {
     color: var(--text-soft);
     font-size: 0.8125rem;
     font-weight: 500;
+}
+
+.theme-edit-this-page:hover {
+    color: var(--text);
+    text-decoration: none;
 }
 
 .theme-edit-this-page svg {
@@ -929,55 +1087,63 @@ html[lang="ko-KR"] body {
     opacity: 0.6;
 }
 
-/* ---------- Shared MDX components ---------- */
+/* ---------- Badges (B4React ui-status-badge) ---------- */
 
-.b4-badge {
-    display: inline-flex;
-    align-items: center;
-    height: 1.375rem;
-    padding: 0 0.55rem;
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-pill);
-    color: var(--text-soft);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    line-height: 1;
-    white-space: nowrap;
-}
-
-.b4-badge--info {
-    border-color: var(--info-border);
-    background: var(--info-bg);
-    color: var(--info-text);
-}
-
-.b4-badge--warn {
-    border-color: var(--warn-border);
-    background: var(--warn-bg);
-    color: var(--warn-text);
-}
-
-.b4-badge--planned {
-    border-style: dashed;
-}
-
-.b4-icon-tile {
-    width: 2.5rem;
-    height: 2.5rem;
+.ui-status-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-control);
-    background: var(--input-bg);
-    color: var(--text);
+    min-width: 4.8rem;
+    min-height: 1.35rem;
+    padding: 0.14rem 0.4rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font:
+        500 0.64rem/1 var(--font-family),
+        system-ui,
+        sans-serif;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
-.b4-icon-tile svg {
-    width: 1.125rem;
-    height: 1.125rem;
+.ui-status-badge--active {
+    color: var(--info-text);
+    border-color: var(--info-border);
+    background: var(--info-bg);
+}
+
+.ui-status-badge--inactive {
+    color: var(--text-soft);
+    border-color: var(--panel-border);
+    background: var(--input-bg);
+}
+
+.ui-status-badge--info {
+    color: var(--accent);
+    border-color: var(--panel-border);
+    background: var(--input-bg);
+}
+
+.ui-status-badge--warning {
+    color: var(--warn-text);
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+}
+
+h1 .ui-status-badge {
+    margin-left: var(--space-3);
+    vertical-align: 0.3em;
+}
+
+/* ---------- Cards (B4React primary-card / settings-row) ---------- */
+
+.primary-card {
+    border: 0.5px solid var(--panel-border);
+    border-radius: var(--radius-panel);
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow);
+    animation: rise 260ms ease-out;
 }
 
 .b4-card-grid {
@@ -994,56 +1160,36 @@ html[lang="ko-KR"] body {
     grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
 }
 
-/* Three-up cards stack the icon above the title so narrow columns stay compact. */
-.b4-card-grid--3 .b4-card {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-        "icon aside"
-        "title title"
-        "body body";
-    row-gap: 0.25rem;
-}
-
-.b4-card-grid--3 .b4-card .b4-icon-tile {
-    margin-bottom: var(--space-3);
-}
-
-.b4-card-grid--3 .b4-card__aside {
-    align-self: start;
-}
-
 .b4-card {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
         "icon title aside"
-        "icon body body";
-    column-gap: var(--space-3);
-    row-gap: 0.125rem;
-    align-items: start;
+        ". body body";
+    column-gap: var(--space-2);
+    row-gap: var(--space-1);
+    align-items: center;
     align-content: start;
     padding: var(--space-4);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius-card);
-    background: var(--panel);
     color: var(--text-soft);
-    font-size: 0.875rem;
-    line-height: 1.55;
+    font-size: 0.8125rem;
+    line-height: 1.5;
 }
 
-.b4-card .b4-icon-tile {
+.b4-card__icon {
     grid-area: icon;
+    width: 1.125rem;
+    height: 1.125rem;
+    stroke-width: 1.75;
+    color: var(--text-soft);
 }
 
 .b4-card__title {
     grid-area: title;
-    align-self: center;
     color: var(--text);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-size: 0.875rem;
+    font-weight: 500;
     line-height: 1.35;
-    min-height: 1.35rem;
 }
 
 .b4-card__aside {
@@ -1051,11 +1197,11 @@ html[lang="ko-KR"] body {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    align-self: center;
 }
 
 .b4-card__body {
     grid-area: body;
+    display: block;
 }
 
 .b4-card__body > p {
@@ -1066,17 +1212,24 @@ html[lang="ko-KR"] body {
     margin-top: var(--space-2);
 }
 
+.b4-card:not(:has(.b4-card__icon)) {
+    grid-template-areas:
+        "title title aside"
+        "body body body";
+}
+
 .b4-card--link {
     text-decoration: none !important;
-    transition:
-        border-color 150ms ease,
-        background-color 150ms ease;
+    transition: background-color 120ms ease;
 }
 
 .b4-card--link:hover {
-    border-color: color-mix(in oklab, var(--text) 30%, transparent);
-    background: var(--input-bg);
     color: var(--text-soft);
+    background: color-mix(in oklab, var(--text) 6%, var(--panel));
+}
+
+.b4-card--link:hover .b4-card__icon {
+    color: var(--text);
 }
 
 .b4-card__arrow {
@@ -1091,54 +1244,234 @@ html[lang="ko-KR"] body {
     transform: translateX(2px);
 }
 
-.b4-button {
+/* Three-up cards stack the icon above the title so narrow columns stay compact. */
+.b4-card-grid--3 .b4-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "icon aside"
+        "title title"
+        "body body";
+    padding: var(--space-5);
+}
+
+.b4-card-grid--3 .b4-card__icon {
+    margin-bottom: var(--space-2);
+}
+
+/* ---------- Buttons (B4React ui-button) ---------- */
+
+.ui-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    height: 3rem;
-    padding: 0 1.2rem 0 1.35rem;
+    height: var(--control-height);
+    padding: var(--space-2) var(--space-3);
     border: 1px solid var(--button-border);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-control);
     background: var(--button-bg);
     color: var(--button-fg);
-    font-size: 0.95rem;
-    font-weight: 500;
+    font:
+        500 0.8125rem/1.25 var(--font-family),
+        system-ui,
+        sans-serif;
     text-decoration: none !important;
+    cursor: pointer;
     transition:
         background-color 150ms ease,
         border-color 150ms ease;
 }
 
-.b4-button svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    transition: transform 160ms ease;
-}
-
-.b4-button--primary:hover {
+.ui-button--primary:hover {
     background: var(--button-hover-bg);
     color: var(--button-fg);
 }
 
-.b4-button--primary:hover svg {
-    transform: translateX(3px);
-}
-
-.b4-button--ghost {
-    padding: 0 1.35rem;
-    border-color: var(--panel-border);
-    background: var(--panel);
-    color: var(--text);
-}
-
-.b4-button--ghost:hover {
+.ui-button.ui-button--pill-secondary {
+    min-height: 40px;
+    height: auto;
+    padding: 8px 16px;
+    border: 0.5px solid var(--panel-border);
+    border-radius: 999px;
     background: var(--input-bg);
-    border-color: color-mix(in oklab, var(--text) 30%, transparent);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.ui-button.ui-button--pill-secondary:hover {
+    background: color-mix(in oklab, var(--text) 12%, var(--popover-bg));
     color: var(--text);
 }
 
-/* ---------- Home (B4React landing layout) ---------- */
+.ui-button svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+/* ---------- Mermaid diagrams ---------- */
+
+.docusaurus-mermaid-container {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-5) var(--space-4);
+    border: 0.5px solid var(--panel-border);
+    border-radius: var(--radius-card);
+    background: var(--panel);
+    overflow-x: auto;
+}
+
+.docusaurus-mermaid-container svg {
+    max-width: 100%;
+    height: auto;
+    font-family: var(--font-family) !important;
+}
+
+/* Flowchart nodes and clusters use B4React surfaces in both themes. */
+.docusaurus-mermaid-container .node rect,
+.docusaurus-mermaid-container .node polygon,
+.docusaurus-mermaid-container .node circle,
+.docusaurus-mermaid-container .node path {
+    fill: var(--popover-bg) !important;
+    stroke: var(--input-border) !important;
+    stroke-width: 1px !important;
+}
+
+.docusaurus-mermaid-container .node rect {
+    rx: 8px;
+    ry: 8px;
+}
+
+.docusaurus-mermaid-container .cluster rect {
+    fill: color-mix(in oklab, var(--text) 3%, transparent) !important;
+    stroke: var(--panel-border) !important;
+    stroke-dasharray: 4 3;
+    rx: 12px;
+    ry: 12px;
+}
+
+.docusaurus-mermaid-container .nodeLabel,
+.docusaurus-mermaid-container .cluster-label,
+.docusaurus-mermaid-container .cluster-label span,
+.docusaurus-mermaid-container .label foreignObject div {
+    color: var(--text) !important;
+    fill: var(--text) !important;
+    font-size: 13px !important;
+    font-weight: 500;
+}
+
+.docusaurus-mermaid-container .cluster-label span {
+    color: var(--text-soft) !important;
+    font-size: 12px !important;
+}
+
+.docusaurus-mermaid-container .flowchart-link,
+.docusaurus-mermaid-container .edgePath .path {
+    stroke: var(--text-soft) !important;
+    stroke-width: 1.25px !important;
+}
+
+.docusaurus-mermaid-container marker path,
+.docusaurus-mermaid-container .marker {
+    fill: var(--text-soft) !important;
+    stroke: var(--text-soft) !important;
+}
+
+.docusaurus-mermaid-container .edgeLabel,
+.docusaurus-mermaid-container .edgeLabel p,
+.docusaurus-mermaid-container .edgeLabel rect,
+.docusaurus-mermaid-container .labelBkg {
+    background: var(--panel) !important;
+    background-color: var(--panel) !important;
+    fill: var(--panel) !important;
+    color: var(--text-soft) !important;
+    font-size: 12px !important;
+}
+
+/* Sequence diagrams */
+.docusaurus-mermaid-container rect.actor {
+    fill: var(--popover-bg) !important;
+    stroke: var(--input-border) !important;
+    rx: 8px;
+}
+
+.docusaurus-mermaid-container text.actor,
+.docusaurus-mermaid-container text.actor > tspan {
+    fill: var(--text) !important;
+    font-weight: 500;
+}
+
+.docusaurus-mermaid-container .actor-line {
+    stroke: var(--panel-border) !important;
+}
+
+.docusaurus-mermaid-container .messageLine0,
+.docusaurus-mermaid-container .messageLine1 {
+    stroke: var(--text-soft) !important;
+}
+
+.docusaurus-mermaid-container #arrowhead path,
+.docusaurus-mermaid-container .arrowheadPath {
+    fill: var(--text-soft) !important;
+    stroke: var(--text-soft) !important;
+}
+
+.docusaurus-mermaid-container .messageText {
+    fill: var(--text) !important;
+    font-size: 12px !important;
+}
+
+.docusaurus-mermaid-container .note {
+    fill: var(--input-bg) !important;
+    stroke: var(--panel-border) !important;
+}
+
+.docusaurus-mermaid-container .noteText,
+.docusaurus-mermaid-container .noteText > tspan {
+    fill: var(--text-soft) !important;
+}
+
+.docusaurus-mermaid-container .activation0,
+.docusaurus-mermaid-container .activation1 {
+    fill: var(--input-bg) !important;
+    stroke: var(--input-border) !important;
+}
+
+.docusaurus-mermaid-container .loopLine {
+    stroke: var(--panel-border) !important;
+}
+
+.docusaurus-mermaid-container .labelBox {
+    fill: var(--input-bg) !important;
+    stroke: var(--panel-border) !important;
+}
+
+.docusaurus-mermaid-container .labelText,
+.docusaurus-mermaid-container .loopText,
+.docusaurus-mermaid-container .loopText > tspan {
+    fill: var(--text-soft) !important;
+}
+
+/* State diagrams */
+.docusaurus-mermaid-container .stateGroup rect,
+.docusaurus-mermaid-container g.stateGroup rect,
+.docusaurus-mermaid-container .statediagram-state rect.basic {
+    fill: var(--popover-bg) !important;
+    stroke: var(--input-border) !important;
+}
+
+.docusaurus-mermaid-container .transition {
+    stroke: var(--text-soft) !important;
+}
+
+.docusaurus-mermaid-container .state-start circle,
+.docusaurus-mermaid-container circle.state-start,
+.docusaurus-mermaid-container .end-state-inner {
+    fill: var(--text) !important;
+    stroke: var(--text) !important;
+}
+
+/* ---------- Home (B4React LandingPage) ---------- */
 
 .home {
     width: min(60rem + 2 * var(--doc-gutter), 100%);
@@ -1161,79 +1494,98 @@ html[lang="ko-KR"] body {
 
 .home-hero__eyebrow {
     margin: 0 0 0.85rem;
-    color: color-mix(in oklab, var(--text-soft) 82%, var(--accent) 18%);
-    font-size: 0.78rem;
-    font-weight: 600;
+    font:
+        600 0.78rem/1 var(--font-family),
+        system-ui,
+        sans-serif;
     letter-spacing: 0.18em;
-    line-height: 1;
     text-transform: uppercase;
+    color: color-mix(in oklab, var(--text-soft) 82%, var(--accent) 18%);
 }
 
 .home-hero h1 {
     max-width: 44rem;
     margin: 0;
-    font-size: clamp(2.3rem, 6vw, 4rem);
+    font-size: clamp(2.3rem, 6vw, 4.4rem);
+    line-height: 1;
     letter-spacing: -0.055em;
-    line-height: 1.02;
 }
 
 .home-hero__subtitle {
     max-width: 38rem;
     margin: 1.2rem 0 0;
-    color: var(--text-soft);
-    font-size: clamp(1rem, 2vw, 1.14rem);
+    font-size: clamp(1rem, 2vw, 1.16rem);
     line-height: 1.65;
+    color: var(--text-soft);
 }
 
 .home-hero__note {
+    max-width: 34rem;
     margin: 0.85rem 0 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
     color: color-mix(in oklab, var(--text-soft) 88%, var(--accent) 12%);
-    font-size: 0.9rem;
 }
 
 .home-hero__actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: var(--space-3);
     margin-top: 1.8rem;
+}
+
+.ui-button.landing-hero__start-button {
+    width: auto;
+    height: 3.15rem;
+    padding: 0 1.2rem 0 1.35rem;
+    border-radius: var(--radius-pill);
+    background: var(--button-bg);
+    color: var(--button-fg);
+    font-size: 1rem;
+}
+
+.ui-button.landing-hero__secondary-button {
+    height: 3.15rem;
+    padding: 0 1.35rem;
+    font-size: 1rem;
+}
+
+.landing-hero__start-button svg {
+    transition: transform 160ms ease;
+}
+
+.landing-hero__start-button:hover svg {
+    transform: translateX(3px);
 }
 
 .home-section {
     margin-top: clamp(3.5rem, 8vw, 4.5rem);
 }
 
+/* showcase-section-heading */
 .home-section__title {
-    margin: 0 0 var(--space-4);
-    color: var(--text-soft);
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    margin: 0 0 var(--space-3);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .home-section .b4-card-grid {
     margin: 0;
 }
 
-@keyframes rise {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    to {
-        opacity: 1;
-        transform: none;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .home-hero {
+    .home-hero,
+    .primary-card {
         animation: none;
     }
 
     .b4-card--link,
-    .b4-button svg,
+    .landing-hero__start-button svg,
     .b4-card__arrow {
         transition: none;
     }
@@ -1248,5 +1600,29 @@ html[lang="ko-KR"] body {
 
     .theme-toggle-button__title {
         display: none;
+    }
+
+    .navbar__logo {
+        width: 34px;
+        height: 34px;
+    }
+
+    .navbar__title {
+        font-size: 20px;
+    }
+
+    /* Infima hides navbar items on mobile; keep that for links too. */
+    .navbar__items > .navbar__item.navbar__link {
+        display: none;
+    }
+
+    .theme-doc-markdown td code {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .theme-doc-markdown table:has(thead th:empty):not(:has(thead th:not(:empty))) td:first-child {
+        width: 5.5rem;
+        white-space: normal;
     }
 }

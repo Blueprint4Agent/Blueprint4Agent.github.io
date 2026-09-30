@@ -101,12 +101,15 @@ function Hero() {
                 </Translate>
             </p>
             <div className="home-hero__actions">
-                <Link className="b4-button b4-button--primary" to={MANUAL_START}>
+                <Link
+                    className="ui-button ui-button--primary landing-hero__start-button"
+                    to={MANUAL_START}
+                >
                     <Translate id="home.hero.start">Read the manual</Translate>
                     <ArrowRight aria-hidden="true" />
                 </Link>
                 <Link
-                    className="b4-button b4-button--ghost"
+                    className="ui-button ui-button--pill-secondary landing-hero__secondary-button"
                     href="https://github.com/Blueprint4Agent"
                 >
                     <GitHubMark />
