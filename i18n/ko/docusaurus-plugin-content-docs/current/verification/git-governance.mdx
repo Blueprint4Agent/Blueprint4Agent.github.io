@@ -1,0 +1,74 @@
+---
+title: Git 거버넌스
+sidebar_position: 3
+description: 하네스가 검증하는 브랜치, 커밋, worklog, PR, 병합 규칙입니다.
+---
+
+# Git 거버넌스
+
+커밋과 PR 메타데이터는 고정된 규칙을 따르므로 에이전트가 리뷰 가능한 이력을 남깁니다. `make git-governance-check`가 로컬에서, 필수 검사 **Git governance**가 PR의 모든 커밋을 검증합니다.
+
+## 브랜치
+
+```text
+<type>/<short-kebab-title>
+```
+
+type: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`, `build`, `perf`, `style`, `revert`, `hotfix`. 예: `feat/api-key-pagination`
+
+## 커밋
+
+제목은 Conventional Commits를 따르고, 사소하지 않은 커밋 본문에는 세 섹션이 필요합니다.
+
+```text
+feat(frontend): add API key pagination
+
+Changes:
+- What changed.
+
+Affected Files:
+- Key files or directories.
+
+Verification:
+- How it was tested.
+```
+
+## Worklog
+
+모든 커밋은 `worklog/NNNN-short-kebab-title.md`를 추가하거나 수정합니다. `# Commit Title`은 실제 커밋 제목과 같아야 하고 모든 섹션을 채워야 합니다.
+
+| 섹션               | 내용                                                                  |
+| ------------------ | --------------------------------------------------------------------- |
+| Commit Title       | 정확한 커밋 제목                                                      |
+| Changed File Scope | 변경된 파일과 계층                                                    |
+| Reason             | 문제와 의도한 결과                                                    |
+| Design             | 요청·서비스·데이터·이벤트 또는 페이지·훅 경로, 계약·마이그레이션 영향 |
+| Verification Plan  | 계획한 Make 타깃과 런타임 확인                                        |
+| Impact             | 동작, 호환성, 배포, 데이터 영향                                       |
+| Loop Alignment     | 적용한 런타임 루프와 해당하지 않는 루프의 이유                        |
+| Verification       | 실제 결과와 건너뛴 검사의 이유                                        |
+
+B4React의 프론트엔드 런타임 변경은 **State Ownership**, **Memoization**, **Performance Evidence** 섹션도 필요합니다.
+
+## Pull request
+
+- 제목: `[type] Concise title`, 예: `[feat] Add API key pagination`
+- 설명 섹션: Summary, Scope, Reason, Verification, Documentation, Risk / Impact(한국어 제목 요약, 범위, 이유, 검증, 문서, 위험 / 영향도 허용)
+- PR은 ready for review로 엽니다. draft는 요청이 있거나 해결해야 할 차단 요소가 있을 때만 사용합니다.
+- 자동 병합을 포함해 merge commit으로 병합합니다: `gh pr merge <number> --auto --merge`. squash와 rebase는 명시적 요청이 있어야 합니다.
+
+## 커밋 전 검증
+
+```bash
+COMMIT_TITLE="feat(frontend): add API key pagination" \
+COMMIT_BODY_FILE=/tmp/body.txt \
+PR_TITLE="[feat] Add API key pagination" \
+PR_BODY_FILE=/tmp/pr.md \
+make git-governance-check
+```
+
+`COMMIT_TITLE`이 있으면 staged 스냅샷을, 없으면 `HEAD`를 검증합니다. untracked worklog는 인정되지 않습니다.
+
+## 저장소 간 작업
+
+B4React도 같은 규칙과 자체 하네스를 가집니다. 프론트엔드 변경은 B4React에서 먼저 커밋하고 병합하며, B4FastAPI는 갱신된 gitlink를 자체 worklog와 함께 커밋합니다. 이 매뉴얼 저장소도 같은 브랜치, 커밋, worklog, PR 규칙을 사용합니다.

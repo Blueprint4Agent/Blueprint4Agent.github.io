@@ -49,7 +49,11 @@ const sidebars: SidebarsConfig = {
             label: "Verification",
             collapsible: false,
             link: { type: "doc", id: "verification/index" },
-            items: [],
+            items: [
+                "verification/verification-process",
+                "verification/checks-and-tests",
+                "verification/git-governance",
+            ],
         },
         {
             type: "category",
