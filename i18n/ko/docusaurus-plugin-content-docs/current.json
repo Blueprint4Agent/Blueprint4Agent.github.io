@@ -1,0 +1,10 @@
+{
+    "version.label": {
+        "message": "Next",
+        "description": "The label for version current"
+    },
+    "sidebar.tutorialSidebar.category.About B4A": {
+        "message": "B4A 소개",
+        "description": "The label for category 'About B4A' in sidebar 'tutorialSidebar'"
+    }
+}

@@ -332,28 +332,112 @@
         "message": "태그",
         "description": "The title of the tag list page"
     },
-    "homepage.feature.minimal.title": {
-        "message": "미니멀 디자인"
+    "home.highlight.auth.title": {
+        "message": "인증"
     },
-    "homepage.feature.minimal.desc": {
-        "message": "B4A는 미니멀 스타일의 디자인을 제공합니다. 에이전트에게 스타일 적용을 지시하여 자신만의 웹 디자인을 구성해보세요."
+    "home.highlight.auth.desc": {
+        "message": "이메일 로그인, 이메일 인증, 비밀번호 재설정, Google/GitHub OAuth를 제공합니다."
     },
-    "homepage.feature.agentic.title": {
-        "message": "에이전틱 코딩 기반의 프로젝트 구축"
+    "home.highlight.apiKeys.title": {
+        "message": "API 키"
     },
-    "homepage.feature.agentic.desc": {
-        "message": "B4A는 에이전틱 코딩을 활용할 수 있도록 구축되어있습니다. 비 개발자, 개발 입문자 혹은 복잡한 세팅 없이 프로젝트를 시작하고 싶은 사람들은 B4A를 통해 에이전틱 코딩 기반의 프로젝트를 시작할 수 있습니다."
+    "home.highlight.apiKeys.desc": {
+        "message": "개인 API 키를 발급, 조회, 폐기하고 페이지네이션으로 관리합니다."
     },
-    "homepage.feature.composition.title": {
-        "message": "웹 서버 블루프린트"
+    "home.highlight.realtime.title": {
+        "message": "실시간 갱신"
     },
-    "homepage.feature.composition.desc": {
-        "message": "B4A는 설계 표준(de-facto)를 중점으로 구성된 블루프린트를 제공합니다. B4A를 통해 기본적인 웹 서버 인터페이스 설계, 스모크 테스트, 트레이스 관측 등 웹 서버 운영에 필요한 스텍을 사용해뵤세요."
+    "home.highlight.realtime.desc": {
+        "message": "Server-Sent Events로 열린 화면을 백엔드 변경과 동기화합니다."
     },
-    "homepage.cta.exploreB4A": {
-        "message": "B4A 살펴보기"
+    "home.highlight.admin.title": {
+        "message": "관리자 콘솔"
     },
-    "homepage.cta.startOnGithub": {
-        "message": "GitHub에서 시작"
+    "home.highlight.admin.desc": {
+        "message": "역할 기반 관리자 사용자 목록과 계정 제어를 제공합니다."
+    },
+    "home.highlight.jobs.title": {
+        "message": "백그라운드 작업"
+    },
+    "home.highlight.jobs.desc": {
+        "message": "공유 Redis 브로커 위에서 선택적으로 켜는 Celery 워커와 스케줄러입니다."
+    },
+    "home.highlight.observability.title": {
+        "message": "옵저버빌리티"
+    },
+    "home.highlight.observability.desc": {
+        "message": "OpenTelemetry 트레이스, 로그, 메트릭과 로컬 Grafana 스택을 제공합니다."
+    },
+    "home.highlight.docker.title": {
+        "message": "Docker 배포"
+    },
+    "home.highlight.docker.desc": {
+        "message": "단일 앱 이미지, PostgreSQL, Redis, 준비 상태 확인 기반 배포를 제공합니다."
+    },
+    "home.highlight.verify.title": {
+        "message": "검증 하네스"
+    },
+    "home.highlight.verify.desc": {
+        "message": "변경 범위 기반 검사, worklog, Git 거버넌스를 모든 커밋에 적용합니다."
+    },
+    "home.hero.eyebrow": {
+        "message": "B4Agent 매뉴얼"
+    },
+    "home.hero.title": {
+        "message": "에이전틱 코딩을 위한 풀스택 블루프린트"
+    },
+    "home.hero.subtitle": {
+        "message": "FastAPI 백엔드와 공유 React 프론트엔드를 고정된 API 계약으로 연결하고, 에이전트가 첫 커밋부터 따르는 검증 하네스를 제공합니다."
+    },
+    "home.hero.note": {
+        "message": "현재 B4FastAPI + B4React · 다음은 B4SpringBoot"
+    },
+    "home.hero.start": {
+        "message": "매뉴얼 읽기"
+    },
+    "home.stack.title": {
+        "message": "블루프린트 스택"
+    },
+    "home.stack.backend": {
+        "message": "백엔드"
+    },
+    "home.stack.fastapi.desc": {
+        "message": "FastAPI, SQLAlchemy, Alembic, Redis, Celery와 Docker 배포를 제공합니다."
+    },
+    "home.stack.frontend": {
+        "message": "프론트엔드"
+    },
+    "home.stack.react.desc": {
+        "message": "React, TypeScript, Vite 기반이며 선택형 Tauri 데스크톱 셸을 포함하고 서브모듈로 고정됩니다."
+    },
+    "home.stack.planned": {
+        "message": "예정"
+    },
+    "home.stack.spring.desc": {
+        "message": "같은 B4React 프론트엔드와 API 계약을 제공하는 Spring Boot 백엔드입니다."
+    },
+    "home.highlights.title": {
+        "message": "처음부터 기본 제공"
+    },
+    "home.meta.title": {
+        "message": "B4Agent 매뉴얼"
+    },
+    "home.meta.description": {
+        "message": "B4Agent 풀스택 블루프린트(B4FastAPI, B4React, B4SpringBoot) 매뉴얼입니다."
+    },
+    "theme.toggle.system": {
+        "message": "시스템"
+    },
+    "theme.toggle.light": {
+        "message": "라이트"
+    },
+    "theme.toggle.dark": {
+        "message": "다크"
+    },
+    "theme.toggle.ariaLabel": {
+        "message": "테마 선택"
+    },
+    "theme.toggle.title": {
+        "message": "테마"
     }
 }

@@ -5,9 +5,9 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-    title: "Blueprint4Agent",
-    tagline: "De facto web server project for agentic coding",
-    favicon: "img/favicon.ico",
+    title: "B4Agent",
+    tagline: "Full-stack blueprint for agentic coding: B4FastAPI + B4React",
+    favicon: "img/b4a-favicon.svg",
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
     future: {
@@ -65,38 +65,42 @@ const config: Config = {
     ],
 
     themeConfig: {
-        // Replace with your project's social card
-        image: "img/docusaurus-social-card.jpg",
+        image: "img/b4a-banner.png",
         colorMode: {
             respectPrefersColorScheme: true,
             disableSwitch: false,
         },
+        docs: {
+            sidebar: {
+                hideable: true,
+            },
+        },
         navbar: {
-            title: "Blueprint4Agent",
+            title: "B4Agent",
             logo: {
-                alt: "Blueprint4Agent Logo",
-                src: "img/b4a-mark.png",
-                srcDark: "img/b4a-mark-dark.png",
+                alt: "B4Agent",
+                src: "img/b4a-mark.svg",
+                srcDark: "img/b4a-mark-dark.svg",
             },
             items: [
                 {
                     type: "docSidebar",
                     sidebarId: "tutorialSidebar",
-                    label: "Docs",
+                    label: "Manual",
                     position: "left",
                 },
+                { type: "localeDropdown", position: "right" },
                 {
+                    type: "custom-githubLink",
                     href: "https://github.com/Blueprint4Agent",
                     label: "GitHub",
-                    className: "navbar-github-link",
                     position: "right",
                 },
-                { type: "localeDropdown", className: "navbar-locale-link", position: "right" },
             ],
         },
         prism: {
             theme: prismThemes.github,
-            darkTheme: prismThemes.dracula,
+            darkTheme: prismThemes.vsDark,
         },
     } satisfies Preset.ThemeConfig,
 };
