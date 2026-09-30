@@ -81,9 +81,9 @@ const config: Config = {
             },
         },
         navbar: {
-            title: "B4Agent",
+            title: "B4A",
             logo: {
-                alt: "B4Agent",
+                alt: "B4A",
                 src: "img/b4a-mark.svg",
                 srcDark: "img/b4a-mark-dark.svg",
             },
