@@ -1,43 +1,77 @@
 ---
-title: Settings & profile
-sidebar_position: 8
-description: The app shell, settings sections, profile editing, themes, shortcuts, and toasts.
+title: Home, settings & profile
+sidebar_position: 9
+description: The home page, app shell, settings sections, account and profile editing, themes, keyboard shortcuts, and toasts.
 ---
 
-# Settings & profile
+# Home, settings & profile
 
-B4React ships a complete app shell: a resizable sidebar, a settings workspace, profile editing, light and dark themes, keyboard shortcuts, and toast feedback.
+B4React ships a complete app shell: a default home page, a resizable sidebar, a settings workspace, account and profile editing, light and dark themes, customizable keyboard shortcuts, and toast feedback.
+
+## Home
+
+`/home` is the default page in both [runtime modes](/docs/environment/runtime-modes). `/`, `/dashboard`, login completion, closing an auth dialog, and page recovery all lead there.
+
+| Viewer         | Sees                                                                         |
+| -------------- | ---------------------------------------------------------------------------- |
+| Guest          | Generic content and sign-in entry points; no private data is fetched         |
+| Signed-in user | A greeting and shortcuts to Account, Billing (when enabled), and Preferences |
+| Manager, admin | An additional User directory shortcut                                        |
+
+The page is built with `MainPageTemplate`, a presentational layout in `src/components/layout` for extending the product:
+
+| Prop                           | Purpose                                                        |
+| ------------------------------ | -------------------------------------------------------------- |
+| `title`, `description`, `icon` | Heading content                                                |
+| `actions`                      | Header controls composed from existing components              |
+| `menuLabel`, `menuItems`       | Accessible navigation with IDs, routes, titles, and icons      |
+| `menuLayout`                   | `list` (default) or responsive `grid`                          |
+| `children`                     | Additional sections, lists, cards, or loading and empty states |
+
+The template owns no auth, API, routing state, or storage. The owning page filters items by permission and fetches its own data through hooks.
 
 ## App shell
 
 - A persistent sidebar: 48px collapsed, 224px expanded, resizable from 200 to 360px. The width is remembered.
-- Profile and connectivity status live in the sidebar footer.
+- The sidebar footer holds the profile control and connectivity status. In development mode, GitHub and User guide links sit directly above the profile control.
+- With billing enabled, the profile shows the subscription tier, and the profile menu opens `/plans`.
 - On mobile the sidebar overlays content with a dismissible backdrop.
+- When the server is unreachable, the recovery panel stays inside the same sidebar layout.
 
 ## Settings sections
 
-| Section    | Who             | Contents                                   |
-| ---------- | --------------- | ------------------------------------------ |
-| General    | Everyone        | Language (English, Korean)                 |
-| Appearance | Everyone        | System, light, or dark theme with previews |
-| Profile    | Signed-in users | Name, profile photo, linked login methods  |
-| Developers | Signed-in users | [API keys](/docs/features/api-keys)        |
+| Section    | Who                                    | Contents                                                                                         |
+| ---------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| General    | Everyone                               | Language (English, Korean)                                                                       |
+| Appearance | Everyone                               | System, light, or dark theme with previews                                                       |
+| Keyboard   | Everyone (editing for signed-in users) | Shortcut bindings                                                                                |
+| Account    | Signed-in users                        | Name, profile photo, email, linked login methods, account deletion                               |
+| Billing    | Signed-in users, billing enabled       | Plan, transactions, billing information, payment methods. See [Billing](/docs/features/billing). |
+| Developers | Signed-in users                        | [API keys](/docs/features/api-keys)                                                              |
 
-The section is part of the URL (`/settings?section=...`). Guests are redirected to General when they open an account-only section.
+The section is part of the URL (`/settings?section=...`); the legacy `section=profile` opens Account. Guests are redirected to General when they open an account-only section, and Billing falls back to General when billing is off.
+
+## Account and profile
+
+- **Name** changes confirm with a toast; errors stay beside the field.
+- **Profile photos** are uploaded as binary images and served privately through the API. See [Object storage](/docs/features/object-storage#profile-photos).
+- **Delete account** sits in a separate section at the bottom. It asks for the registered email and a six-digit code sent to it. See [Authentication](/docs/features/authentication#account-deletion).
 
 ## Keyboard shortcuts
 
-| Shortcut                      | Action             |
-| ----------------------------- | ------------------ |
-| <kbd>Mod</kbd> + <kbd>B</kbd> | Toggle the sidebar |
-| <kbd>Mod</kbd> + <kbd>,</kbd> | Open settings      |
+| Action             | Default                       |
+| ------------------ | ----------------------------- |
+| Toggle the sidebar | <kbd>Mod</kbd> + <kbd>B</kbd> |
+| Open settings      | <kbd>Mod</kbd> + <kbd>,</kbd> |
 
 <kbd>Mod</kbd> is Command on macOS and Control on Windows and Linux.
 
-## Toasts
+Bindings are stored in the account (`keyboard_shortcuts` on `GET/PATCH /auth/me`), so they follow the user across browsers and devices. Guests see the defaults read-only. Conflicting bindings are rejected, only confirmed saves replace the active keys, and **Reset** restores the defaults. Changes appear in other open clients after a reload or sign-in.
 
-Explicit actions confirm once with a short capsule toast at the top of the screen: sign-in and sign-out, signup, verification resend, password reset, profile changes, API key actions, and copying secrets. Validation errors stay inline, and toasts never contain passwords, secrets, or tokens.
+## Toasts and feedback
+
+Explicit actions confirm once with a short capsule toast at the top of the screen: sign-in and sign-out, signup, verification resend, password reset, profile changes, API key actions, billing confirmations, and copying secrets. Validation errors stay inline, persistent notices use `InlineMessage`, and toasts never contain passwords, secrets, or tokens.
 
 ## Localization
 
-All UI text is translated into English and Korean with react-i18next. Authentication emails follow the user's language.
+All UI text is translated into English and Korean with react-i18next. Emails follow the user's language.

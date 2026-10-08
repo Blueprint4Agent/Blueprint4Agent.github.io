@@ -8,12 +8,12 @@ description: The optional Tauri 2 desktop shell and its connectivity recovery.
 
 B4React includes an optional Tauri 2 shell that packages the same React app for macOS, Windows, and Linux. The browser app remains the default.
 
-|              |                                            |
-| ------------ | ------------------------------------------ |
-| **Requires** | Rust and the platform's Tauri dependencies |
-| **Develop**  | `make frontend-desktop-dev`                |
-| **Build**    | `make frontend-desktop-build`              |
-| **CI**       | `.github/workflows/desktop-build.yml`      |
+|              |                                                        |
+| ------------ | ------------------------------------------------------ |
+| **Requires** | Rust and the platform's Tauri dependencies             |
+| **Develop**  | `make frontend-desktop-dev`                            |
+| **Build**    | `make frontend-desktop-build`                          |
+| **CI**       | `.github/workflows/desktop-build.yml`, manual dispatch |
 
 ## Pointing at a server
 
@@ -39,10 +39,10 @@ The browser app never starts this polling.
 
 ## Build pipeline
 
-The desktop workflow builds macOS Apple Silicon, macOS Intel, Linux x64, and Windows x64 bundles on manual dispatch, a nightly schedule, releases, and `v*` tags.
+The desktop workflow builds macOS Apple Silicon, macOS Intel, Linux x64, and Windows x64 bundles for the selected ref. It runs only on manual dispatch (Actions → Run workflow, or `gh workflow run`).
 
 - The API origin comes from the `api_base_url` input, then the `DESKTOP_API_BASE_URL` variable, then `http://localhost:8000`.
-- Bundles are uploaded as workflow artifacts, and attached to the GitHub Release for releases and tags.
+- Bundles are uploaded as workflow artifacts.
 - Artifacts are unsigned. Public distribution still needs macOS and Windows signing and notarization.
 
 ## Identity

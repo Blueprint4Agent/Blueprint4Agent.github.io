@@ -1,19 +1,20 @@
 ---
 title: Showcase & style studio
 sidebar_position: 9
-description: The public component catalog and the local style editor.
+description: The development component catalog and the local style editor.
 ---
 
 # Showcase & style studio
 
-The root route opens a public catalog of every shared component. During local development, the style studio edits the design tokens of that catalog and writes them back to the stylesheet.
+In development mode, a separate showcase menu opens a catalog of every shared component. During local development, the style studio edits the design tokens of that catalog and writes them back to the stylesheet.
 
 ## Component showcase
 
-- Opens at `/` (redirects to `/show-case`) for guests and signed-in users. The landing page moved to `/welcome`.
+- Opens at `/show-case` from its own sidebar menu, for guests and signed-in users, in development mode only. In production, showcase URLs redirect to `/home`. The landing page is at `/welcome`.
 - Every shared UI component has a rendered, interactive example, grouped by category and searchable.
 - Previews never call account APIs or start OAuth.
 - `make ui-composition-check` fails if a new public UI export has no showcase example.
+- Feature compositions such as `MainPageTemplate`, `AccountDeletionDialog`, compact `DropdownMenu` actions, and `SegmentedControl` have searchable examples that never call real APIs.
 
 ## Style studio
 

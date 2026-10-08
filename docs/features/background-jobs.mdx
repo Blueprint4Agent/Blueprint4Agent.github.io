@@ -6,7 +6,7 @@ description: Standalone Celery worker and scheduler on Redis.
 
 # Background jobs
 
-Celery 5.6 runs slow, retryable work outside the API process. Authentication email already uses it; Beat is ready for scheduled work but has no schedules by default.
+Celery 5.6 runs slow, retryable work outside the API process. Account email, lifecycle notifications, and billing reconciliation use it; Beat schedules the outbox scan and the reconciliation job.
 
 |              |                                                                                   |
 | ------------ | --------------------------------------------------------------------------------- |
@@ -18,7 +18,7 @@ Celery 5.6 runs slow, retryable work outside the API process. Authentication ema
 ```mermaid
 flowchart LR
     SV["Service<br/>await publish_task"] --> Q[("Redis<br/>CELERY_QUEUE")]
-    B["celery-beat<br/>optional, one per deployment"] --> Q
+    B["celery-beat<br/>one per deployment"] --> Q
     Q --> W["celery-worker<br/>solo locally, prefork in production"]
     W --> L["Logs with task and trace IDs"]
 ```
@@ -29,16 +29,25 @@ Start Redis, then use separate terminals:
 
 ```bash
 make celery-worker   # solo pool for macOS development
-make celery-beat     # optional scheduler
+make celery-beat     # scheduler for the outbox and billing reconciliation
 make celery-ping     # check running workers
 make celery-probe    # send a harmless task; look for "Celery probe completed" in worker logs
 ```
 
 An empty `CELERY_BROKER_URL` reuses `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, and `REDIS_PASSWORD`. Use a `rediss://` URL for TLS. On Linux production, run the prefork pool: `CELERY_POOL=prefork CELERY_CONCURRENCY=2 make celery-worker`.
 
+## Schedules
+
+Beat runs two schedules. They are required when the matching feature is enabled:
+
+| Schedule                 | Task                            | Interval | Needed for                                                                             |
+| ------------------------ | ------------------------------- | -------- | -------------------------------------------------------------------------------------- |
+| `lifecycle-mail-outbox`  | `b4fastapi.notifications.drain` | 60 s     | [Lifecycle email](/docs/features/email#lifecycle-email)                                |
+| `billing-reconciliation` | `b4fastapi.billing.reconcile`   | 300 s    | [Subscription snapshot](/docs/features/billing#webhooks-and-the-subscription-snapshot) |
+
 ## Run in Docker
 
-The worker (prefork, two processes) and Beat use the same app image. When both `LOGIN_ENABLED` and `EMAIL_ENABLED` are true, `make docker-up` and `make docker-deploy` start and health-check the worker before the API. Beat stays opt-in with `make docker-celery-up`. Run exactly one Beat per deployment.
+The worker (prefork, two processes) and Beat use the same app image. When both `LOGIN_ENABLED` and `EMAIL_ENABLED` are true, `make docker-up` and `make docker-deploy` start and health-check the worker before the API. Beat starts with `make docker-celery-up`; start it, and the worker, whenever billing or lifecycle email is enabled. Run exactly one Beat per deployment. Both services mount the object storage volume.
 
 ## Execution contract
 
