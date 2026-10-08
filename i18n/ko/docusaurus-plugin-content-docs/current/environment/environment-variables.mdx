@@ -160,6 +160,23 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 라이브 키는 HTTPS 복귀 URL이 필요합니다.
 
+### 오브젝트 스토리지 \{#object-storage\}
+
+[오브젝트 스토리지](/docs/features/object-storage)를 참고하세요.
+
+| 변수                                                     | 기본값        | 설명                                                            |
+| -------------------------------------------------------- | ------------- | --------------------------------------------------------------- |
+| `OBJECT_STORAGE_PROVIDER`                                | `local`       | `local`, `s3`, `r2`, `supabase`                                 |
+| `OBJECT_STORAGE_LOCAL_ROOT`                              | _(비어 있음)_ | 비공개 절대 경로, 비어 있으면 `src/backend/data/object-storage` |
+| `OBJECT_STORAGE_MAX_BYTES`                               | `8388608`     | 객체당 제한, 1바이트–100 MiB                                    |
+| `OBJECT_STORAGE_TIMEOUT_SECONDS`                         | `10`          | 원격 연결·읽기 시간 제한, 1–120                                 |
+| `OBJECT_STORAGE_S3_ENDPOINT_URL`                         | _(비어 있음)_ | AWS는 비움, R2와 Supabase는 필수                                |
+| `OBJECT_STORAGE_S3_BUCKET`                               | _(비어 있음)_ | 기존 버킷, 원격 프로바이더는 필수                               |
+| `OBJECT_STORAGE_S3_REGION`                               | _(비어 있음)_ | S3와 Supabase는 필수, R2는 `auto`                               |
+| `OBJECT_STORAGE_S3_ACCESS_KEY_ID` / `_SECRET_ACCESS_KEY` | _(비어 있음)_ | S3 자격 증명, R2와 Supabase는 필수                              |
+| `OBJECT_STORAGE_S3_SESSION_TOKEN`                        | _(비어 있음)_ | 선택 사항인 AWS 임시 토큰                                       |
+| `OBJECT_STORAGE_S3_ADDRESSING_STYLE`                     | `auto`        | `auto`, `path`, `virtual`                                       |
+
 ## Docker 기본값
 
 `docker/.env.example`은 같은 백엔드 키를 선언하되 컨테이너용 기본값이 다릅니다.
