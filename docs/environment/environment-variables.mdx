@@ -106,20 +106,20 @@ Change `DB_DRIVER` and `DB_NAME` together. See [Database & Redis](/docs/environm
 
 ### Email and SMTP
 
-| Variable                          | Default                | Description                                                   |
-| --------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| `EMAIL_ENABLED`                   | `false`                | Sends verification and reset email. Requires a Celery worker. |
-| `EMAIL_FROM`                      | `no-reply@example.com` | Sender address                                                |
-| `EMAIL_BRAND_NAME`                | `Blueprint4FastAPI`    | Brand shown in emails                                         |
-| `SMTP_HOST`                       | _(empty)_              | SMTP server                                                   |
-| `SMTP_PORT`                       | `587`                  | SMTP port                                                     |
-| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(empty)_              | SMTP credentials                                              |
-| `SMTP_USE_STARTTLS`               | `true`                 | Upgrade with STARTTLS                                         |
-| `SMTP_USE_SSL`                    | `false`                | Use implicit TLS instead                                      |
-| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP timeout                                                  |
-| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | The worker checks the SMTP connection at startup              |
-| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | Delayed retries after the first attempt                       |
-| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | Delay between retries                                         |
+| Variable                          | Default                | Description                                                  |
+| --------------------------------- | ---------------------- | ------------------------------------------------------------ |
+| `EMAIL_ENABLED`                   | `false`                | Sends account and lifecycle email. Requires a Celery worker. |
+| `EMAIL_FROM`                      | `no-reply@example.com` | Sender address                                               |
+| `EMAIL_BRAND_NAME`                | `B4A`                  | Brand shown in emails                                        |
+| `SMTP_HOST`                       | _(empty)_              | SMTP server                                                  |
+| `SMTP_PORT`                       | `587`                  | SMTP port                                                    |
+| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(empty)_              | SMTP credentials                                             |
+| `SMTP_USE_STARTTLS`               | `true`                 | Upgrade with STARTTLS                                        |
+| `SMTP_USE_SSL`                    | `false`                | Use implicit TLS instead                                     |
+| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP timeout                                                 |
+| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | The worker checks the SMTP connection at startup             |
+| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | Delayed retries after the first attempt                      |
+| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | Delay between retries                                        |
 
 ### OAuth
 
@@ -141,6 +141,24 @@ Change `DB_DRIVER` and `DB_NAME` together. See [Database & Redis](/docs/environm
 | ----------------------- | ------- | ------------------------------------ |
 | `SSE_HEARTBEAT_SECONDS` | `20`    | Heartbeat interval on event streams  |
 | `SSE_RETRY_MILLIS`      | `5000`  | Reconnect delay suggested to clients |
+
+### Billing \{#billing\}
+
+All billing features share one switch. See [Billing](/docs/features/billing).
+
+| Variable                                                     | Default                                               | Description                                                              |
+| ------------------------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| `STRIPE_ENABLED`                                             | `false`                                               | Enables payment methods, billing profile, invoices, and subscriptions    |
+| `STRIPE_SECRET_KEY`                                          | _(empty)_                                             | `sk_test_...` or `sk_live_...`; server only                              |
+| `STRIPE_PUBLISHABLE_KEY`                                     | _(empty)_                                             | `pk_...` of the same account and mode; enables in-app card entry         |
+| `STRIPE_WEBHOOK_SECRET`                                      | _(empty)_                                             | `whsec_...`; empty disables the webhook                                  |
+| `STRIPE_SETUP_SUCCESS_URL` / `STRIPE_SETUP_CANCEL_URL`       | `http://localhost:5173/settings?billing_setup=...`    | Hosted card/Link setup returns; success contains `{CHECKOUT_SESSION_ID}` |
+| `STRIPE_CHECKOUT_SUCCESS_URL` / `STRIPE_CHECKOUT_CANCEL_URL` | `http://localhost:5173/settings?billing_checkout=...` | Subscription Checkout returns                                            |
+| `STRIPE_{MONTHLY\|ANNUAL}_{KRW\|USD}_PRICE_ID`               | _(empty)_                                             | Plus recurring prices; required when enabled                             |
+| `STRIPE_PLUS_*_PRICE_ID`, `STRIPE_PRO_*_PRICE_ID`            | _(empty)_                                             | Optional Plus overrides and Pro prices                                   |
+| `STRIPE_PORTAL_CONFIGURATION_ID`                             | _(empty)_                                             | Restricted customer portal configuration (`bpc_...`)                     |
+
+Live keys require HTTPS return URLs.
 
 ## Docker defaults
 

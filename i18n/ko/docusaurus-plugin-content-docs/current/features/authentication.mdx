@@ -70,7 +70,7 @@ sequenceDiagram
 
 - 이메일 기능이 켜져 있어야 하며, 로그인 비활성 부트스트랩 계정에는 제공되지 않습니다.
 - 마지막 활성 관리자는 삭제할 수 없습니다.
-- 구독 Checkout 기록이 있는 계정은 운영자가 Stripe에서 정리하기 전까지 `ACCOUNT_BILLING_REVIEW_REQUIRED`(409)를 반환합니다.
+- 구독 Checkout 기록이 있는 계정은 운영자가 Stripe에서 정리하기 전까지 `ACCOUNT_BILLING_REVIEW_REQUIRED`(409)를 반환합니다. [결제](/docs/features/billing)를 참고하세요.
 - 삭제된 사용자 ID는 재사용되지 않으므로 이전 토큰이 새 계정을 가리키지 않습니다.
 - 삭제 후에는 내구성 있는 생명주기 아웃박스로 완료 이메일을 보냅니다. [이메일](/docs/features/email)을 참고하세요.
 

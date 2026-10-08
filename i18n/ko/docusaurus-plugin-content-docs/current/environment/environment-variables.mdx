@@ -106,20 +106,20 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 ### 이메일과 SMTP
 
-| 변수                              | 기본값                 | 설명                                    |
-| --------------------------------- | ---------------------- | --------------------------------------- |
-| `EMAIL_ENABLED`                   | `false`                | 인증·재설정 메일 발송. Celery 워커 필요 |
-| `EMAIL_FROM`                      | `no-reply@example.com` | 발신 주소                               |
-| `EMAIL_BRAND_NAME`                | `Blueprint4FastAPI`    | 메일에 표시되는 브랜드                  |
-| `SMTP_HOST`                       | _(비어 있음)_          | SMTP 서버                               |
-| `SMTP_PORT`                       | `587`                  | SMTP 포트                               |
-| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(비어 있음)_          | SMTP 자격 증명                          |
-| `SMTP_USE_STARTTLS`               | `true`                 | STARTTLS로 업그레이드                   |
-| `SMTP_USE_SSL`                    | `false`                | 대신 암묵적 TLS 사용                    |
-| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP 제한 시간                          |
-| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | 워커 시작 시 SMTP 연결 확인             |
-| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | 첫 시도 후 지연 재시도 횟수             |
-| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | 재시도 간격                             |
+| 변수                              | 기본값                 | 설명                                      |
+| --------------------------------- | ---------------------- | ----------------------------------------- |
+| `EMAIL_ENABLED`                   | `false`                | 계정·생명주기 메일 발송. Celery 워커 필요 |
+| `EMAIL_FROM`                      | `no-reply@example.com` | 발신 주소                                 |
+| `EMAIL_BRAND_NAME`                | `B4A`                  | 메일에 표시되는 브랜드                    |
+| `SMTP_HOST`                       | _(비어 있음)_          | SMTP 서버                                 |
+| `SMTP_PORT`                       | `587`                  | SMTP 포트                                 |
+| `SMTP_USERNAME` / `SMTP_PASSWORD` | _(비어 있음)_          | SMTP 자격 증명                            |
+| `SMTP_USE_STARTTLS`               | `true`                 | STARTTLS로 업그레이드                     |
+| `SMTP_USE_SSL`                    | `false`                | 대신 암묵적 TLS 사용                      |
+| `SMTP_TIMEOUT_SECONDS`            | `10`                   | SMTP 제한 시간                            |
+| `SMTP_VALIDATE_ON_STARTUP`        | `true`                 | 워커 시작 시 SMTP 연결 확인               |
+| `EMAIL_QUEUE_MAX_RETRIES`         | `3`                    | 첫 시도 후 지연 재시도 횟수               |
+| `EMAIL_QUEUE_RETRY_DELAY_SECONDS` | `2`                    | 재시도 간격                               |
 
 ### OAuth
 
@@ -141,6 +141,24 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 | ----------------------- | ------ | --------------------------------- |
 | `SSE_HEARTBEAT_SECONDS` | `20`   | 이벤트 스트림 heartbeat 간격      |
 | `SSE_RETRY_MILLIS`      | `5000` | 클라이언트에 권장하는 재연결 지연 |
+
+### 결제 \{#billing\}
+
+모든 결제 기능은 하나의 스위치를 공유합니다. [결제](/docs/features/billing)를 참고하세요.
+
+| 변수                                                         | 기본값                                                | 설명                                                                    |
+| ------------------------------------------------------------ | ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| `STRIPE_ENABLED`                                             | `false`                                               | 결제수단, 청구 정보, 청구서, 구독을 함께 활성화                         |
+| `STRIPE_SECRET_KEY`                                          | _(비어 있음)_                                         | `sk_test_...` 또는 `sk_live_...`, 서버 전용                             |
+| `STRIPE_PUBLISHABLE_KEY`                                     | _(비어 있음)_                                         | 같은 계정·모드의 `pk_...`, 앱 내 카드 입력 활성화                       |
+| `STRIPE_WEBHOOK_SECRET`                                      | _(비어 있음)_                                         | `whsec_...`, 비어 있으면 웹훅 비활성화                                  |
+| `STRIPE_SETUP_SUCCESS_URL` / `STRIPE_SETUP_CANCEL_URL`       | `http://localhost:5173/settings?billing_setup=...`    | 호스팅 카드/Link 등록 복귀 URL, 성공 URL에 `{CHECKOUT_SESSION_ID}` 포함 |
+| `STRIPE_CHECKOUT_SUCCESS_URL` / `STRIPE_CHECKOUT_CANCEL_URL` | `http://localhost:5173/settings?billing_checkout=...` | 구독 Checkout 복귀 URL                                                  |
+| `STRIPE_{MONTHLY\|ANNUAL}_{KRW\|USD}_PRICE_ID`               | _(비어 있음)_                                         | Plus 정기 가격, 활성화 시 필수                                          |
+| `STRIPE_PLUS_*_PRICE_ID`, `STRIPE_PRO_*_PRICE_ID`            | _(비어 있음)_                                         | 선택 사항인 Plus 대체 가격과 Pro 가격                                   |
+| `STRIPE_PORTAL_CONFIGURATION_ID`                             | _(비어 있음)_                                         | 제한된 고객 포털 설정(`bpc_...`)                                        |
+
+라이브 키는 HTTPS 복귀 URL이 필요합니다.
 
 ## Docker 기본값
 

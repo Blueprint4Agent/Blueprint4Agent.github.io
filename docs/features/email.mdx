@@ -1,27 +1,29 @@
 ---
 title: Email
 sidebar_position: 2
-description: Verification and password-reset email delivered by a Celery worker over SMTP.
+description: Account email and lifecycle notifications delivered by a Celery worker over SMTP.
 ---
 
 # Email
 
-Signup verification and password reset emails, rendered in English or Korean and delivered by a standalone Celery worker.
+Account email (verification, password reset, welcome, deletion code) and lifecycle notifications (subscription and account deletion), rendered in English or Korean and delivered by a standalone Celery worker.
 
 |               |                                                                                                                                               |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Enable**    | `EMAIL_ENABLED=true` (requires `LOGIN_ENABLED=true`)                                                                                          |
-| **Requires**  | SMTP credentials, real Redis, and a running [Celery worker](/docs/features/background-jobs)                                                   |
+| **Requires**  | SMTP credentials, real Redis, a running [Celery worker](/docs/features/background-jobs), and one Beat for lifecycle notifications             |
 | **Settings**  | `EMAIL_FROM`, `EMAIL_BRAND_NAME`, `SMTP_*`, `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES`, `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`, `EMAIL_QUEUE_*` |
 | **Endpoints** | `/api/v1/auth/verify-email`, `resend-verification`, `forgot-password`, `reset-password`                                                       |
 
 ## Behavior
 
-| Flow           | With email enabled                                     | With email disabled (default)   |
-| -------------- | ------------------------------------------------------ | ------------------------------- |
-| Signup         | Account starts unverified; a verification link is sent | Account is verified immediately |
-| Login          | Unverified accounts get `EMAIL_NOT_VERIFIED`           | No verification check           |
-| Password reset | A reset link is sent                                   | Not available                   |
+| Flow             | With email enabled                                       | With email disabled (default)   |
+| ---------------- | -------------------------------------------------------- | ------------------------------- |
+| Signup           | Account starts unverified; a verification link is sent   | Account is verified immediately |
+| Login            | Unverified accounts get `EMAIL_NOT_VERIFIED`             | No verification check           |
+| Password reset   | A reset link is sent                                     | Not available                   |
+| Activation       | A welcome email after verification or first OAuth signup | No email                        |
+| Account deletion | A six-digit code, then a deletion notice                 | Not available                   |
 
 Request confirmations never reveal whether an account exists.
 
@@ -48,11 +50,38 @@ flowchart LR
 
 :::
 
+## Lifecycle email \{#lifecycle-email\}
+
+Subscription and account-deletion notices go through a durable outbox, so a committed change is never lost between the database and the queue.
+
+```mermaid
+flowchart LR
+    E["Account deleted,<br/>verified Stripe event"] --> O[("Encrypted outbox<br/>same transaction")]
+    BT["Celery Beat<br/>every minute"] --> O
+    O --> W["Celery worker"]
+    W --> S["SMTP"]
+```
+
+| Notice                 | Sent when                                                            |
+| ---------------------- | -------------------------------------------------------------------- |
+| Subscription started   | The first `invoice.paid` of a subscription                           |
+| Plan changed           | A plan change is applied (`customer.subscription.updated`)           |
+| Subscription cancelled | A requested cancellation completes (`customer.subscription.deleted`) |
+| Account deleted        | The deletion transaction commits                                     |
+
+Renewals and payment failures do not send email.
+
+- Billing notices need the [Stripe webhook](/docs/features/billing#webhooks-and-the-subscription-snapshot). Signatures, mode, and current provider state are checked before a notice is stored, and semantic keys prevent duplicates.
+- Recipient data is encrypted with a key derived from `SECRET_KEY`, erased after delivery, and erased after 72 hours if undelivered. Drain pending mail before rotating `SECRET_KEY`.
+- Delivery uses up to five attempts with five-minute leases. A crash after SMTP acceptance can duplicate a message; delivery is at least once, not exactly once.
+- Mail or broker failures never undo a committed deletion or subscription change.
+
 ## Templates
 
-Verification and reset messages share one table-based 480px layout with a plain-text alternative and a visible fallback link. No web fonts, scripts, or remote assets are loaded.
+All messages share one table-based 480px layout with a plain-text alternative. Link messages include a visible fallback link; the deletion code replaces the action button and contains no link. No web fonts, scripts, or remote assets are loaded. The brand defaults to `B4A`; set `EMAIL_BRAND_NAME` to change it, then recreate the workers.
 
 ## Code
 
 - `src/backend/app/core/mail/` (service, queue, templates)
-- `src/backend/app/core/celery/mail.py`
+- `src/backend/app/core/celery/mail.py`, `core/celery/notifications.py`
+- `src/backend/app/services/notifications.py`, `services/billing_notifications.py`

@@ -70,7 +70,7 @@ sequenceDiagram
 
 - Deletion requires email to be enabled, and is never offered to login-disabled bootstrap identities.
 - The last active admin cannot be deleted.
-- An account with subscription Checkout history returns `ACCOUNT_BILLING_REVIEW_REQUIRED` (409) until an operator reconciles it in Stripe.
+- An account with subscription Checkout history returns `ACCOUNT_BILLING_REVIEW_REQUIRED` (409) until an operator reconciles it in Stripe. See [Billing](/docs/features/billing).
 - Deleted user IDs are never reused, so old tokens cannot resolve to a new account.
 - After deletion, a confirmation email is sent through the durable lifecycle outbox. See [Email](/docs/features/email).
 

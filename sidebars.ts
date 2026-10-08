@@ -28,6 +28,7 @@ const sidebars: SidebarsConfig = {
                 doc("features/oauth", "lock"),
                 doc("features/api-keys", "key"),
                 doc("features/admin-and-roles", "users"),
+                doc("features/billing", "credit-card"),
                 doc("features/realtime-events", "radio"),
                 doc("features/background-jobs", "clock"),
                 doc("features/settings-and-profile", "settings"),
