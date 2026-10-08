@@ -6,7 +6,7 @@ description: What make check, test, and build run, the test suites, and the runt
 
 # Checks & tests
 
-`make verify` selects from the same targets you can run directly. `make ci` runs all of them.
+`make verify` selects from the same targets you can run directly. `make ci` runs all of them locally. Full verification also runs `make hooks-test`, which tests the Git hooks and receipt invalidation; `make verification-test` tests change classification.
 
 ## Aggregate targets
 

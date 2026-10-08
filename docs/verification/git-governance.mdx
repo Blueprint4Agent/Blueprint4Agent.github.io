@@ -6,7 +6,7 @@ description: Branches, commits, worklogs, pull requests, and merge rules validat
 
 # Git governance
 
-Commit and PR metadata follow fixed rules so that agents produce reviewable history. `make git-governance-check` validates them locally, and the required **Git governance** check validates every commit of a PR.
+Commit and PR metadata follow fixed rules so that agents produce reviewable history. The `commit-msg` and `pre-push` [hooks](/docs/verification/verification-process#local-git-hooks) validate them on every commit and push, `make git-governance-check` validates planned metadata, and `make git-governance-pr-check` validates an open PR.
 
 ## Branches
 
@@ -48,7 +48,7 @@ Every commit adds or modifies `worklog/NNNN-short-kebab-title.md`. Its `# Commit
 | Loop Alignment     | Runtime loops applied, and why others do not apply                                 |
 | Verification       | Observed results and reasons for skipped checks                                    |
 
-Frontend runtime changes in B4React also need **State Ownership**, **Memoization**, and **Performance Evidence** sections.
+Frontend runtime changes in B4React also need **State Ownership**, **Memoization**, and **Performance Evidence** sections. B4React UI source and style changes also need a **Page Family** section (Family, Reference, Shared Rules, Exceptions, Evidence) that names the canonical peer page and records mobile and desktop, light and dark comparisons.
 
 ## Pull requests
 
@@ -69,15 +69,21 @@ make git-governance-check
 
 With `COMMIT_TITLE`, the check validates the staged snapshot; without it, it checks `HEAD`. Untracked worklogs do not count.
 
+After creating or editing a PR, and again right before merging, check its actual remote metadata against local `HEAD`:
+
+```bash
+PR_NUMBER=123 make git-governance-pr-check
+```
+
 ## Across repositories
 
 ```mermaid
 flowchart LR
     subgraph fe["B4React"]
-        F1["Branch + commits + worklogs"] --> F2["PR checks"] --> F3["Merge commit"]
+        F1["Branch + commits + worklogs"] --> F2["pre-push verify<br/>+ PR metadata check"] --> F3["Merge commit"]
     end
     subgraph be["B4FastAPI"]
-        B1["Update gitlink + worklog"] --> B2["Backend, Frontend,<br/>Git governance checks"] --> B3["Merge commit"]
+        B1["Update gitlink + worklog"] --> B2["pre-push verify<br/>reuses B4React receipts"] --> B3["Merge commit"]
     end
     F3 --> B1
 ```

@@ -6,7 +6,7 @@ description: 하네스가 검증하는 브랜치, 커밋, worklog, PR, 병합 �
 
 # Git 거버넌스
 
-커밋과 PR 메타데이터는 고정된 규칙을 따르므로 에이전트가 리뷰 가능한 이력을 남깁니다. `make git-governance-check`가 로컬에서, 필수 검사 **Git governance**가 PR의 모든 커밋을 검증합니다.
+커밋과 PR 메타데이터는 고정된 규칙을 따르므로 에이전트가 리뷰 가능한 이력을 남깁니다. `commit-msg`·`pre-push` [훅](/docs/verification/verification-process#local-git-hooks)이 커밋과 푸시마다 검증하고, `make git-governance-check`가 예정 메타데이터를, `make git-governance-pr-check`가 열린 PR을 검증합니다.
 
 ## 브랜치
 
@@ -48,7 +48,7 @@ Verification:
 | Loop Alignment     | 적용한 런타임 루프와 해당하지 않는 루프의 이유                        |
 | Verification       | 실제 결과와 건너뛴 검사의 이유                                        |
 
-B4React의 프론트엔드 런타임 변경은 **State Ownership**, **Memoization**, **Performance Evidence** 섹션도 필요합니다.
+B4React의 프론트엔드 런타임 변경은 **State Ownership**, **Memoization**, **Performance Evidence** 섹션도 필요합니다. B4React UI 소스·스타일 변경에는 기준이 되는 동일 계열 페이지를 밝히고 모바일·데스크톱, 라이트·다크 비교를 기록하는 **Page Family** 섹션(Family, Reference, Shared Rules, Exceptions, Evidence)도 필요합니다.
 
 ## Pull request
 
@@ -69,15 +69,21 @@ make git-governance-check
 
 `COMMIT_TITLE`이 있으면 staged 스냅샷을, 없으면 `HEAD`를 검증합니다. untracked worklog는 인정되지 않습니다.
 
+PR을 만들거나 수정한 뒤, 그리고 병합 직전에 실제 원격 메타데이터를 로컬 `HEAD`와 대조합니다.
+
+```bash
+PR_NUMBER=123 make git-governance-pr-check
+```
+
 ## 저장소 간 작업
 
 ```mermaid
 flowchart LR
     subgraph fe["B4React"]
-        F1["브랜치 + 커밋 + worklog"] --> F2["PR 검사"] --> F3["merge commit"]
+        F1["브랜치 + 커밋 + worklog"] --> F2["pre-push 검증<br/>+ PR 메타데이터 확인"] --> F3["merge commit"]
     end
     subgraph be["B4FastAPI"]
-        B1["gitlink + worklog 갱신"] --> B2["Backend, Frontend,<br/>Git governance 검사"] --> B3["merge commit"]
+        B1["gitlink + worklog 갱신"] --> B2["pre-push 검증<br/>B4React 영수증 재사용"] --> B3["merge commit"]
     end
     F3 --> B1
 ```
