@@ -110,3 +110,5 @@ Without `COMMIT_TITLE`, the check validates the current `HEAD` commit. `make gov
 ## Documentation Sync
 
 If implementation changes behavior, structure, or rules, update related docs in the same work cycle.
+
+Open upstream work that the manual must cover once it merges is tracked in `notes/manual-backlog.md` (Korean: `notes/ko/manual-backlog.md`). That file is not published; follow its usage steps and remove an item when it is documented.

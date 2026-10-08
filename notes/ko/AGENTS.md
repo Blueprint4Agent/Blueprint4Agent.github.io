@@ -110,3 +110,5 @@ PR_TITLE="[docs] Add feature pages" PR_BODY_FILE=<file> make git-governance-chec
 ## Documentation Sync
 
 구현 변경으로 동작, 구조, 규칙이 바뀌면 관련 문서를 같은 작업 사이클에서 함께 업데이트하세요.
+
+머지되면 매뉴얼에 반영해야 하는 진행 중인 상위 저장소 작업은 `notes/manual-backlog.md`(한국어: `notes/ko/manual-backlog.md`)에서 추적합니다. 이 파일은 게시되지 않습니다. 파일의 사용 방법을 따르고, 문서화한 항목은 삭제하세요.
