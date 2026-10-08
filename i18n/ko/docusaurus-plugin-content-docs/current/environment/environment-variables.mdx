@@ -25,11 +25,12 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 - 파일을 바꾸기 전에 `.env-backups/`에 시각이 붙은 백업을 남깁니다(Git·Docker 제외, 본인만 읽기 가능).
 - 값은 출력하지 않습니다. 내 `.env`에만 있는 키는 파일 끝의 별도 구역에 유지됩니다.
+- 예제는 구역 구분선으로 묶여 있고, 각 키 바로 위의 `# Values:` 주석이 허용 값이나 형식을 알려줍니다. 동기화는 이 배치와 주석을 그대로 복사합니다.
 - `make docker-deploy`는 먼저 `docker-env-check`를 실행하고 키가 빠져 있으면 멈춥니다.
 
 :::tip[설정 추가]
 
-공유 백엔드 설정은 `src/backend/.env.example`과 `docker/.env.example` 양쪽에 추가합니다. 한쪽에 빠지면 `make check`와 CI에서도 실행되는 `make env-contract-check`가 실패합니다.
+공유 백엔드 설정은 `src/backend/.env.example`과 `docker/.env.example` 양쪽에 추가합니다. 한쪽에 빠지면 `make check`와 로컬 검증에서도 실행되는 `make env-contract-check`가 실패합니다.
 
 :::
 
@@ -39,16 +40,18 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 ### 서버
 
-| 변수              | 기본값                                                          | 설명                                                         |
-| ----------------- | --------------------------------------------------------------- | ------------------------------------------------------------ |
-| `APP_NAME`        | `Blueprint4FastAPI API`                                         | OpenAPI에 표시되는 API 이름                                  |
-| `APP_ENV`         | `local`                                                         | 환경 이름(Docker에서는 `docker`)                             |
-| `LOG_LEVEL`       | `INFO`                                                          | Python 로그 레벨                                             |
-| `APP_PORT`        | `8000`                                                          | `make backend-dev` 포트                                      |
-| `APP_BASE_URL`    | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 origin |
-| `SWAGGER_ENABLED` | `true`                                                          | `/docs`에서 Swagger UI 제공                                  |
-| `METRICS_ENABLED` | `true`                                                          | `/metrics`에서 Prometheus 메트릭 제공                        |
-| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | 쉼표로 구분한 허용 origin                                    |
+| 변수              | 기본값                                                          | 설명                                                                                     |
+| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `APP_NAME`        | `Blueprint4FastAPI API`                                         | OpenAPI에 표시되는 API 이름                                                              |
+| `APP_MODE`        | `development`                                                   | `development` 또는 `production`. [런타임 모드](/docs/environment/runtime-modes) 참고     |
+| `APP_ENV`         | `local`                                                         | 텔레메트리 라벨(Docker에서는 `docker`), 모드를 정하지 않음                               |
+| `LOG_LEVEL`       | `INFO`                                                          | Python 로그 레벨                                                                         |
+| `STARTUP_DISPLAY` | `auto`                                                          | `auto`, `plain`, `off`. [시작 화면과 콘솔 로그](/docs/environment/startup-and-logs) 참고 |
+| `APP_PORT`        | `8000`                                                          | `make backend-dev` 포트                                                                  |
+| `APP_BASE_URL`    | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 origin                             |
+| `SWAGGER_ENABLED` | `true`                                                          | `/docs`에서 Swagger UI 제공                                                              |
+| `METRICS_ENABLED` | `true`                                                          | `/metrics`에서 Prometheus 메트릭 제공                                                    |
+| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | 쉼표로 구분한 허용 origin                                                                |
 
 ### 옵저버빌리티
 
@@ -181,14 +184,16 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 `docker/.env.example`은 같은 백엔드 키를 선언하되 컨테이너용 기본값이 다릅니다.
 
-| 변수                                | Docker 기본값                                  |
-| ----------------------------------- | ---------------------------------------------- |
-| `APP_ENV`                           | `docker`                                       |
-| `APP_BASE_URL`                      | `http://localhost:8000`                        |
-| `CORS_ORIGINS`                      | `http://localhost:8000` 추가                   |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                   |
-| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres` |
-| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                              |
+| 변수                                | Docker 기본값                                            |
+| ----------------------------------- | -------------------------------------------------------- |
+| `APP_MODE`                          | `production`                                             |
+| `APP_ENV`                           | `docker`                                                 |
+| `APP_BASE_URL`                      | `http://localhost:8000`                                  |
+| `CORS_ORIGINS`                      | `http://localhost:8000` 추가                             |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                             |
+| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres`           |
+| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                                        |
+| `OBJECT_STORAGE_LOCAL_ROOT`         | `/var/lib/b4fastapi/objects`(`object_storage_data` 볼륨) |
 
 Docker 전용 키도 있습니다.
 

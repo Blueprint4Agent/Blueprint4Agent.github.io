@@ -36,7 +36,12 @@ Change `DB_DRIVER` and `DB_NAME` together. `env-sync` keeps existing values, so 
 
 ## Migrations
 
-The app runs `alembic upgrade head` on startup and logs `Database schema migration check complete (target=head).`
+The app runs `alembic upgrade head` on startup and logs `Database schema migration check complete (target=head).` To inspect or apply migrations without starting the server:
+
+```bash
+make db-current   # show the configured database's revision
+make db-migrate   # apply all pending migrations
+```
 
 When you change models:
 
@@ -73,7 +78,7 @@ After a restore, run `uv run alembic upgrade head` and the smoke tests (`uv run 
 
 ## Redis
 
-Redis backs login lockout, realtime pub/sub, and the Celery broker.
+Redis backs login lockout, deletion and verification codes, realtime pub/sub, and the Celery broker. The API sends a `PING` with a five-second timeout at startup; an unreachable Redis aborts startup.
 
 | Mode            | Settings                                                                   | Use                                                     |
 | --------------- | -------------------------------------------------------------------------- | ------------------------------------------------------- |

@@ -25,11 +25,12 @@ B4FastAPI reads three `.env` files. Each has a committed `.env.example`, which i
 
 - Before changing a file, sync writes a timestamped backup to `.env-backups/` (ignored by Git and Docker, readable only by you).
 - Values are never printed. Keys that exist only in your `.env` are kept in a separate section at the end.
+- Examples are grouped by section dividers, and a `# Values:` comment above each key lists its accepted values or format. Sync copies that layout and the comments.
 - `make docker-deploy` runs `docker-env-check` first and stops if keys are missing.
 
 :::tip[Adding a setting]
 
-Add a shared backend setting to both `src/backend/.env.example` and `docker/.env.example`. `make env-contract-check`, which also runs in `make check` and CI, fails if one of them is missing it.
+Add a shared backend setting to both `src/backend/.env.example` and `docker/.env.example`. `make env-contract-check`, which also runs in `make check` and local verification, fails if one of them is missing it.
 
 :::
 
@@ -39,16 +40,18 @@ Defaults below are from `src/backend/.env.example` (local development). [Docker 
 
 ### Server
 
-| Variable          | Default                                                         | Description                                                |
-| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
-| `APP_NAME`        | `Blueprint4FastAPI API`                                         | API title shown in OpenAPI                                 |
-| `APP_ENV`         | `local`                                                         | Environment name (`docker` in Docker)                      |
-| `LOG_LEVEL`       | `INFO`                                                          | Python log level                                           |
-| `APP_PORT`        | `8000`                                                          | Port for `make backend-dev`                                |
-| `APP_BASE_URL`    | `http://localhost:5173`                                         | Public frontend origin for email links and OAuth redirects |
-| `SWAGGER_ENABLED` | `true`                                                          | Serves Swagger UI at `/docs`                               |
-| `METRICS_ENABLED` | `true`                                                          | Serves Prometheus metrics at `/metrics`                    |
-| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | Comma-separated allowed origins                            |
+| Variable          | Default                                                         | Description                                                                                  |
+| ----------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `APP_NAME`        | `Blueprint4FastAPI API`                                         | API title shown in OpenAPI                                                                   |
+| `APP_MODE`        | `development`                                                   | `development` or `production`. See [Runtime modes](/docs/environment/runtime-modes).         |
+| `APP_ENV`         | `local`                                                         | Telemetry label (`docker` in Docker); does not select the mode                               |
+| `LOG_LEVEL`       | `INFO`                                                          | Python log level                                                                             |
+| `STARTUP_DISPLAY` | `auto`                                                          | `auto`, `plain`, or `off`. See [Startup & console logs](/docs/environment/startup-and-logs). |
+| `APP_PORT`        | `8000`                                                          | Port for `make backend-dev`                                                                  |
+| `APP_BASE_URL`    | `http://localhost:5173`                                         | Public frontend origin for email links and OAuth redirects                                   |
+| `SWAGGER_ENABLED` | `true`                                                          | Serves Swagger UI at `/docs`                                                                 |
+| `METRICS_ENABLED` | `true`                                                          | Serves Prometheus metrics at `/metrics`                                                      |
+| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | Comma-separated allowed origins                                                              |
 
 ### Observability
 
@@ -181,14 +184,16 @@ See [Object storage](/docs/features/object-storage).
 
 `docker/.env.example` declares the same backend keys with these container defaults:
 
-| Variable                            | Docker default                                 |
-| ----------------------------------- | ---------------------------------------------- |
-| `APP_ENV`                           | `docker`                                       |
-| `APP_BASE_URL`                      | `http://localhost:8000`                        |
-| `CORS_ORIGINS`                      | Adds `http://localhost:8000`                   |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                   |
-| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres` |
-| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                              |
+| Variable                            | Docker default                                                  |
+| ----------------------------------- | --------------------------------------------------------------- |
+| `APP_MODE`                          | `production`                                                    |
+| `APP_ENV`                           | `docker`                                                        |
+| `APP_BASE_URL`                      | `http://localhost:8000`                                         |
+| `CORS_ORIGINS`                      | Adds `http://localhost:8000`                                    |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`       | `http://otel-collector:4317`                                    |
+| `DB_DRIVER` / `DB_NAME` / `DB_HOST` | `postgresql+asyncpg` / `template` / `postgres`                  |
+| `REDIS_IN_MEMORY` / `REDIS_HOST`    | `false` / `redis`                                               |
+| `OBJECT_STORAGE_LOCAL_ROOT`         | `/var/lib/b4fastapi/objects` (the `object_storage_data` volume) |
 
 It also has Docker-only keys:
 

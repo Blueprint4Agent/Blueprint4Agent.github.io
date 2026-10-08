@@ -47,6 +47,7 @@ const sidebars: SidebarsConfig = {
                 doc("environment/runtime-modes", "layers"),
                 doc("environment/database-and-redis", "database"),
                 doc("environment/observability", "activity"),
+                doc("environment/startup-and-logs", "terminal"),
                 doc("environment/docker", "container"),
                 doc("environment/make-commands", "terminal"),
             ],

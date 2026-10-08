@@ -15,22 +15,24 @@ The root `Makefile` is the single entry point for every workflow. Run `make help
 | Set up a fresh clone               | `make init install`                                  |
 | Run the app locally                | `make backend-dev` and `make frontend-dev`           |
 | Check my changes before committing | `make verify-plan`, then `make verify`               |
-| Run everything CI runs             | `make ci`                                            |
+| Run every check                    | `make ci`                                            |
+| Apply database migrations          | `make db-migrate`                                    |
 | Deploy with Docker                 | `make docker-deploy`                                 |
-| Promote a user to admin            | `make user-role EMAIL=person@example.com ROLE=admin` |
+| Promote a user to admin or manager | `make user-role EMAIL=person@example.com ROLE=admin` |
 
 ## Variables
 
-| Variable                                                       | Used by                 | Effect                                     |
-| -------------------------------------------------------------- | ----------------------- | ------------------------------------------ |
-| `VERIFY_BASE`                                                  | `verify-plan`, `verify` | Compare from this commit instead of `HEAD` |
-| `VERIFY_FULL=1`                                                | `verify`                | Force every check                          |
-| `DOCKER_SERVICE`                                               | `docker-logs`           | Service to follow (default `app`)          |
-| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`             | Wait per startup stage (default 120)       |
-| `PROJECT_CONFIG`                                               | `project-*`             | Manifest path (default `project.json`)     |
-| `FRONTEND_DIR`                                                 | `frontend-style-studio` | Frontend checkout to edit                  |
-| `EMAIL`, `ROLE`                                                | `user-role`             | Account and new role                       |
-| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`  | Planned metadata to validate               |
+| Variable                                                       | Used by                   | Effect                                      |
+| -------------------------------------------------------------- | ------------------------- | ------------------------------------------- |
+| `VERIFY_BASE`                                                  | `verify-plan`, `verify`   | Compare from this commit instead of `HEAD`  |
+| `VERIFY_FULL=1`                                                | `verify`                  | Force every check                           |
+| `DOCKER_SERVICE`                                               | `docker-logs`             | Service to follow (default `app`)           |
+| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`               | Wait per startup stage (default 120)        |
+| `PROJECT_CONFIG`                                               | `project-*`               | Manifest path (default `project.json`)      |
+| `FRONTEND_DIR`                                                 | `frontend-style-studio`   | Frontend checkout to edit                   |
+| `EMAIL`, `ROLE`                                                | `user-role`               | Account and new role                        |
+| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`    | Planned metadata to validate                |
+| `PR_NUMBER`                                                    | `git-governance-pr-check` | Pull request whose actual metadata to check |
 
 ## Setup and environment
 
@@ -48,17 +50,19 @@ The root `Makefile` is the single entry point for every workflow. Run `make help
 
 ## Develop and operate
 
-| Target                  | Description                                                                   |
-| ----------------------- | ----------------------------------------------------------------------------- |
-| `backend-dev`           | Run backend development server                                                |
-| `frontend-dev`          | Run frontend development server                                               |
-| `frontend-desktop-dev`  | Run the frontend in the Tauri desktop shell                                   |
-| `frontend-style-studio` | Run local style editor for FRONTEND_DIR (default src/frontend)                |
-| `celery-worker`         | Run standalone Celery worker (local default: solo; Linux production: prefork) |
-| `celery-beat`           | Run the single scheduler; no business schedules enabled by default            |
-| `celery-ping`           | Check running Celery workers through the configured broker                    |
-| `celery-probe`          | Send a harmless task; confirm completion and task ID in worker logs           |
-| `user-role`             | Set an existing account role: EMAIL=address ROLE=admin\|user                  |
+| Target                  | Description                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `backend-dev`           | Run backend development server                                                        |
+| `frontend-dev`          | Run frontend development server                                                       |
+| `frontend-desktop-dev`  | Run the frontend in the Tauri desktop shell                                           |
+| `frontend-style-studio` | Run local style editor for FRONTEND_DIR (default src/frontend)                        |
+| `celery-worker`         | Run standalone Celery worker (local default: solo; Linux production: prefork)         |
+| `celery-beat`           | Run the single scheduler (mail outbox every 60 s, billing reconciliation every 300 s) |
+| `celery-ping`           | Check running Celery workers through the configured broker                            |
+| `celery-probe`          | Send a harmless task; confirm completion and task ID in worker logs                   |
+| `user-role`             | Set an existing account role: EMAIL=address ROLE=admin\|manager\|user                 |
+| `db-current`            | Show the configured backend database migration revision                               |
+| `db-migrate`            | Apply all pending migrations to the configured backend database                       |
 
 ## Install and build
 
@@ -149,7 +153,9 @@ The root `Makefile` is the single entry point for every workflow. Run `make help
 
 ## Git governance
 
-| Target                    | Description                                                             |
-| ------------------------- | ----------------------------------------------------------------------- |
-| `git-governance-check`    | Validate git governance; optionally pass commit, PR, and merge metadata |
-| `git-governance-pr-check` | Validate actual PR metadata and every authored commit                   |
+| Target                    | Description                                                              |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `git-governance-check`    | Validate git governance; optionally pass commit, PR, and merge metadata  |
+| `git-governance-pr-check` | Validate actual PR metadata and every authored commit                    |
+| `hooks-install`           | Install commit-msg and pre-push hooks in this clone (run by `make init`) |
+| `hooks-test`              | Test Git hooks and verification receipt invalidation                     |

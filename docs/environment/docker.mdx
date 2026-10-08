@@ -47,7 +47,7 @@ flowchart LR
 | `postgres`       | `postgres:16-alpine`                            | `docker-up` when `DB_HOST=postgres`                               | Database                                              |
 | `redis`          | `redis:7-alpine`                                | `docker-up` when `REDIS_HOST=redis`                               | Cache, pub/sub, Celery broker                         |
 | `celery-worker`  | App image                                       | `celery` profile, or `docker-up` when login and email are enabled | Background tasks (prefork, 2 processes)               |
-| `celery-beat`    | App image                                       | `make docker-celery-up`                                           | Scheduler (exactly one)                               |
+| `celery-beat`    | App image                                       | `make docker-celery-up`                                           | Outbox and billing schedules (exactly one)            |
 | `otel-collector` | `otel/opentelemetry-collector-contrib:0.114.0`  | `observability` profile                                           | Receives OTLP traces and logs                         |
 | `tempo`          | `grafana/tempo:2.6.1`                           | `observability` profile                                           | Trace storage                                         |
 | `loki`           | `grafana/loki:3.6.0`                            | `observability` profile                                           | Log storage (7-day retention)                         |
@@ -118,15 +118,29 @@ After deploying, check `http://localhost:8000/health/ready` and look for `Databa
 
 To run a second stack on the same host, set a unique `COMPOSE_PROJECT_NAME`, unused host ports, and a distinct `APP_IMAGE` tag. A new project name creates new volumes; it does not migrate data. Keep `docker` for the original installation.
 
+## Volumes
+
+| Volume                | Mounted in             | Holds                                                                                |
+| --------------------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| `postgres_data`       | `postgres`             | Database                                                                             |
+| `redis_data`          | `redis`                | Redis data                                                                           |
+| `object_storage_data` | `app`, `celery-worker` | [Local object storage](/docs/features/object-storage) at `OBJECT_STORAGE_LOCAL_ROOT` |
+| `celery_beat_data`    | `celery-beat`          | Beat schedule state                                                                  |
+
+The observability services keep their own volumes. Recreating containers keeps volumes; `docker compose down -v` deletes them. Back up the database and object storage together.
+
+## Production settings
+
+`docker/.env.example` selects `APP_MODE=production`, so login must stay enabled and developer UI is hidden. When billing or lifecycle email is enabled, also run `make docker-celery-up` so the worker and Beat process webhooks, the mail outbox, and reconciliation.
+
 ## Image pipeline
 
-`.github/workflows/build.yml` runs backend and frontend checks, and builds the image from `docker/Dockerfile` only when publishing:
+`.github/workflows/build.yml` runs only on manual dispatch (Actions → Run workflow, or `gh workflow run`). It runs backend and frontend checks for the selected ref, and builds and publishes the image from `docker/Dockerfile` only when requested:
 
-| Trigger                     | Checks | Publishes to `ghcr.io/<owner>/<repo>` |
-| --------------------------- | ------ | ------------------------------------- |
-| Pull request to `main`      | Yes    | No                                    |
-| Nightly (00:00 KST)         | Yes    | `nightly-main`                        |
-| Manual dispatch             | Yes    | Only with `publish_image=true`        |
-| Release published, `v*` tag | Yes    | Yes                                   |
+| Input           | Effect                                                               |
+| --------------- | -------------------------------------------------------------------- |
+| `ref`           | Branch, tag, or SHA to build (defaults to `main` when publishing)    |
+| `pr_number`     | Validate a pull request; takes priority over `ref`, does not publish |
+| `publish_image` | Build and push the image to `ghcr.io/<owner>/<repo>`                 |
 
-Merges to `main` do not build an image automatically.
+No workflow runs automatically on pull requests, pushes, schedules, tags, or releases.

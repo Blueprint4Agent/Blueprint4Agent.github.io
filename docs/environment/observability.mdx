@@ -53,7 +53,7 @@ flowchart LR
 {service_name="blueprint4fastapi-backend"}
 ```
 
-- Application, worker, Uvicorn server, and access logs are exported at `LOG_LEVEL`. Console output stays unchanged.
+- Application, worker, Uvicorn server, and access logs are exported at `LOG_LEVEL` as original records. The compact console format is described in [Startup & console logs](/docs/environment/startup-and-logs).
 - Request and task IDs are structured metadata, not labels. Filter with `| request_id="..."` or `| task_id="..."`.
 - Logs are batched in memory. Abrupt termination or long collector outages can lose logs, so this is not an audit log.
 

@@ -53,7 +53,7 @@ flowchart LR
 {service_name="blueprint4fastapi-backend"}
 ```
 
-- 애플리케이션, 워커, Uvicorn 서버, 접근 로그를 `LOG_LEVEL` 기준으로 내보냅니다. 콘솔 출력은 그대로입니다.
+- 애플리케이션, 워커, Uvicorn 서버, 접근 로그를 `LOG_LEVEL` 기준으로 원래 레코드 그대로 내보냅니다. 간결한 콘솔 형식은 [시작 화면과 콘솔 로그](/docs/environment/startup-and-logs)를 참고하세요.
 - 요청 ID와 작업 ID는 라벨이 아닌 구조화 메타데이터입니다. `| request_id="..."` 또는 `| task_id="..."`로 필터링합니다.
 - 로그는 메모리에서 묶어 보내므로 갑작스러운 종료나 긴 Collector 장애 시 유실될 수 있습니다. 감사 로그 용도가 아닙니다.
 
