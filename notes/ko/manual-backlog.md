@@ -18,41 +18,11 @@ English: [Manual backlog](../manual-backlog.md)
 
 | 추적          | 주제                              | 대상 페이지                                                     |
 | ------------- | --------------------------------- | --------------------------------------------------------------- |
-| B4FastAPI #92 | 사용자 프로필 화면                | `features/settings-and-profile.mdx`                             |
 | B4FastAPI #95 | 남은 결제 안내 메일               | `features/email.mdx`, `features/billing.mdx`                    |
 | B4FastAPI #93 | 결제 생명주기 점검                | `features/billing.mdx`                                          |
 | B4FastAPI #91 | 관리자 Observability 화면(후순위) | `features/admin-and-roles.mdx`, `environment/observability.mdx` |
 | B4FastAPI #94 | Stripe 외 결제 제공자(조사)       | 제공자 인터페이스를 도입하는 경우에만 `features/billing.mdx`    |
 | B4FastAPI #87 | 위 항목들의 총괄                  | 페이지 없음, 모든 항목이 끝나면 이 파일 정리                    |
-
----
-
-### 사용자 프로필 화면 (#92)
-
-**대상:** `docs/features/settings-and-profile.mdx`의 `## Account and profile` 뒤에 `## Profile` 섹션 추가. 홈에서 연결한다면 홈 표에도 행 추가.
-
-**초안(한국어 페이지용):**
-
-```mdx
-## 프로필
-
-`<verify: 경로, 예: /profile>`는 로그인한 사용자의 프로필을 보여주고 편집은 **설정 → 계정**으로 연결합니다. 같은 계정 스냅샷을 사용하므로 저장한 이름이나 사진이 프로필, 사이드바, 설정에 바로 반영됩니다.
-
-| 항목                          | 표시     | 편집 위치   |
-| ----------------------------- | -------- | ----------- |
-| 이름                          | 예       | 설정 → 계정 |
-| 프로필 사진                   | 예       | 설정 → 계정 |
-| 이메일                        | <verify> | —           |
-| 연결된 로그인 방식            | <verify> | 설정 → 계정 |
-| <verify: 소개글 등 추가 항목> | <verify> | <verify>    |
-
-- 본인만 자신의 프로필을 볼 수 있습니다. <verify: 공개 프로필 존재 여부와 노출 항목>
-- 사진이 없거나 불러오지 못하면 이니셜을 보여주며, 긴 이름은 넘치지 않고 줄바꿈됩니다.
-```
-
-영어 페이지에는 `manual-backlog.md`의 영어 초안을 사용합니다.
-
-**완료 시 확인:** 경로와 메뉴 진입점, 본인 전용인지 공개 프로필인지, `/auth/me`에 추가된 필드나 새 엔드포인트와 API 키 정책, `notes/api-authentication.md` 변경 여부.
 
 ---
 

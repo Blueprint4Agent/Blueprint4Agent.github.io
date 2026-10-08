@@ -18,39 +18,11 @@ Baseline: the manual describes B4FastAPI `2a62b52` and its pinned B4React `d4878
 
 | Tracking      | Topic                                          | Target pages                                                    |
 | ------------- | ---------------------------------------------- | --------------------------------------------------------------- |
-| B4FastAPI #92 | User profile screen                            | `features/settings-and-profile.mdx`                             |
 | B4FastAPI #95 | Remaining payment notices                      | `features/email.mdx`, `features/billing.mdx`                    |
 | B4FastAPI #93 | Billing lifecycle review                       | `features/billing.mdx`                                          |
 | B4FastAPI #91 | Admin observability screen (low priority)      | `features/admin-and-roles.mdx`, `environment/observability.mdx` |
 | B4FastAPI #94 | Payment providers other than Stripe (research) | `features/billing.mdx`, only if a provider interface is adopted |
 | B4FastAPI #87 | Umbrella for the items above                   | No page; close the backlog when every item is resolved          |
-
----
-
-### User profile screen (#92)
-
-**Target:** `docs/features/settings-and-profile.mdx`, new `## Profile` section after `## Account and profile`; add a row to the Home table if the home page links to it.
-
-**Draft:**
-
-```mdx
-## Profile
-
-`<verify: route, e.g. /profile>` shows the signed-in user's profile and links to **Settings → Account** for editing. It reuses the same account snapshot, so a saved name or photo appears at once in the profile, the sidebar, and Settings.
-
-| Field                                | Shown    | Edited in          |
-| ------------------------------------ | -------- | ------------------ |
-| Name                                 | Yes      | Settings → Account |
-| Profile photo                        | Yes      | Settings → Account |
-| Email                                | <verify> | —                  |
-| Linked login methods                 | <verify> | Settings → Account |
-| <verify: extra fields such as a bio> | <verify> | <verify>           |
-
-- Only the owner can read their profile. <verify: whether a public profile exists, and which fields it exposes>
-- Missing or failed photos fall back to initials; long names wrap without overflow.
-```
-
-**Verify at completion:** route and menu entry; own-only versus public profile; added `/auth/me` fields or new endpoints and their API-key policy; whether `notes/api-authentication.md` changed.
 
 ---
 

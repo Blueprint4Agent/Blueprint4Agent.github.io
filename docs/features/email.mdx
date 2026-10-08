@@ -6,7 +6,7 @@ description: Account email and lifecycle notifications delivered by a Celery wor
 
 # Email
 
-Account email (verification, password reset, welcome, deletion code) and lifecycle notifications (subscription and account deletion), rendered in English or Korean and delivered by a standalone Celery worker.
+Account email (verification, password reset, welcome, password-change and deletion codes) and lifecycle notifications (subscription and account deletion), rendered in English or Korean and delivered by a standalone Celery worker.
 
 |               |                                                                                                                                               |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -22,6 +22,7 @@ Account email (verification, password reset, welcome, deletion code) and lifecyc
 | Signup           | Account starts unverified; a verification link is sent   | Account is verified immediately |
 | Login            | Unverified accounts get `EMAIL_NOT_VERIFIED`             | No verification check           |
 | Password reset   | A reset link is sent                                     | Not available                   |
+| Password change  | A six-digit code to confirm the change                   | Not available                   |
 | Activation       | A welcome email after verification or first OAuth signup | No email                        |
 | Account deletion | A six-digit code, then a deletion notice                 | Not available                   |
 

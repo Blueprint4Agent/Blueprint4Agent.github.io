@@ -1,7 +1,7 @@
 ---
 title: Authentication
 sidebar_position: 1
-description: Email and password accounts, sessions, lockout, account deletion, login-disabled mode, and recent accounts.
+description: Email and password accounts, sessions, lockout, password change, account deletion, login-disabled mode, and recent accounts.
 ---
 
 # Authentication
@@ -12,7 +12,7 @@ Email and password accounts with short-lived access tokens, a refresh cookie, lo
 | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | **Enable**    | On by default (`LOGIN_ENABLED=true`)                                                                                   |
 | **Settings**  | `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `LOGIN_FAILED_LIMIT`, `LOGIN_LOCKED_MINUTES` |
-| **Endpoints** | `/api/v1/auth/signup`, `login`, `refresh`, `logout`, `me`, `token`, `me/deletion-code`                                 |
+| **Endpoints** | `/api/v1/auth/signup`, `login`, `refresh`, `logout`, `me`, `token`, `me/password`, `me/deletion-code`                  |
 | **Frontend**  | `/login`, `/signup` dialogs over the home page                                                                         |
 
 ## Sessions
@@ -64,15 +64,43 @@ sequenceDiagram
     API-->>UI: Account, OAuth identities, and API keys deleted
 ```
 
-1. `POST /api/v1/auth/me/deletion-code` sends a six-digit code to the account's own address. A resend replaces the previous code, and the UI waits for the server's retry interval.
-2. `DELETE /api/v1/auth/me` requires the matching email and code. The code is bound to the user, stored as an HMAC, valid for ten minutes, and consumed once.
-3. Both calls require a Bearer session; API keys are rejected. Opening the email alone cannot delete anything.
+1. `POST /api/v1/auth/me/deletion-code` sends a six-digit code to the account's own address.
+2. `POST /api/v1/auth/me/deletion-code/verify` checks the code without consuming it.
+3. `DELETE /api/v1/auth/me` requires the matching email and code, and consumes the code.
+4. All calls require a Bearer session; API keys are rejected. Opening the email alone cannot delete anything. Code rules are listed in [Email codes](#email-codes).
 
 - Deletion requires email to be enabled, and is never offered to login-disabled bootstrap identities.
 - The last active admin cannot be deleted.
 - An account with subscription Checkout history returns `ACCOUNT_BILLING_REVIEW_REQUIRED` (409) until an operator reconciles it in Stripe. See [Billing](/docs/features/billing).
 - Deleted user IDs are never reused, so old tokens cannot resolve to a new account.
 - After deletion, a confirmation email is sent through the durable lifecycle outbox. See [Email](/docs/features/email).
+
+## Password change \{#password-change\}
+
+Users with an email password change it from **Settings → Account**:
+
+1. `POST /api/v1/auth/me/password/code` sends a six-digit code to the registered email.
+2. `POST /api/v1/auth/me/password/code/verify` checks the code without consuming it, so the UI can show feedback before the new password is entered.
+3. `POST /api/v1/auth/me/password` with `{code, password}` validates the code again, consumes it, and sets the new password. It uses the same strength rules as signup and reset.
+
+- All three calls require a Bearer session; API keys are rejected.
+- Refresh sessions are revoked, so other browsers sign in again on their next refresh. Issued access tokens expire normally, and API keys are unchanged.
+- OAuth-only accounts manage their password with their provider. `has_password` on `/auth/me` tells the UI whether the action applies.
+
+## Email codes \{#email-codes\}
+
+Password change and account deletion share one code mechanism, with separate keys per purpose:
+
+| Rule           | Value                                                                   |
+| -------------- | ----------------------------------------------------------------------- |
+| Format         | Six digits, sent only to the account's registered email                 |
+| Lifetime       | Ten minutes; only the latest code is valid                              |
+| Use            | Single use; verify endpoints never consume or extend a code             |
+| Resend         | After 30 seconds, at most five per hour                                 |
+| Wrong attempts | Five wrong codes lock the purpose for the rest of the ten-minute window |
+| Email disabled | Issuance, verification, and the final action are rejected               |
+
+Codes are stored as HMACs in Redis. Cache or queue failures fail closed.
 
 ## Login-disabled mode
 
