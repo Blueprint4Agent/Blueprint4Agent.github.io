@@ -43,7 +43,7 @@ sequenceDiagram
 1. The login dialog lists enabled providers from `/oauth/providers`. Disabled providers stay hidden.
 2. `/oauth/{provider}/start` redirects to the provider with a state value valid for `OAUTH_STATE_EXPIRE_MINUTES`.
 3. The callback signs the user in with the refresh cookie and redirects to `OAUTH_FRONTEND_SUCCESS_PATH`, or to `OAUTH_FRONTEND_FAILURE_PATH` on failure.
-4. Linked providers appear in the user's `oauth_providers` and in **Settings → Profile**.
+4. Linked providers appear in the user's `oauth_providers` and in **Settings → Account**.
 
 ## Account matching
 

@@ -20,14 +20,11 @@ Stripe-backed billing: saved cards and Link wallets, Free/Plus/Pro subscriptions
 
 ```mermaid
 flowchart LR
-    UI["B4React<br/>Settings, /plans"] -- "Bearer or X-API-Key" --> API["BillingService"]
-    API -- "server-owned prices,<br/>customer, return URLs" --> ST["Stripe"]
-    API --> DB[("customers, reservations,<br/>subscription snapshot")]
-    ST -- "signed webhook" --> WH["/billing/webhook"]
-    WH --> DB
-    BT["Celery Beat<br/>every 5 min"] --> RC["Reconciliation"]
-    RC --> ST
-    RC --> DB
+    UI["B4React"] --> API["BillingService"]
+    API --> ST["Stripe"]
+    API --> DB[("Billing tables")]
+    ST -- "webhook" --> API
+    BT["Beat, 5 min"] --> API
 ```
 
 - **Server-owned parameters.** Callers never choose the customer, price, amount, or return URL. A plan request carries only the plan, currency, and a request UUID.

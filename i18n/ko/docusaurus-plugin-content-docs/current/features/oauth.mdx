@@ -43,7 +43,7 @@ sequenceDiagram
 1. 로그인 대화상자는 `/oauth/providers`에서 활성화된 제공자를 표시합니다. 비활성화된 제공자는 숨겨집니다.
 2. `/oauth/{provider}/start`는 `OAUTH_STATE_EXPIRE_MINUTES` 동안 유효한 state 값과 함께 제공자로 리다이렉트합니다.
 3. 콜백은 refresh 쿠키로 로그인시키고 `OAUTH_FRONTEND_SUCCESS_PATH`로, 실패하면 `OAUTH_FRONTEND_FAILURE_PATH`로 리다이렉트합니다.
-4. 연결된 제공자는 사용자의 `oauth_providers`와 **설정 → 프로필**에 표시됩니다.
+4. 연결된 제공자는 사용자의 `oauth_providers`와 **설정 → 계정**에 표시됩니다.
 
 ## 계정 매칭
 

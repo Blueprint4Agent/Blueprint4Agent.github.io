@@ -20,14 +20,11 @@ Stripe 기반 결제 기능입니다. 카드와 Link 지갑 저장, 월간·연�
 
 ```mermaid
 flowchart LR
-    UI["B4React<br/>설정, /plans"] -- "Bearer 또는 X-API-Key" --> API["BillingService"]
-    API -- "서버가 정한 가격,<br/>고객, 복귀 URL" --> ST["Stripe"]
-    API --> DB[("고객, 예약,<br/>구독 스냅샷")]
-    ST -- "서명된 웹훅" --> WH["/billing/webhook"]
-    WH --> DB
-    BT["Celery Beat<br/>5분마다"] --> RC["동기화 작업"]
-    RC --> ST
-    RC --> DB
+    UI["B4React"] --> API["BillingService"]
+    API --> ST["Stripe"]
+    API --> DB[("결제 테이블")]
+    ST -- "웹훅" --> API
+    BT["Beat, 5분"] --> API
 ```
 
 - **서버가 정하는 값.** 호출자는 고객, 가격, 금액, 복귀 URL을 지정할 수 없습니다. 요금제 요청에는 요금제, 통화, 요청 UUID만 담습니다.

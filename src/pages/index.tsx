@@ -47,7 +47,7 @@ const highlights: Highlight[] = [
         title: translate({ id: "home.highlight.admin.title", message: "Admin console" }),
         description: translate({
             id: "home.highlight.admin.desc",
-            message: "Role-based administrator user directory and account controls.",
+            message: "User, manager, and admin roles with a user directory and server status.",
         }),
     },
     {
@@ -56,7 +56,7 @@ const highlights: Highlight[] = [
         title: translate({ id: "home.highlight.jobs.title", message: "Background jobs" }),
         description: translate({
             id: "home.highlight.jobs.desc",
-            message: "Opt-in Celery worker and scheduler on the shared Redis broker.",
+            message: "Celery worker and Beat for email, lifecycle notices, and billing sync.",
         }),
     },
     {

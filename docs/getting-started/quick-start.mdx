@@ -30,11 +30,11 @@ In an existing clone, run `make frontend-init` to check out the pinned B4React c
 ## 2. Create env files and install dependencies
 
 ```bash
-make init       # backend, frontend, and docker .env files from their examples
+make init       # .env files from their examples, plus local Git hooks
 make install    # backend (uv) and frontend (npm) dependencies
 ```
 
-`make init` never overwrites an existing `.env`. Use `make env-sync` later to add keys introduced by a newer example.
+`make init` never overwrites an existing `.env`, and installs the `commit-msg` and `pre-push` hooks (`make hooks-install`). Use `make env-sync` later to add keys introduced by a newer example.
 
 ## 3. Run the backend and frontend
 
@@ -56,15 +56,15 @@ make backend-dev
 make frontend-dev
 ```
 
-| URL                                  | What you get                                              |
-| ------------------------------------ | --------------------------------------------------------- |
-| `http://localhost:5173`              | B4React app (Vite dev server) with the component showcase |
-| `http://localhost:8000/docs`         | Swagger UI for the FastAPI backend                        |
-| `http://localhost:8000/health/ready` | Readiness check for the database and Redis                |
+| URL                                  | What you get                                   |
+| ------------------------------------ | ---------------------------------------------- |
+| `http://localhost:5173`              | B4React app (Vite dev server), opening `/home` |
+| `http://localhost:8000/docs`         | Swagger UI for the FastAPI backend             |
+| `http://localhost:8000/health/ready` | Readiness check for the database and Redis     |
 
 :::tip[Explore without signing up]
 
-The root route opens the public component showcase. Sign up from the profile menu to try account features. With `EMAIL_ENABLED=false` (the default), email verification is skipped.
+The local backend runs with `APP_MODE=development`, so the home page, the component showcase menu, and the GitHub and User guide links are available without an account. Sign up from the profile menu to try account features. With `EMAIL_ENABLED=false` (the default), email verification is skipped.
 
 :::
 

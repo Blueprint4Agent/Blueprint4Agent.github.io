@@ -354,13 +354,13 @@
         "message": "관리자 콘솔"
     },
     "home.highlight.admin.desc": {
-        "message": "역할 기반 관리자 사용자 목록과 계정 제어를 제공합니다."
+        "message": "user·manager·admin 역할과 사용자 목록, 서버 상태를 제공합니다."
     },
     "home.highlight.jobs.title": {
         "message": "백그라운드 작업"
     },
     "home.highlight.jobs.desc": {
-        "message": "공유 Redis 브로커 위에서 선택적으로 켜는 Celery 워커와 스케줄러입니다."
+        "message": "메일, 생명주기 알림, 결제 동기화를 처리하는 Celery 워커와 Beat입니다."
     },
     "home.highlight.observability.title": {
         "message": "옵저버빌리티"

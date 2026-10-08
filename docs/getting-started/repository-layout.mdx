@@ -44,10 +44,10 @@ The backend application follows a strict layering:
 
 ```text
 src/backend/app/
-├── routers/v1/   # HTTP endpoints (auth, api-keys, events)
+├── routers/v1/   # HTTP endpoints (auth, admin, api-keys, billing, events)
 ├── services/     # domain logic called by routers
 ├── models/       # SQLAlchemy models and Pydantic schemas
-├── core/         # config, db, cache, celery, mail, realtime, observability, errors
+├── core/         # config, db, cache, celery, mail, object_storage, realtime, observability, errors
 └── utils/        # cookies, security, tokens
 ```
 
@@ -59,7 +59,7 @@ flowchart LR
     R --> S["services"]
     S --> M["models"]
     S --> U["utils"]
-    S --> C["core<br/>db, cache, celery, mail, realtime"]
+    S --> C["core<br/>db, cache, celery, mail,<br/>object_storage, realtime"]
     S -. "domain exception" .-> H["global handlers"]
 ```
 

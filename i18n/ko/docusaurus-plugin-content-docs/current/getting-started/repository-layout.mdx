@@ -44,10 +44,10 @@ B4FastAPI/
 
 ```text
 src/backend/app/
-├── routers/v1/   # HTTP 엔드포인트(auth, api-keys, events)
+├── routers/v1/   # HTTP 엔드포인트(auth, admin, api-keys, billing, events)
 ├── services/     # 라우터가 호출하는 도메인 로직
 ├── models/       # SQLAlchemy 모델과 Pydantic 스키마
-├── core/         # config, db, cache, celery, mail, realtime, observability, errors
+├── core/         # config, db, cache, celery, mail, object_storage, realtime, observability, errors
 └── utils/        # 쿠키, 보안, 토큰
 ```
 
@@ -59,7 +59,7 @@ flowchart LR
     R --> S["services"]
     S --> M["models"]
     S --> U["utils"]
-    S --> C["core<br/>db, cache, celery, mail, realtime"]
+    S --> C["core<br/>db, cache, celery, mail,<br/>object_storage, realtime"]
     S -. "도메인 예외" .-> H["전역 핸들러"]
 ```
 
