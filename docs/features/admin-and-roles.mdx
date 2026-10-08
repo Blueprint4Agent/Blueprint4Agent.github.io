@@ -1,25 +1,37 @@
 ---
 title: Admin & roles
 sidebar_position: 5
-description: The administrator panel, user directory, and operator role management.
+description: The user, manager, and admin roles, the user directory, server status, and operator role management.
 ---
 
 # Admin & roles
 
-Users are either `user` or `admin`. Administrators get a read-only user directory at `/admin`; roles are changed by an operator command, not through the UI.
+Users have one of three roles: `user`, `manager`, or `admin`. Managers and admins can read the user directory at `/admin`; only admins can read the server status at `/admin/server`. Roles are changed by an operator command, not through the UI or an HTTP API.
 
-|               |                                                                          |
-| ------------- | ------------------------------------------------------------------------ |
-| **Enable**    | Always available to users with the `admin` role                          |
-| **Endpoints** | `GET /api/v1/auth/admin/users`, `GET /api/v1/auth/admin/user-role-stats` |
-| **Frontend**  | **Admin panel** in the profile menu (`/admin`)                           |
-| **Command**   | `make user-role EMAIL=<address> ROLE=admin\|user`                        |
+|               |                                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------------------------- |
+| **Enable**    | Always available to users with the `manager` or `admin` role                                         |
+| **Endpoints** | `GET /api/v1/auth/admin/users`, `GET /api/v1/auth/admin/user-role-stats`, `GET /api/v1/admin/status` |
+| **Frontend**  | **Admin panel** in the profile menu (`/admin`, `/admin/server`)                                      |
+| **Command**   | `make user-role EMAIL=<address> ROLE=admin\|manager\|user`                                           |
+
+## Permissions
+
+| Permission                                      | User | Manager | Admin |
+| ----------------------------------------------- | ---- | ------- | ----- |
+| Own account, API keys, and billing              | Yes  | Yes     | Yes   |
+| Read the user directory and role statistics     | No   | Yes     | Yes   |
+| Read server status and admin-only endpoints     | No   | No      | Yes   |
+| Change another user's role, profile, or billing | No   | No      | No    |
+
+Roles are explicit allowlists, not an inheritance chain. Managers do not get admin-only access automatically, and new admin endpoints must opt in to each role. Every check reads the current database role, so a role change applies on the next request without reissuing tokens. API keys act as their owner and pass the same role checks.
 
 ## Assigning roles
 
 ```bash
-make user-role EMAIL=person@example.com ROLE=admin
-make user-role EMAIL=person@example.com ROLE=user
+make user-role EMAIL=operator@example.com ROLE=admin
+make user-role EMAIL=manager@example.com ROLE=manager
+make user-role EMAIL=manager@example.com ROLE=user
 ```
 
 The command uses the backend environment (`src/backend/.env`). In a Docker deployment, run it inside the app container:
@@ -29,14 +41,23 @@ cd docker
 docker compose exec app .venv/bin/python -m app.manage_user_role --email person@example.com --role admin
 ```
 
-- It changes existing, active accounts only; it never creates accounts or tables.
-- Demoting the last active admin is rejected.
-- It is rejected when `LOGIN_ENABLED=false`, because the bootstrap user is already an admin.
-- The new role applies on the next request.
+- Provision the first admin from a normally registered or OAuth account. The command changes existing, active accounts only.
+- The last active admin cannot be demoted to `manager` or `user`, or deleted.
+- It requires `LOGIN_ENABLED=true`.
+- It runs as a standalone process; the server does not need to be running.
+- The open browser refreshes navigation after the account data is reloaded.
 
-## Admin panel
+## Role change audit
 
-The panel reuses the settings layout and lists each user's name, email, role, account and verification status, login methods, signup date, and latest successful login.
+Every effective role change writes a `role_change_audit` row in the same transaction: target user ID, old and new role, UTC time, and the operator's OS username (`cli:<name>`). No-op assignments are not recorded. The rows contain no email or credentials and survive account deletion.
+
+This is a trusted-operator record, not tamper-proof auditing. There is no endpoint to read it; control access and retention through database operations.
+
+The audit table is created by migration `0010_role_change_audit`, which the app applies on startup.
+
+## User directory
+
+The panel at `/admin` reuses the settings layout. A summary shows four role and account counts (two columns on mobile), and the table lists each user's name, email, role, account and verification status, login methods, signup date, and latest successful login.
 
 - Search by name or email, filter by role and by enabled/disabled status.
 - Results are paginated (`page_size` 1–100, default 20), newest first.
@@ -45,7 +66,28 @@ The panel reuses the settings layout and lists each user's name, email, role, ac
 
 The panel refreshes on focus, visibility, manual refresh, and connectivity recovery. It does not poll or stream user changes.
 
+## Server status
+
+`/admin/server` is a read-only, admin-only snapshot of the running server. Managers cannot open it.
+
+| Row            | Shows                                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Database       | Dialect, hostname and port, status, latency. SQLite is labeled as a local file.                                                 |
+| Redis          | Hostname and port, or in-memory, with status and latency                                                                        |
+| Object storage | Local, Amazon S3, Cloudflare R2, or Supabase, with transport, port, status, and latency                                         |
+| Email, Stripe  | Current connectivity: SMTP connection and authentication, and a read-only Stripe call. No email or billing resource is created. |
+| Startup checks | The results recorded when the process started, with their original timestamp                                                    |
+| Environment    | Effective email, login, OAuth, billing, development UI, and runtime mode values                                                 |
+
+- Database and Redis checks run concurrently with 2-second timeouts, shared with `/health/ready`.
+- Email, Stripe, and storage checks are cached per process for 60 seconds, shared between concurrent requests, and wait at most 5 seconds.
+- The page refreshes every 30 seconds while visible and on focus or reconnection. A failed refresh or a snapshot older than 60 seconds is marked stale.
+- OAuth has no health badge: configuration cannot prove a successful user sign-in.
+- Connection URLs, credentials, database names, bucket names, endpoints, regions, and local paths are never returned.
+
+A storage check proves bucket access only, not upload permission or bucket privacy. Worker health and historical metrics are outside this snapshot.
+
 ## Code
 
-- Backend: `routers/v1/auth.py` (admin routes), `manage_user_role.py`, `routers/list_query.py`
+- Backend: `routers/v1/auth.py` (directory routes), `routers/v1/admin.py`, `services/admin.py`, `manage_user_role.py`, `routers/list_query.py`
 - Frontend: `src/frontend/src/pages/admin/`, `components/features/admin/`

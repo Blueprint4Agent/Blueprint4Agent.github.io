@@ -42,6 +42,7 @@ const sidebars: SidebarsConfig = {
             link: { type: "doc", id: "environment/index" },
             items: [
                 doc("environment/environment-variables", "file-code"),
+                doc("environment/runtime-modes", "layers"),
                 doc("environment/database-and-redis", "database"),
                 doc("environment/observability", "activity"),
                 doc("environment/docker", "container"),

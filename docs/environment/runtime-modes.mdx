@@ -1,0 +1,58 @@
+---
+title: Runtime modes
+sidebar_position: 2
+description: Development and production modes, what each one exposes, and how feature switches gate the API and UI.
+---
+
+# Runtime modes
+
+`APP_MODE` selects product behavior: `development` exposes developer tools, and `production` serves only what end users need. It is independent of `APP_ENV`, which is only a telemetry label, and of Vite's build mode.
+
+|                |                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------- |
+| **Setting**    | `APP_MODE=development\|production`                                                 |
+| **Defaults**   | `development` in `src/backend/.env.example`, `production` in `docker/.env.example` |
+| **Exposed as** | The `app_mode` field of `GET /config`, read by B4React                             |
+| **Requires**   | `production` requires `LOGIN_ENABLED=true`                                         |
+
+An unknown mode, or production with login disabled, fails configuration validation and the server does not start. Set the mode explicitly for every deployment, and deploy the backend and the pinned B4React together so both sides agree on the `/config` contract.
+
+## What each mode exposes
+
+| Behavior                      | Development                        | Production                                |
+| ----------------------------- | ---------------------------------- | ----------------------------------------- |
+| Default page                  | `/home`                            | `/home`                                   |
+| GitHub and User guide links   | Sidebar footer                     | Hidden                                    |
+| Component showcase            | Separate menu at `/show-case`      | Direct URLs redirect to `/home`           |
+| Login-disabled bootstrap user | Allowed with `LOGIN_ENABLED=false` | Rejected, including tokens issued earlier |
+| Personal API keys             | Available                          | Available                                 |
+| Style studio                  | Loopback-only local tool           | Never included                            |
+
+Runtime gating does not remove showcase JavaScript from the shared build; it only controls navigation and routes.
+
+## Bootstrap identities
+
+Login-disabled development uses a dedicated, password-less bootstrap identity:
+
+- If a normal account already uses `BOOTSTRAP_USER_EMAIL`, or the bootstrap identity's role was changed, startup fails. Existing accounts are never promoted automatically.
+- When the bootstrap access token expires, `/config` issues a fresh one, and concurrent `401` responses share a single renewal.
+- Production never provisions bootstrap identities and rejects their bearer sessions and API keys. Their data is kept, not deleted or converted. Use a separate real account in production.
+
+## Feature switches
+
+Feature switches control both the visible UI and direct API calls. Changing one requires a restart.
+
+| Switch           | When off                                                                                                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `STRIPE_ENABLED` | `billing_enabled=false` in `/config`. Billing navigation, settings, `/plans`, and tier badges disappear, and billing hooks send no requests. Direct URLs fall back to Home or General settings. Existing Stripe subscriptions are not cancelled. |
+| `EMAIL_ENABLED`  | Email-only routes are hidden, and direct email verification is rejected without consuming the token. Password signup and login keep working, and new accounts are verified immediately.                                                          |
+| `OAUTH_ENABLED`  | OAuth buttons and linked-provider details are hidden. Callbacks check the current configuration before consuming state.                                                                                                                          |
+| `LOGIN_ENABLED`  | Signup, refresh, and email or OAuth entry mutations are rejected before any I/O.                                                                                                                                                                 |
+
+## Switching modes
+
+1. Set `APP_MODE` (and `LOGIN_ENABLED=true` for production) in the backend or Docker `.env`.
+2. Restart the backend. Account and billing data are not changed by a mode switch.
+3. Before retiring old development bootstrap identities, review the data linked to them.
+
+See `notes/runtime-modes-rbac.md` in B4FastAPI for the full policy, and [Admin & roles](/docs/features/admin-and-roles) for role permissions.
