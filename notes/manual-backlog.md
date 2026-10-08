@@ -4,7 +4,7 @@ Korean: [매뉴얼 대기 항목](ko/manual-backlog.md)
 
 This file is not published. It tracks B4FastAPI work that is still open, so the manual can be updated as soon as each item lands on `main`.
 
-Baseline: the manual describes B4FastAPI `2a62b52` and its pinned B4React `d4878ea` (2026-10-08).
+Baseline: the manual describes B4FastAPI `836d626` and its pinned B4React `d32fce7` (2026-10-08).
 
 ## How to use
 
@@ -16,58 +16,10 @@ Baseline: the manual describes B4FastAPI `2a62b52` and its pinned B4React `d4878
 
 ## Open items
 
-| Tracking      | Topic                                          | Target pages                                                    |
-| ------------- | ---------------------------------------------- | --------------------------------------------------------------- |
-| B4FastAPI #95 | Remaining payment notices                      | `features/email.mdx`, `features/billing.mdx`                    |
-| B4FastAPI #93 | Billing lifecycle review                       | `features/billing.mdx`                                          |
-| B4FastAPI #91 | Admin observability screen (low priority)      | `features/admin-and-roles.mdx`, `environment/observability.mdx` |
-| B4FastAPI #94 | Payment providers other than Stripe (research) | `features/billing.mdx`, only if a provider interface is adopted |
-| B4FastAPI #87 | Umbrella for the items above                   | No page; close the backlog when every item is resolved          |
-
----
-
-### Remaining payment notices (#95)
-
-Already documented: welcome mail, deletion code, account-deletion notice, subscription started, plan changed, and subscription cancelled through the encrypted outbox (`features/email.mdx#lifecycle-email`).
-
-**Target:** the notice table in `docs/features/email.mdx` (`## Lifecycle email`), and the webhook paragraph in `docs/features/billing.mdx` if new events are required.
-
-**Draft rows (add only what is implemented):**
-
-```mdx
-| Payment failed | <verify: invoice.payment_failed, first failure only?> |
-| Renewal upcoming | <verify: invoice.upcoming, N days before renewal> |
-| Renewal succeeded | <verify: invoice.paid for a renewal> |
-```
-
-Replace the sentence "Renewals and payment failures do not send email." with the implemented rule, for example: "Stripe's own customer emails <verify: enabled/disabled> for these events so users do not get duplicates."
-
-**Optional section, if failed-delivery tracking ships:**
-
-```mdx
-### Failed deliveries
-
-Notices that exhaust their attempts are <verify: kept / listed at ...> with <verify: fields>. <verify: role> can <verify: view / retry> them from <verify: screen or command>. Recipient data stays encrypted and follows the 72-hour retention.
-```
-
-**Verify at completion:** event list, deduplication key per event, interaction with Stripe's built-in emails, retry and failure storage, manager permission (add a row to the permission table in `features/admin-and-roles.mdx` if managers gain access).
-
----
-
-### Billing lifecycle review (#93)
-
-**Target:** `docs/features/billing.mdx`.
-
-This item is a review. Update the manual only for behavior that changes. Likely places:
-
-- `## Subscription lifecycle`: new or removed transitions, or a changed apply time.
-- `## Errors`: new or renamed error codes.
-- `## Webhooks and the subscription snapshot`: required events, ordering guarantees, reconciliation interval or batch size (`<verify: 300 s, 50 snapshots>`).
-- `## Operating notes`: new operator reconciliation steps, for example for partial schedule creation.
-
-If the review publishes a state-transition table in B4FastAPI `notes/billing.md`, summarize it as one Mermaid `stateDiagram-v2` and link to the guide instead of copying it.
-
-**Verify at completion:** diff `notes/billing.md` and `services/billing.py` against `2a62b52`; re-check every number on the Billing page.
+| Tracking      | Topic                                     | Target pages                                                    |
+| ------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| B4FastAPI #91 | Admin observability screen (low priority) | `features/admin-and-roles.mdx`, `environment/observability.mdx` |
+| B4FastAPI #87 | Umbrella for the items above              | No page; close the backlog when every item is resolved          |
 
 ---
 
@@ -94,16 +46,6 @@ If the review publishes a state-transition table in B4FastAPI `notes/billing.md`
 ```
 
 **Verify at completion:** route and role; metrics names; whether Grafana links require the observability profile; any new environment variables (add to `environment-variables.mdx`).
-
----
-
-### Payment providers other than Stripe (#94, research)
-
-No manual change is expected from the research itself. Update the manual only if a provider interface or a second provider is implemented:
-
-- `docs/features/billing.mdx`: generalize the intro and `## Architecture` diagram (`BillingService` → `<verify: provider interface>` → Stripe / `<verify: provider>`), and move Stripe-only sections under a `## Stripe` heading.
-- `docs/environment/environment-variables.mdx`: a provider selector variable and the new provider's keys.
-- `docs/environment/runtime-modes.mdx`: the feature switch row if `STRIPE_ENABLED` is replaced by a generic switch.
 
 ---
 

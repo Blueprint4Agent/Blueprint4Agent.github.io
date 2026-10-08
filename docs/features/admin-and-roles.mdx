@@ -23,8 +23,9 @@ Users have one of three roles: `user`, `manager`, or `admin`. Managers and admin
 | Read the user directory and role statistics     | No   | Yes     | Yes   |
 | Read server status and admin-only endpoints     | No   | No      | Yes   |
 | Change another user's role, profile, or billing | No   | No      | No    |
+| Inspect or retry other users' lifecycle mail    | No   | No      | No    |
 
-Roles are explicit allowlists, not an inheritance chain. Managers do not get admin-only access automatically, and new admin endpoints must opt in to each role. Every check reads the current database role, so a role change applies on the next request without reissuing tokens. API keys act as their owner and pass the same role checks.
+Role changes and failed-mail recovery are operator commands, not role permissions. Roles are explicit allowlists, not an inheritance chain. Managers do not get admin-only access automatically, and new admin endpoints must opt in to each role. Every check reads the current database role, so a role change applies on the next request without reissuing tokens. API keys act as their owner and pass the same role checks.
 
 ## Assigning roles
 

@@ -63,19 +63,51 @@ flowchart LR
     W --> S["SMTP"]
 ```
 
-| Notice                 | Sent when                                                            |
-| ---------------------- | -------------------------------------------------------------------- |
-| Subscription started   | The first `invoice.paid` of a subscription                           |
-| Plan changed           | A plan change is applied (`customer.subscription.updated`)           |
-| Subscription cancelled | A requested cancellation completes (`customer.subscription.deleted`) |
-| Account deleted        | The deletion transaction commits                                     |
+| Notice                 | Sent when                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Subscription started   | The initial `invoice.paid`, for a paid single-line invoice whose price matches the current active subscription |
+| Plan changed           | `customer.subscription.updated` with an actual price change, active and with no pending update                 |
+| Subscription cancelled | `customer.subscription.deleted` after a requested cancellation, with no replacement subscription               |
+| Account deleted        | The deletion transaction commits                                                                               |
 
-Renewals and payment failures do not send email.
+Scheduling or undoing a cancellation, renewals, payment failures, required authentication, pending upgrades, and unknown prices do not send app email.
 
-- Billing notices need the [Stripe webhook](/docs/features/billing#webhooks-and-the-subscription-snapshot). Signatures, mode, and current provider state are checked before a notice is stored, and semantic keys prevent duplicates.
-- Recipient data is encrypted with a key derived from `SECRET_KEY`, erased after delivery, and erased after 72 hours if undelivered. Drain pending mail before rotating `SECRET_KEY`.
-- Delivery uses up to five attempts with five-minute leases. A crash after SMTP acceptance can duplicate a message; delivery is at least once, not exactly once.
-- Mail or broker failures never undo a committed deletion or subscription change.
+### Who sends what \{#who-sends-what\}
+
+| Owner  | Messages                                                                            |
+| ------ | ----------------------------------------------------------------------------------- |
+| App    | The four notices above, account email, and codes                                    |
+| Stripe | Financial receipts, renewal reminders, payment failure and action-required recovery |
+
+Review the Stripe Dashboard customer email and revenue recovery settings before launch. The app does not change them. If Stripe cancellation emails are enabled, decide which side owns the completion message.
+
+### Language and links
+
+- Billing notices use the first `ko` or `en` entry in the Stripe Customer's `preferred_locales`, otherwise English. Changing the app language does not update Stripe.
+- The account-deleted notice uses the language of the confirmed deletion request.
+- Billing notices link to `/settings?section=billing`; the deletion notice links to `/home`.
+
+### Delivery and retention
+
+- Billing notices need the [Stripe webhook](/docs/features/billing#webhooks-and-the-subscription-snapshot). The webhook commits the synchronized state and the outbox row before acknowledging; a failure returns non-2xx so Stripe redelivers.
+- Redelivered events are deduplicated by subscription and event ID, so repeated changes within one second are not merged. Obsolete events are suppressed after checking current provider state.
+- Each claim holds a five-minute lease. At most five claims are made, including workers that crash mid-delivery. SMTP failures back off 2, 4, 8, and 16 minutes; the fifth failure is terminal (`delivery_failed`, or `delivery_unconfirmed` for an abandoned lease).
+- Recipient data is encrypted (Fernet, key derived from `SECRET_KEY`), erased on success, and erased 72 hours after reservation even for failed jobs. Opaque metadata without recipients is kept. Drain pending mail before rotating `SECRET_KEY`.
+- A crash after SMTP acceptance can duplicate a message; delivery is at least once, not exactly once. Mail or broker failures never undo a committed deletion or subscription change.
+
+### Operator commands
+
+Trusted deployment operators inspect and retry failed notices from the backend shell:
+
+```bash
+cd src/backend
+uv run python -m app.manage_notifications list --limit 50
+uv run python -m app.manage_notifications retry <64-character-notification-id>
+```
+
+- `list` shows safe metadata only (up to 100 rows) and never decrypts recipients.
+- `retry` resets the attempt budget of one failed notice but never extends its 72-hour expiry; the next Beat scan delivers it. Expired, erased, sent, or pending notices are rejected.
+- No user, manager, or admin HTTP endpoint inspects or retries other users' mail.
 
 ## Templates
 

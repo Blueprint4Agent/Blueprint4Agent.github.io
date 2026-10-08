@@ -28,7 +28,7 @@ flowchart LR
 ```
 
 - **서버가 정하는 값.** 호출자는 고객, 가격, 금액, 복귀 URL을 지정할 수 없습니다. 요금제 요청에는 요금제, 통화, 요청 UUID만 담습니다.
-- **제공자 검증 결과.** 복귀 URL은 성공의 증거가 아닙니다. Stripe 객체와 소유자를 확인하는 상태 엔드포인트(`registered=true`, `paid=true`)만 등록이나 결제를 확정합니다.
+- **제공자 검증 결과.** 복귀 URL은 성공의 증거가 아닙니다. Stripe 객체, 소유자, 세션과 그 안의 SetupIntent·구독의 모드까지 확인하는 상태 엔드포인트(`registered=true`, `paid=true`)만 등록이나 결제를 확정합니다.
 - **소유권과 모드.** 모든 고객, 세션, 결제수단, 청구서는 로그인한 사용자와 키의 테스트/라이브 모드로 확인합니다. 테스트와 라이브 매핑은 분리됩니다.
 - **멱등성.** 같은 작업의 재시도는 같은 요청 UUID를 사용합니다. 고객별 데이터베이스 잠금과 영속적인 Checkout 예약이 여러 기기·워커에서 고객과 구독이 중복 생성되는 것을 막습니다.
 
@@ -108,7 +108,7 @@ stateDiagram-v2
 
 웹훅은 `/api/v1/billing/webhook`에 `STRIPE_WEBHOOK_SECRET`과 함께 설정하며, 시크릿이 비어 있으면 비활성화됩니다. `customer.subscription.*`(created, updated, deleted, paused, resumed), `invoice.paid`, `invoice.payment_failed`, `invoice.payment_action_required`, `checkout.session.*`(completed, async payment succeeded/failed), `subscription_schedule.*`(updated, released, canceled, completed, aborted) 이벤트를 구독합니다.
 
-핸들러는 고객 잠금 안에서 현재 Stripe 상태를 다시 읽으므로 중복되거나 순서가 바뀐 이벤트가 이전 요금제를 되살리지 않습니다. 활성 구독이 여러 개면 등급을 부여하지 않고 알 수 없음 상태로 저장합니다. B4React는 계정마다 하나의 메모리 스냅샷을 사이드바와 페이지가 공유하며 폴링하지 않고, 사이드바 프로필에 등급을 표시합니다.
+핸들러는 고객 잠금 안에서 현재 Stripe 상태를 다시 읽으므로 중복되거나 순서가 바뀐 이벤트가 이전 요금제를 되살리지 않습니다. 활성 구독이 여러 개면 관리할 수 없는 알 수 없음 상태로 저장하되 구독이 있는 것으로 취급하므로, 등급을 부여하지 않고 새 구매도 제안하지 않습니다. B4React는 계정마다 하나의 메모리 스냅샷을 사이드바와 페이지가 공유하며 폴링하지 않고, 사이드바 프로필에 등급을 표시합니다.
 
 확정된 구독 시작과 요금제 변경은 [생명주기 이메일](/docs/features/email#lifecycle-email)도 보냅니다.
 
@@ -130,6 +130,14 @@ stateDiagram-v2
 - 로컬 계정 삭제는 Stripe 고객을 삭제하거나 결제수단을 분리하지 않습니다. Checkout 기록이 있는 계정은 삭제 전에 운영자가 정리해야 합니다.
 - 결제를 꺼도 기존 Stripe 구독은 해지되지 않습니다.
 - 구독 등급은 UI에 표시되지만 그 자체로 애플리케이션 기능 권한을 부여하지 않습니다.
+- 결제는 제공자 추상화 없이 Stripe 전용으로 구현되어 있습니다. B4FastAPI의 `notes/payment-provider-research.md`가 Toss Payments, PortOne, Paddle을 비교하고 다른 제공자 도입에 필요한 작업을 정리합니다.
+
+운영 전 확인 사항:
+
+1. 위의 웹훅 이벤트를 등록하고 `STRIPE_WEBHOOK_SECRET`을 설정합니다.
+2. Celery 워커와 정확히 하나의 Beat를 실행합니다.
+3. Stripe Dashboard의 고객 이메일과 매출 회수 설정을 확인합니다. [발송 주체](/docs/features/email#who-sends-what)를 참고하세요.
+4. 테스트 모드에서 Checkout, 3D Secure를 포함한 카드·Link 등록, 결제 실패를 통제된 수신자로 확인합니다.
 
 ## 코드
 

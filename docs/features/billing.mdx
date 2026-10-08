@@ -28,7 +28,7 @@ flowchart LR
 ```
 
 - **Server-owned parameters.** Callers never choose the customer, price, amount, or return URL. A plan request carries only the plan, currency, and a request UUID.
-- **Provider-verified results.** A return URL is never proof of success. Only status endpoints that check the Stripe object and its owner (`registered=true`, `paid=true`) confirm a registration or payment.
+- **Provider-verified results.** A return URL is never proof of success. Only status endpoints that check the Stripe object, its owner, and the mode of the session and its inner SetupIntent or subscription (`registered=true`, `paid=true`) confirm a registration or payment.
 - **Ownership and mode.** Every customer, session, payment method, and invoice is checked against the signed-in user and the key's test/live mode. Test and live mappings are isolated.
 - **Idempotency.** Retries of one action reuse its request UUID. Per-customer database locks and durable Checkout reservations prevent duplicate customers and subscriptions across devices and workers.
 
@@ -108,7 +108,7 @@ stateDiagram-v2
 
 Configure the webhook at `/api/v1/billing/webhook` with `STRIPE_WEBHOOK_SECRET`; an empty secret disables it. Subscribe to `customer.subscription.*` (created, updated, deleted, paused, resumed), `invoice.paid`, `invoice.payment_failed`, `invoice.payment_action_required`, `checkout.session.*` (completed, async payment succeeded/failed), and `subscription_schedule.*` (updated, released, canceled, completed, aborted).
 
-Handlers fetch the current Stripe state under the customer lock, so duplicate or out-of-order events cannot restore an old plan. Multiple active subscriptions are stored as an unknown state rather than granting a tier. B4React shares one in-memory snapshot per account between the sidebar and pages, with no polling; the sidebar profile shows the tier.
+Handlers fetch the current Stripe state under the customer lock, so duplicate or out-of-order events cannot restore an old plan. Multiple active subscriptions are stored as an unknown, non-manageable state that still counts as a subscription, so no tier is granted and no new purchase is offered. B4React shares one in-memory snapshot per account between the sidebar and pages, with no polling; the sidebar profile shows the tier.
 
 Confirmed subscription starts and plan changes also send [lifecycle email](/docs/features/email#lifecycle-email).
 
@@ -130,6 +130,14 @@ Confirmed subscription starts and plan changes also send [lifecycle email](/docs
 - Local account deletion does not delete Stripe customers or detach saved methods. Accounts with Checkout history require operator reconciliation before deletion.
 - Turning billing off does not cancel existing Stripe subscriptions.
 - The subscription tier is shown in the UI but does not authorize application features by itself.
+- Billing is implemented for Stripe only, without a provider abstraction. `notes/payment-provider-research.md` in B4FastAPI compares Toss Payments, PortOne, and Paddle and lists what adopting another provider would require.
+
+Before production:
+
+1. Register the webhook events listed above and set `STRIPE_WEBHOOK_SECRET`.
+2. Run a Celery worker and exactly one Beat.
+3. Review the Stripe Dashboard customer email and revenue recovery settings. See [Who sends what](/docs/features/email#who-sends-what).
+4. In test mode, complete a Checkout, a card or Link registration with 3D Secure, and a failed payment with controlled recipients.
 
 ## Code
 
