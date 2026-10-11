@@ -110,3 +110,10 @@ The Docusaurus production configuration is:
 
 - `url`: `https://blueprint4agent.github.io`
 - `baseUrl`: `/`
+
+## License
+
+Original documentation and site source are available under the [MIT License](LICENSE).
+Retain the copyright and permission notice when redistributing copies or substantial
+portions. Third-party dependencies and brand assets, such as the GitHub mark, retain
+their own licenses and notices.

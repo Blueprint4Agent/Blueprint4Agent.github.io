@@ -111,3 +111,9 @@ Docusaurus production 설정은 아래 값을 기준으로 합니다.
 
 - `url`: `https://blueprint4agent.github.io`
 - `baseUrl`: `/`
+
+## 라이선스
+
+이 저장소의 원본 문서와 사이트 소스는 [MIT 라이선스](../../LICENSE)로 제공합니다.
+복사본이나 상당 부분을 재배포할 때 저작권·허가 고지를 유지하세요. 제3자 의존성과
+GitHub 마크 같은 브랜드 자산은 각각의 라이선스와 고지를 유지합니다.
