@@ -22,7 +22,9 @@ description: 개발 모드와 운영 모드, 각 모드가 제공하는 기능, 
 | 동작                            | 개발                           | 운영                          |
 | ------------------------------- | ------------------------------ | ----------------------------- |
 | 기본 페이지                     | `/home`                        | `/home`                       |
-| GitHub·사용 가이드 링크         | 사이드바 하단                  | 숨김                          |
+| GitHub·사용 가이드 링크         | 프로필 컨트롤 옆에 표시        | 숨김                          |
+| 후원 링크(Buy Me a Coffee)      | 빌드 시 켠 경우 표시           | 켜져 있어도 숨김              |
+| 모양 설정의 레이아웃 미리보기   | 사용 가능, 브라우저별 저장     | 숨김, 저장된 미리보기 무시    |
 | 컴포넌트 쇼케이스               | `/show-case` 별도 메뉴         | 직접 URL은 `/home`으로 이동   |
 | 로그인 비활성 부트스트랩 사용자 | `LOGIN_ENABLED=false`에서 허용 | 거부(이전에 발급된 토큰 포함) |
 | 개인 API 키                     | 사용 가능                      | 사용 가능                     |
@@ -64,6 +66,17 @@ python3 -c "import secrets; print(secrets.token_urlsafe(48))"
 | `EMAIL_ENABLED`  | 이메일 전용 라우트를 숨기고, 직접 이메일 인증 요청은 토큰을 소비하지 않고 거부합니다. 비밀번호 가입·로그인은 계속 동작하며 새 계정은 즉시 인증됩니다.                                                       |
 | `OAUTH_ENABLED`  | OAuth 버튼과 연결된 제공자 정보를 숨깁니다. 콜백은 state를 소비하기 전에 현재 설정을 확인합니다.                                                                                                            |
 | `LOGIN_ENABLED`  | 가입, 토큰 갱신, 이메일·OAuth 진입 요청을 I/O 이전에 거부합니다.                                                                                                                                            |
+
+## 런타임 표시 설정
+
+이 설정은 시작 시 읽혀 `GET /config`로 노출됩니다. 같은 이미지가 모든 값을 제공하므로, 바꾸려면 컨테이너를 재생성하고 브라우저를 새로고침합니다.
+
+| 설정           | `/config` 필드 | 값                                   | 효과                                                                    |
+| -------------- | -------------- | ------------------------------------ | ----------------------------------------------------------------------- |
+| `APP_LAYOUT`   | `app_layout`   | `sidebar`(기본), `topnav`, `focused` | 앱 셸. [레이아웃](/docs/features/settings-and-profile#layouts) 참고     |
+| `DEMO_ENABLED` | `demo_enabled` | `false`(기본), `true`                | 공개 읽기 전용 [관리자 데모](/docs/features/admin-and-roles#admin-demo) |
+
+알 수 없는 `APP_LAYOUT`은 설정 검증에서 실패합니다. `/config`는 [basePath](/docs/environment/deployment#base-path) 배포를 위해 `api_base_path`와 `frontend_base_path`도 반환합니다.
 
 ## 모드 전환
 

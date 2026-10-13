@@ -38,7 +38,7 @@ const highlights: Highlight[] = [
         title: translate({ id: "home.highlight.realtime.title", message: "Realtime refresh" }),
         description: translate({
             id: "home.highlight.realtime.desc",
-            message: "Server-Sent Events keep open screens in sync with backend changes.",
+            message: "Server-Sent Events keep screens and the notification inbox in sync.",
         }),
     },
     {
@@ -47,7 +47,8 @@ const highlights: Highlight[] = [
         title: translate({ id: "home.highlight.admin.title", message: "Admin console" }),
         description: translate({
             id: "home.highlight.admin.desc",
-            message: "User, manager, and admin roles with a user directory and server status.",
+            message:
+                "Roles, a user directory, server status, support inquiries, and a public demo.",
         }),
     },
     {
@@ -70,11 +71,11 @@ const highlights: Highlight[] = [
     },
     {
         icon: "container",
-        href: "/docs/environment/docker",
+        href: "/docs/environment/deployment",
         title: translate({ id: "home.highlight.docker.title", message: "Docker delivery" }),
         description: translate({
             id: "home.highlight.docker.desc",
-            message: "Single app image, PostgreSQL, Redis, and readiness-gated deploys.",
+            message: "One monolith image with HTTPS, basePath mounts, and smoke-checked deploys.",
         }),
     },
     {

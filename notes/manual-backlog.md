@@ -4,7 +4,7 @@ Korean: [매뉴얼 대기 항목](ko/manual-backlog.md)
 
 This file is not published. It tracks B4FastAPI work that is still open, so the manual can be updated as soon as each item lands on `main`.
 
-Baseline: the manual describes B4FastAPI `836d626` and its pinned B4React `d32fce7` (2026-10-08).
+Baseline: the manual describes B4FastAPI `509155a` and its pinned B4React `8572a36` (2026-10-13).
 
 ## How to use
 

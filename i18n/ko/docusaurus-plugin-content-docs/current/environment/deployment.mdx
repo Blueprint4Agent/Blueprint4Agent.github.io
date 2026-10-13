@@ -141,12 +141,13 @@ COMPOSE_FILE=docker-compose.yml
 
 일부 값은 프론트엔드에 컴파일됩니다. 비밀값이 아닌 공개 값이며, 바꾸려면 다시 빌드해야 합니다(기본 `build` 출처로 `make docker-deploy`, 또는 수동 Build 워크플로의 새 입력).
 
-| 변수                    | 효과                                                                       |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `VITE_PUBLIC_SITE_URL`  | Open Graph·Twitter 태그용 HTTP(S) origin, 비우면 URL·이미지 태그 생략      |
-| `VITE_SITE_DESCRIPTION` | 정적 HTML의 설명                                                           |
-| `VITE_PUBLIC_DISCOVERY` | `/about/`, `/about/ko/`의 정적 B4A 소개와 `robots.txt`, `sitemap.xml` 게시 |
-| `VITE_INDEXNOW_KEY`     | `/<key>.txt`로 제공되는 공개 IndexNow 소유 증명                            |
+| 변수                                                       | 효과                                                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `VITE_PUBLIC_SITE_URL`                                     | Open Graph·Twitter 태그용 HTTP(S) origin, 비우면 URL·이미지 태그 생략      |
+| `VITE_SITE_DESCRIPTION`                                    | 정적 HTML의 설명                                                           |
+| `VITE_PUBLIC_DISCOVERY`                                    | `/about/`, `/about/ko/`의 정적 B4A 소개와 `robots.txt`, `sitemap.xml` 게시 |
+| `VITE_INDEXNOW_KEY`                                        | `/<key>.txt`로 제공되는 공개 IndexNow 소유 증명                            |
+| `VITE_BUY_ME_A_COFFEE_ENABLED`, `VITE_BUY_ME_A_COFFEE_URL` | 프로필 컨트롤 옆의 선택형 후원 링크, 서버가 개발 모드일 때만 표시          |
 
 검색 공개를 켜면 앱 페이지는 `noindex`가 되고, 소개 URL만 사이트맵에 들어가며, `robots.txt`는 검색 크롤러를 허용하고 GPTBot과 ClaudeBot을 차단합니다. 검색 공개에는 기본 B4A 식별 정보와 공개 origin이 필요하며, 사용자 정의 프로젝트는 자체 콘텐츠를 게시합니다. 없는 `/about/` 페이지와 정적 파일은 SPA 대신 404를 반환합니다.
 

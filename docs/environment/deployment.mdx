@@ -141,12 +141,13 @@ COMPOSE_FILE=docker-compose.yml
 
 Some values are compiled into the frontend. They are public, not secrets, and changing them requires a rebuild (`make docker-deploy` with the default `build` source, or new inputs to the manual Build workflow).
 
-| Variable                | Effect                                                                                                   |
-| ----------------------- | -------------------------------------------------------------------------------------------------------- |
-| `VITE_PUBLIC_SITE_URL`  | HTTP(S) origin for Open Graph and Twitter tags; empty omits URL and image tags                           |
-| `VITE_SITE_DESCRIPTION` | Description in the static HTML                                                                           |
-| `VITE_PUBLIC_DISCOVERY` | Publishes the static B4A introductions at `/about/` and `/about/ko/` with `robots.txt` and `sitemap.xml` |
-| `VITE_INDEXNOW_KEY`     | Public IndexNow ownership proof served at `/<key>.txt`                                                   |
+| Variable                                                   | Effect                                                                                                   |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `VITE_PUBLIC_SITE_URL`                                     | HTTP(S) origin for Open Graph and Twitter tags; empty omits URL and image tags                           |
+| `VITE_SITE_DESCRIPTION`                                    | Description in the static HTML                                                                           |
+| `VITE_PUBLIC_DISCOVERY`                                    | Publishes the static B4A introductions at `/about/` and `/about/ko/` with `robots.txt` and `sitemap.xml` |
+| `VITE_INDEXNOW_KEY`                                        | Public IndexNow ownership proof served at `/<key>.txt`                                                   |
+| `VITE_BUY_ME_A_COFFEE_ENABLED`, `VITE_BUY_ME_A_COFFEE_URL` | Optional support link beside the profile control; shown only when the server runs in development mode    |
 
 With discovery on, app pages are `noindex`, only the introduction URLs enter the sitemap, and `robots.txt` allows search crawlers while blocking GPTBot and ClaudeBot. Discovery requires the default B4A identity and a public origin; custom projects publish their own content instead. Missing `/about/` pages and static files return 404 rather than the SPA.
 

@@ -348,13 +348,13 @@
         "message": "실시간 갱신"
     },
     "home.highlight.realtime.desc": {
-        "message": "Server-Sent Events로 열린 화면을 백엔드 변경과 동기화합니다."
+        "message": "Server-Sent Events로 열린 화면과 알림함을 동기화합니다."
     },
     "home.highlight.admin.title": {
         "message": "관리자 콘솔"
     },
     "home.highlight.admin.desc": {
-        "message": "user·manager·admin 역할과 사용자 목록, 서버 상태를 제공합니다."
+        "message": "역할, 사용자 목록, 서버 상태, 문의 관리, 공개 데모를 제공합니다."
     },
     "home.highlight.jobs.title": {
         "message": "백그라운드 작업"
@@ -372,7 +372,7 @@
         "message": "Docker 배포"
     },
     "home.highlight.docker.desc": {
-        "message": "단일 앱 이미지, PostgreSQL, Redis, 준비 상태 확인 기반 배포를 제공합니다."
+        "message": "HTTPS, basePath 마운트, 스모크 검사를 갖춘 단일 모놀리식 이미지 배포입니다."
     },
     "home.highlight.verify.title": {
         "message": "검증 하네스"

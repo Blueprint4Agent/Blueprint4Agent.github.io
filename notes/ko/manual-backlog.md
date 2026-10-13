@@ -4,7 +4,7 @@ English: [Manual backlog](../manual-backlog.md)
 
 이 파일은 게시되지 않습니다. 아직 진행 중인 B4FastAPI 작업을 기록해 두고, 각 항목이 `main`에 반영되면 바로 매뉴얼을 갱신할 수 있게 합니다.
 
-기준: 매뉴얼은 B4FastAPI `836d626`와 고정된 B4React `d32fce7`(2026-10-08)를 설명합니다.
+기준: 매뉴얼은 B4FastAPI `509155a`와 고정된 B4React `8572a36`(2026-10-13)를 설명합니다.
 
 ## 사용 방법
 

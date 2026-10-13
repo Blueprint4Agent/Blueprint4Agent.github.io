@@ -47,6 +47,8 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 | `APP_ENV`             | `local`                                                         | 텔레메트리 라벨(Docker에서는 `docker`), 모드를 정하지 않음                                                        |
 | `LOG_LEVEL`           | `INFO`                                                          | Python 로그 레벨                                                                                                  |
 | `STARTUP_DISPLAY`     | `auto`                                                          | `auto`, `plain`, `off`. [시작 화면과 콘솔 로그](/docs/environment/startup-and-logs) 참고                          |
+| `APP_LAYOUT`          | `sidebar`                                                       | `sidebar`, `topnav`, `focused`. [레이아웃](/docs/features/settings-and-profile#layouts) 참고                      |
+| `DEMO_ENABLED`        | `false`                                                         | 공개 읽기 전용 [관리자 데모](/docs/features/admin-and-roles#admin-demo)                                           |
 | `APP_PORT`            | `8000`                                                          | `make backend-dev` 포트                                                                                           |
 | `APP_BASE_URL`        | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 URL, `APP_BASE_PATH` 포함                                   |
 | `APP_BASE_PATH`       | _(비어 있음)_                                                   | `/my-app` 같은 공개 URL 접두사, 비어 있거나 `/`이면 루트. [basePath](/docs/environment/deployment#base-path) 참고 |
@@ -217,19 +219,21 @@ Docker 전용 키도 있습니다.
 
 | `INDEXNOW_ENABLED` | `false` | `docker-deploy` 성공 후 변경된 공개 URL 제출 |
 
-Docker 파일은 [공개 빌드 값](/docs/environment/deployment#public-build-values)인 `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, `VITE_INDEXNOW_KEY`도 프론트엔드 빌드에 전달합니다. 바꾸면 다시 빌드해야 합니다.
+Docker 파일은 [공개 빌드 값](/docs/environment/deployment#public-build-values)인 `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, `VITE_INDEXNOW_KEY`, `VITE_BUY_ME_A_COFFEE_ENABLED`, `VITE_BUY_ME_A_COFFEE_URL`도 프론트엔드 빌드에 전달합니다. 바꾸면 다시 빌드해야 합니다.
 
 `$`가 들어간 값은 Compose 보간을 막기 위해 작은따옴표로 감쌉니다.
 
 ## 프론트엔드 변수
 
-| 변수                    | 기본값        | 설명                                                                                                                                                      |
-| ----------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL`     | _(비어 있음)_ | API origin. 비어 있으면 개발 중에는 `http://localhost:8000`, 다른 웹 빌드는 페이지 자신의 origin을 사용. 데스크톱 빌드, 별도 호스팅, 다른 백엔드에서 지정 |
-| `VITE_BASE_PATH`        | _(비어 있음)_ | 별도 Vite 개발 서버의 basePath. 패키징된 빌드는 런타임 `APP_BASE_PATH`를 읽음                                                                             |
-| `VITE_PUBLIC_SITE_URL`  | _(비어 있음)_ | 공유 메타데이터와 검색 공개 페이지의 공개 origin                                                                                                          |
-| `VITE_SITE_DESCRIPTION` | _(비어 있음)_ | 정적 HTML의 설명                                                                                                                                          |
-| `VITE_PUBLIC_DISCOVERY` | `false`       | 정적 `/about/`, `/about/ko/` 소개 페이지 빌드                                                                                                             |
-| `VITE_INDEXNOW_KEY`     | _(비어 있음)_ | 공개 IndexNow 소유 키                                                                                                                                     |
+| 변수                           | 기본값        | 설명                                                                                                                                                      |
+| ------------------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`            | _(비어 있음)_ | API origin. 비어 있으면 개발 중에는 `http://localhost:8000`, 다른 웹 빌드는 페이지 자신의 origin을 사용. 데스크톱 빌드, 별도 호스팅, 다른 백엔드에서 지정 |
+| `VITE_BASE_PATH`               | _(비어 있음)_ | 별도 Vite 개발 서버의 basePath. 패키징된 빌드는 런타임 `APP_BASE_PATH`를 읽음                                                                             |
+| `VITE_PUBLIC_SITE_URL`         | _(비어 있음)_ | 공유 메타데이터와 검색 공개 페이지의 공개 origin                                                                                                          |
+| `VITE_SITE_DESCRIPTION`        | _(비어 있음)_ | 정적 HTML의 설명                                                                                                                                          |
+| `VITE_PUBLIC_DISCOVERY`        | `false`       | 정적 `/about/`, `/about/ko/` 소개 페이지 빌드                                                                                                             |
+| `VITE_INDEXNOW_KEY`            | _(비어 있음)_ | 공개 IndexNow 소유 키                                                                                                                                     |
+| `VITE_BUY_ME_A_COFFEE_ENABLED` | `false`       | 셸에 후원 링크 표시, 개발 모드에서만                                                                                                                      |
+| `VITE_BUY_ME_A_COFFEE_URL`     | _(비어 있음)_ | 쿼리·fragment·포트가 없는 HTTPS `buymeacoffee.com` 크리에이터 URL                                                                                         |
 
 모든 `VITE_*` 값은 공개 빌드 시점 값입니다. 비밀값을 넣지 않습니다.

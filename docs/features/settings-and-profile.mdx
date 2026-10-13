@@ -1,24 +1,40 @@
 ---
 title: Home, settings & profile
 sidebar_position: 9
-description: The home page, app shell, settings sections, account security, the personal profile, themes, keyboard shortcuts, and toasts.
+description: The landing home page, app shell and layouts, settings sections, account security, the personal profile, themes, keyboard shortcuts, and toasts.
 ---
 
 # Home, settings & profile
 
-B4React ships a complete app shell: a default home page, a resizable sidebar, a settings workspace, account and profile editing, light and dark themes, customizable keyboard shortcuts, and toast feedback.
+B4React ships a complete app shell: a landing home page, three deployment layouts, a settings workspace, account and profile editing, light and dark themes, customizable keyboard shortcuts, and toast feedback.
 
 ## Home
 
-`/home` is the default page in both [runtime modes](/docs/environment/runtime-modes). `/`, `/dashboard`, login completion, closing an auth dialog, and page recovery all lead there.
+`/home` is the default page in both [runtime modes](/docs/environment/runtime-modes). `/`, `/dashboard`, login completion, closing an auth dialog, and page recovery all lead there. It is a product landing page that works in every [layout](#layouts):
 
-| Viewer         | Sees                                                                         |
-| -------------- | ---------------------------------------------------------------------------- |
-| Guest          | Generic content and sign-in entry points; no private data is fetched         |
-| Signed-in user | A greeting and shortcuts to Account, Billing (when enabled), and Preferences |
-| Manager, admin | An additional User directory shortcut                                        |
+| Section       | Contents                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| Introduction  | Headline, GitHub and User guide links, and a product preview beside it (stacked on narrow screens) |
+| Preview       | Real screenshots with demo data: Users, Server status, Billing, and Showcase                       |
+| Features      | Cards grouped into _For your users_, _Inside the product_, and _Behind the scenes_                 |
+| Workflow      | Three numbered steps: set up, build, verify and deploy                                             |
+| Use cases     | Subscription services, internal tools, customer portals, and product prototypes                    |
+| Account links | Quick links filtered by sign-in state and role                                                     |
+| Footer        | Product, resource, and account columns that reuse the same destinations and role checks            |
 
-The page is built with `MainPageTemplate`, a presentational layout in `src/components/layout` for extending the product:
+- **Section links** jump to Preview, Features, Workflow, and Use cases. Top-navigation and minimal layouts center them in the header; the sidebar layout shows a floating capsule. Scrolling is smooth unless reduced motion is requested.
+- **Previews** crossfade every six seconds with a progress line, including while hovered or focused. An explicit pause, the enlarged viewer, an offscreen or hidden tab, and reduced motion stop rotation. **Open screen** follows the existing role checks.
+- Screenshots contain fictional data, never real accounts or server health, and the feature list describes what the blueprint supports, not what is currently enabled.
+
+| Viewer         | Account links                                                                     |
+| -------------- | --------------------------------------------------------------------------------- |
+| Guest          | A **Log in** entry, Account (to `/login`), Billing (to `/plans`), and Preferences |
+| Signed-in user | Account, Billing, Notifications, Support, and Preferences                         |
+| Manager, admin | An additional User directory link                                                 |
+
+Billing links appear only when billing is enabled. Guests trigger no private API requests.
+
+`MainPageTemplate` in `src/components/layout` remains the presentational layout for settings-style menu pages you add to the product:
 
 | Prop                           | Purpose                                                        |
 | ------------------------------ | -------------------------------------------------------------- |
@@ -32,19 +48,32 @@ The template owns no auth, API, routing state, or storage. The owning page filte
 
 ## App shell
 
-- A persistent sidebar: 48px collapsed, 224px expanded, resizable from 200 to 360px. The width is remembered.
-- The sidebar footer holds the profile control and connectivity status. In development mode, GitHub and User guide links sit directly above the profile control.
+- The sidebar layout: 48px collapsed, 224px expanded, resizable from 200 to 360px. The width is remembered.
+- The profile control and connectivity status stay available in every layout. In development mode, GitHub, User guide, and the optional support link sit beside them.
 - With billing enabled, the profile shows the subscription tier, and the profile menu opens `/plans`.
-- The profile menu lists **Profile**, then **Notifications** with an unread badge (see [Notification inbox](/docs/features/notifications)).
+- The profile menu holds **Profile**, **Notifications** directly below it with an unread badge (see [Notification inbox](/docs/features/notifications)), and **Admin panel** for managers and admins. When the [admin demo](/docs/features/admin-and-roles#admin-demo) is on, other visitors, including guests, see **Admin panel (demo)** instead.
 - On mobile the sidebar overlays content with a dismissible backdrop.
-- When the server is unreachable, the recovery panel stays inside the same sidebar layout.
+- When the server is unreachable, the recovery panel stays inside the same layout.
+
+## Layouts \{#layouts\}
+
+| `APP_LAYOUT`        | Shell                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `sidebar` (default) | Collapsible, resizable left rail                                                           |
+| `topnav`            | Global navigation in a horizontal header; narrow screens use a menu icon left of the brand |
+| `focused` (Minimal) | Compact transparent header; a menu icon left of the brand opens a small navigation popup   |
+
+- The deployment chooses the layout with the runtime setting `APP_LAYOUT`, exposed as `app_layout` in `GET /config`. The same image serves all three: recreate the container with a new value and reload the browser. An unknown value fails startup validation. `src/service.config.ts` is only a fallback for providers that do not send the field.
+- Global navigation contains Home and, in development, the showcase. It never contains Settings or admin section lists: without the sidebar, those sections use a boxed column beside the content, which becomes a disclosure above it on narrow screens.
+- Home, profile, inbox, error, and auth pages keep their own page styles. `/plans` and the public `/about/` pages keep their independent shells.
+- When the server reports `app_mode=development`, **Settings → Appearance → Layout** previews another layout in this browser only, and that preview takes precedence over `APP_LAYOUT`. **Use service default** removes it. Production ignores saved previews and hides the selector. Open clients pick up a changed `APP_LAYOUT` on reload.
 
 ## Settings sections
 
 | Section    | Who                                    | Contents                                                                                         |
 | ---------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | General    | Everyone                               | Language (English, Korean)                                                                       |
-| Appearance | Everyone                               | System, light, or dark theme with previews                                                       |
+| Appearance | Everyone                               | System, light, or dark theme with previews; layout preview in development                        |
 | Keyboard   | Everyone (editing for signed-in users) | Shortcut bindings                                                                                |
 | Account    | Signed-in users                        | Name, email, linked login methods, plan, password change, account deletion                       |
 | Billing    | Signed-in users, billing enabled       | Plan, transactions, billing information, payment methods. See [Billing](/docs/features/billing). |

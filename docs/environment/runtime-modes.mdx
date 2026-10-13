@@ -19,14 +19,16 @@ An unknown mode, or production with login disabled, fails configuration validati
 
 ## What each mode exposes
 
-| Behavior                      | Development                        | Production                                |
-| ----------------------------- | ---------------------------------- | ----------------------------------------- |
-| Default page                  | `/home`                            | `/home`                                   |
-| GitHub and User guide links   | Sidebar footer                     | Hidden                                    |
-| Component showcase            | Separate menu at `/show-case`      | Direct URLs redirect to `/home`           |
-| Login-disabled bootstrap user | Allowed with `LOGIN_ENABLED=false` | Rejected, including tokens issued earlier |
-| Personal API keys             | Available                          | Available                                 |
-| Style studio                  | Loopback-only local tool           | Never included                            |
+| Behavior                       | Development                        | Production                                |
+| ------------------------------ | ---------------------------------- | ----------------------------------------- |
+| Default page                   | `/home`                            | `/home`                                   |
+| GitHub and User guide links    | Shown beside the profile control   | Hidden                                    |
+| Support link (Buy Me a Coffee) | When enabled at build time         | Hidden even when enabled                  |
+| Layout preview in Appearance   | Available, stored per browser      | Hidden; saved previews are ignored        |
+| Component showcase             | Separate menu at `/show-case`      | Direct URLs redirect to `/home`           |
+| Login-disabled bootstrap user  | Allowed with `LOGIN_ENABLED=false` | Rejected, including tokens issued earlier |
+| Personal API keys              | Available                          | Available                                 |
+| Style studio                   | Loopback-only local tool           | Never included                            |
 
 Runtime gating does not remove showcase JavaScript from the shared build; it only controls navigation and routes.
 
@@ -64,6 +66,17 @@ Feature switches control both the visible UI and direct API calls. Changing one 
 | `EMAIL_ENABLED`  | Email-only routes are hidden, and direct email verification is rejected without consuming the token. Password signup and login keep working, and new accounts are verified immediately.                                                          |
 | `OAUTH_ENABLED`  | OAuth buttons and linked-provider details are hidden. Callbacks check the current configuration before consuming state.                                                                                                                          |
 | `LOGIN_ENABLED`  | Signup, refresh, and email or OAuth entry mutations are rejected before any I/O.                                                                                                                                                                 |
+
+## Runtime display settings
+
+These settings are read at startup and exposed in `GET /config`. The same image serves every value; recreate the container and reload the browser to apply a change.
+
+| Setting        | `/config` field | Values                                   | Effect                                                                        |
+| -------------- | --------------- | ---------------------------------------- | ----------------------------------------------------------------------------- |
+| `APP_LAYOUT`   | `app_layout`    | `sidebar` (default), `topnav`, `focused` | The app shell. See [Layouts](/docs/features/settings-and-profile#layouts).    |
+| `DEMO_ENABLED` | `demo_enabled`  | `false` (default), `true`                | The public, read-only [admin demo](/docs/features/admin-and-roles#admin-demo) |
+
+An unknown `APP_LAYOUT` fails configuration validation. `/config` also returns `api_base_path` and `frontend_base_path` for a [basePath](/docs/environment/deployment#base-path) deployment.
 
 ## Switching modes
 

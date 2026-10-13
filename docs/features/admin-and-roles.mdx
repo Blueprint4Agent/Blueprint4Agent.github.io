@@ -1,7 +1,7 @@
 ---
 title: Admin & roles
 sidebar_position: 5
-description: The user, manager, and admin roles, the user directory, server status, and operator role management.
+description: The user, manager, and admin roles, the user directory, server status, support inquiries, the public admin demo, and operator role management.
 ---
 
 # Admin & roles
@@ -89,6 +89,26 @@ The panel refreshes on focus, visibility, manual refresh, and connectivity recov
 - Connection URLs, credentials, database names, bucket names, endpoints, regions, and local paths are never returned.
 
 A storage check proves bucket access only, not upload permission or bucket privacy. Worker health and historical metrics are outside this snapshot.
+
+## Admin demo \{#admin-demo\}
+
+With `DEMO_ENABLED=true`, any visitor, including guests, can open a read-only copy of the admin panel built from real but anonymized data. It is off by default, works in both runtime modes, and needs no frontend rebuild.
+
+| Route                   | Data source                     | Shows                                                  |
+| ----------------------- | ------------------------------- | ------------------------------------------------------ |
+| `/demo/admin`           | `GET /api/v1/admin/demo/users`  | The user directory with pseudonymized identities       |
+| `/demo/admin/server`    | `GET /api/v1/admin/demo/status` | Real server health with connection addresses removed   |
+| `/demo/admin/inquiries` | None (bundled sample data)      | The support screen with synthetic, localized inquiries |
+
+- The entry is **Admin panel (demo)** in the profile menu, and the home previews link to it. Real admins see only their normal **Admin panel**. `/config` reports `demo_enabled`.
+- The demo APIs reuse the admin response schemas and are GET-only. Real admin routes keep their role checks, and nothing can be changed from the demo.
+- **Published:** totals, roles, active and verified flags, login provider names, UTC signup and last-login dates (day only), and server health with effective feature flags.
+- **Replaced or removed:** names, emails, and database IDs become keyed pseudonyms, and search matches pseudonyms only. Internal hosts and ports are removed. Credentials, IP addresses, profile data, and support messages are never exposed.
+- Snapshots are coalesced and cached per process for up to 30 seconds, and errors fail closed. The first directory snapshot reads a minimal projection of every user, so check memory on large installations.
+- Pseudonyms are keyed by `SECRET_KEY`. Do not rotate it just to change aliases, because it also signs tokens.
+- Pseudonymization does not prevent inference in small user bases. Setting `DEMO_ENABLED=false` and redeploying removes the entry, and the demo APIs return 404.
+
+The demo does not enable metrics, tracing, or log export.
 
 ## Support inquiries
 

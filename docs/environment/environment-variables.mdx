@@ -47,6 +47,8 @@ Defaults below are from `src/backend/.env.example` (local development). [Docker 
 | `APP_ENV`             | `local`                                                         | Telemetry label (`docker` in Docker); does not select the mode                                                         |
 | `LOG_LEVEL`           | `INFO`                                                          | Python log level                                                                                                       |
 | `STARTUP_DISPLAY`     | `auto`                                                          | `auto`, `plain`, or `off`. See [Startup & console logs](/docs/environment/startup-and-logs).                           |
+| `APP_LAYOUT`          | `sidebar`                                                       | `sidebar`, `topnav`, or `focused`. See [Layouts](/docs/features/settings-and-profile#layouts).                         |
+| `DEMO_ENABLED`        | `false`                                                         | Public read-only [admin demo](/docs/features/admin-and-roles#admin-demo)                                               |
 | `APP_PORT`            | `8000`                                                          | Port for `make backend-dev`                                                                                            |
 | `APP_BASE_URL`        | `http://localhost:5173`                                         | Public frontend URL for email links and OAuth redirects, including `APP_BASE_PATH`                                     |
 | `APP_BASE_PATH`       | _(empty)_                                                       | Public URL prefix such as `/my-app`; empty or `/` is the root. See [basePath](/docs/environment/deployment#base-path). |
@@ -217,19 +219,21 @@ It also has Docker-only keys:
 
 | `INDEXNOW_ENABLED` | `false` | Submit changed public URLs after a successful `docker-deploy` |
 
-The Docker file also forwards the [public build values](/docs/environment/deployment#public-build-values) `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, and `VITE_INDEXNOW_KEY` to the frontend build. Changing them requires a rebuild.
+The Docker file also forwards the [public build values](/docs/environment/deployment#public-build-values) `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, `VITE_INDEXNOW_KEY`, `VITE_BUY_ME_A_COFFEE_ENABLED`, and `VITE_BUY_ME_A_COFFEE_URL` to the frontend build. Changing them requires a rebuild.
 
 Quote literal values containing `$` with single quotes so Compose does not interpolate them.
 
 ## Frontend variables
 
-| Variable                | Default   | Description                                                                                                                                                                   |
-| ----------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL`     | _(empty)_ | API origin. Empty uses `http://localhost:8000` in development and the page's own origin in other web builds. Set it for desktop builds, separate hosting, or another backend. |
-| `VITE_BASE_PATH`        | _(empty)_ | basePath for a separate Vite dev server; packaged builds read the runtime `APP_BASE_PATH` instead                                                                             |
-| `VITE_PUBLIC_SITE_URL`  | _(empty)_ | Public origin for sharing metadata and discovery pages                                                                                                                        |
-| `VITE_SITE_DESCRIPTION` | _(empty)_ | Description in the static HTML                                                                                                                                                |
-| `VITE_PUBLIC_DISCOVERY` | `false`   | Builds the static `/about/` and `/about/ko/` introductions                                                                                                                    |
-| `VITE_INDEXNOW_KEY`     | _(empty)_ | Public IndexNow ownership key                                                                                                                                                 |
+| Variable                       | Default   | Description                                                                                                                                                                   |
+| ------------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`            | _(empty)_ | API origin. Empty uses `http://localhost:8000` in development and the page's own origin in other web builds. Set it for desktop builds, separate hosting, or another backend. |
+| `VITE_BASE_PATH`               | _(empty)_ | basePath for a separate Vite dev server; packaged builds read the runtime `APP_BASE_PATH` instead                                                                             |
+| `VITE_PUBLIC_SITE_URL`         | _(empty)_ | Public origin for sharing metadata and discovery pages                                                                                                                        |
+| `VITE_SITE_DESCRIPTION`        | _(empty)_ | Description in the static HTML                                                                                                                                                |
+| `VITE_PUBLIC_DISCOVERY`        | `false`   | Builds the static `/about/` and `/about/ko/` introductions                                                                                                                    |
+| `VITE_INDEXNOW_KEY`            | _(empty)_ | Public IndexNow ownership key                                                                                                                                                 |
+| `VITE_BUY_ME_A_COFFEE_ENABLED` | `false`   | Shows a support link in the shell, in development mode only                                                                                                                   |
+| `VITE_BUY_ME_A_COFFEE_URL`     | _(empty)_ | HTTPS `buymeacoffee.com` creator URL, without query, fragment, or port                                                                                                        |
 
 All `VITE_*` values are public build-time values. Never put secrets in them.

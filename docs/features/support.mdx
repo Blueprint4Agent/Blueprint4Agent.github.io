@@ -56,6 +56,7 @@ Account deletion removes the user's own inquiries. When an admin account is dele
 - Opening an inquiry confirms with a toast. A failed send keeps the draft and shows no success feedback.
 - The owner writes an **additional message**; only administrators see **Reply message**, so the two sides are easy to tell apart.
 - Screens refresh from the API when `inbox.changed` arrives; the event carries no content.
+- The [admin demo](/docs/features/admin-and-roles#admin-demo) shows `/demo/admin/inquiries` with synthetic, localized inquiries only. It calls no inquiry API and hides reply and status controls.
 
 ## Code
 
