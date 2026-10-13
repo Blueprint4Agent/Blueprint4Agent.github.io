@@ -35,6 +35,7 @@ The template owns no auth, API, routing state, or storage. The owning page filte
 - A persistent sidebar: 48px collapsed, 224px expanded, resizable from 200 to 360px. The width is remembered.
 - The sidebar footer holds the profile control and connectivity status. In development mode, GitHub and User guide links sit directly above the profile control.
 - With billing enabled, the profile shows the subscription tier, and the profile menu opens `/plans`.
+- The profile menu lists **Profile**, then **Notifications** with an unread badge (see [Notification inbox](/docs/features/notifications)).
 - On mobile the sidebar overlays content with a dismissible backdrop.
 - When the server is unreachable, the recovery panel stays inside the same sidebar layout.
 
@@ -47,6 +48,7 @@ The template owns no auth, API, routing state, or storage. The owning page filte
 | Keyboard   | Everyone (editing for signed-in users) | Shortcut bindings                                                                                |
 | Account    | Signed-in users                        | Name, email, linked login methods, plan, password change, account deletion                       |
 | Billing    | Signed-in users, billing enabled       | Plan, transactions, billing information, payment methods. See [Billing](/docs/features/billing). |
+| Support    | Signed-in users                        | Private [support inquiries](/docs/features/support) and their replies                            |
 | Developers | Signed-in users                        | [API keys](/docs/features/api-keys)                                                              |
 
 The section is part of the URL (`/settings?section=...`); the legacy `section=profile` opens Account. Guests are redirected to General when they open an account-only section, and Billing falls back to General when billing is off.
@@ -76,7 +78,7 @@ With `EMAIL_ENABLED=false`, password change and account deletion are disabled wi
 | Signup date     | Read-only                                                                                              |
 | Current plan    | From the shared subscription snapshot; Free when billing is off                                        |
 
-- Name, Bio, and location can be edited in place on the page, or together in an edit modal. Each inline save patches only that field, and a failed save keeps the draft.
+- Name, Bio, and location can be edited in place on the page, or together in an edit modal. Each inline save patches only that field, and a failed save keeps the draft. Clicking outside an inline editor cancels its draft; the save button and floating menus such as the location dropdown do not.
 - `GET/PATCH /api/v1/auth/me` stays the single source of truth: `bio` and `location` are cleared with `null` and kept when omitted. The backend validates the same country and region pairs as the UI.
 - Saved changes update the sidebar at once. Other open clients see them after their next reload or sign-in.
 - The page enters with the shared rise animation and honors reduced motion.

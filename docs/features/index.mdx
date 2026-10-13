@@ -29,13 +29,19 @@ Everything on these pages works as soon as the blueprint runs. Each page explain
     <Card icon="credit-card" title="Billing" href="/docs/features/billing">
         Stripe cards, Free/Plus/Pro subscriptions, invoices, and webhooks.
     </Card>
+    <Card icon="bell" title="Notification inbox" href="/docs/features/notifications">
+        Persistent in-app notifications with unread counts, independent of email.
+    </Card>
+    <Card icon="support" title="Support inquiries" href="/docs/features/support">
+        Private user-to-admin conversations with status and inbox notifications.
+    </Card>
 </CardGrid>
 
 ## Runtime
 
 <CardGrid columns={2}>
     <Card icon="radio" title="Realtime events" href="/docs/features/realtime-events">
-        Per-user Server-Sent Events over Redis pub/sub.
+        Per-user Server-Sent Events over Redis pub/sub, and an opt-in WebSocket provider.
     </Card>
     <Card icon="clock" title="Background jobs" href="/docs/features/background-jobs">
         Standalone Celery worker and Beat scheduler.

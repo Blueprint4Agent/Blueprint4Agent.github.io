@@ -29,6 +29,8 @@ const sidebars: SidebarsConfig = {
                 doc("features/api-keys", "key"),
                 doc("features/admin-and-roles", "users"),
                 doc("features/billing", "credit-card"),
+                doc("features/notifications", "bell"),
+                doc("features/support", "support"),
                 doc("features/object-storage", "boxes"),
                 doc("features/realtime-events", "radio"),
                 doc("features/background-jobs", "clock"),

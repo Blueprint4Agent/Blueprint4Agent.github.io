@@ -1,7 +1,7 @@
 ---
 title: Realtime events
 sidebar_position: 6
-description: Server-Sent Events that keep open screens in sync with backend changes.
+description: Server-Sent Events that keep open screens in sync with backend changes, and the opt-in WebSocket provider template.
 ---
 
 # Realtime events
@@ -50,3 +50,36 @@ Events are notifications, not a message log:
 3. Handle it in `src/frontend/src/hooks/realtime/<domain>/` and update state through the domain hook.
 
 This is the backend **domain event loop** and the frontend **realtime refresh loop** described in each repository's guide.
+
+For example, `inbox.changed` is published after an inbox or inquiry commit and carries no message content; the [notification inbox](/docs/features/notifications) and [support](/docs/features/support) screens reload from the API when it arrives.
+
+## WebSocket provider (opt-in) \{#websocket-provider\}
+
+B4React includes `WebSocketProvider` (`src/hooks/realtime/websocket/`) as a reusable transport template for a future feature that needs two-way messaging. It is **not mounted** in the app and opens no connection by default; the backend has no WebSocket route. Notifications and support keep using SSE.
+
+```tsx
+const connection = useCallback(async (signal: AbortSignal) => {
+    // Domain API that returns an authorized { url, protocols? } descriptor.
+    return getAuthorizedSocketConnection(signal);
+}, []);
+
+<WebSocketProvider
+    enabled={featureEnabled && Boolean(user)}
+    sessionKey={user?.id ?? null}
+    getConnection={connection}
+    onMessage={handleDomainMessage}
+>
+    <Feature />
+</WebSocketProvider>;
+```
+
+| Behavior | Rule                                                                                                                                            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| API      | `useWebSocket()` returns `status` (`idle`, `connecting`, `open`, `reconnecting`, `closed`, `error`), `send(string): boolean`, and `reconnect()` |
+| URL      | Only `ws://` or `wss://` without credentials; use `wss` in deployment                                                                           |
+| Sending  | Returns `false` when not open or when more than 64 KiB is buffered; nothing is queued or replayed                                               |
+| Retries  | 1, 2, 4, 8, 16 seconds, at most five per connection; `reconnect()` starts over. Close codes 1000 and 1008 stop retries                          |
+| Cleanup  | Changing the session, disabling, going offline, or unmounting aborts pending factories and closes the socket                                    |
+| Recovery | Browser online and desktop connectivity recovery reconnect                                                                                      |
+
+The feature that adopts it owns authentication and authorization of both the connection and each message, payload validation, and HTTP reconciliation. Browsers cannot set an `Authorization` header on a WebSocket, so use cookie and `Origin` validation or a short-lived socket ticket, and never put a long-lived bearer token in the URL. Incoming payloads are delivered as `unknown` and are not kept in shared state.

@@ -1,0 +1,63 @@
+---
+title: Support inquiries
+sidebar_position: 8
+description: Private text inquiries between users and administrators, with message history, status, and inbox notifications.
+---
+
+# Support inquiries
+
+Users open private support inquiries from Settings and follow the conversation there. Administrators review every inquiry, reply, and change its status from the admin panel. No external email service is required.
+
+|                  |                                                        |
+| ---------------- | ------------------------------------------------------ |
+| **Enable**       | Always on for signed-in users                          |
+| **User screen**  | **Settings → Support** (`/settings?section=support`)   |
+| **Admin screen** | `/admin/inquiries`                                     |
+| **Endpoints**    | `/api/v1/inquiries`                                    |
+| **Notifies**     | The [notification inbox](/docs/features/notifications) |
+
+## Endpoints
+
+| Method and path                        | Who            | Does                                    |
+| -------------------------------------- | -------------- | --------------------------------------- |
+| `GET /api/v1/inquiries`                | Signed-in user | List own inquiries, filter by status    |
+| `POST /api/v1/inquiries`               | Signed-in user | Open an inquiry with a subject and body |
+| `GET /api/v1/inquiries/{id}`           | Owner or admin | Read the inquiry and its messages       |
+| `POST /api/v1/inquiries/{id}/messages` | Owner or admin | Add a message                           |
+| `GET /api/v1/inquiries/admin`          | Admin          | List every inquiry                      |
+| `PATCH /api/v1/inquiries/{id}/status`  | Admin          | Set `open`, `in_progress`, or `closed`  |
+
+- Authorization is checked on the server. An inquiry the caller may not see returns 404, and every response is `no-store`.
+- Managers have only their own user access; they cannot see other users' inquiries.
+- Lists are paginated (`page_size` 1–100, default 20).
+
+## Rules
+
+| Rule                | Value                                                         |
+| ------------------- | ------------------------------------------------------------- |
+| Subject             | Up to 160 characters                                          |
+| Body, message       | Up to 4,000 characters, text only, no attachments             |
+| Messages per thread | 200                                                           |
+| Closed inquiries    | Reject new messages; an admin can reopen them                 |
+| Retries             | A client request UUID deduplicates a repeated create or reply |
+
+On PostgreSQL, per-user and per-thread locks serialize writes. Each inquiry change and its inbox records commit in one transaction:
+
+| Event         | Notifies                    |
+| ------------- | --------------------------- |
+| New inquiry   | The owner and active admins |
+| Reply         | The other side              |
+| Status change | The owner                   |
+
+Account deletion removes the user's own inquiries. When an admin account is deleted, its identity is removed from the replies that remain.
+
+## Frontend
+
+- Opening an inquiry confirms with a toast. A failed send keeps the draft and shows no success feedback.
+- The owner writes an **additional message**; only administrators see **Reply message**, so the two sides are easy to tell apart.
+- Screens refresh from the API when `inbox.changed` arrives; the event carries no content.
+
+## Code
+
+- Backend: `routers/v1/inquiry.py`, `services/inquiry.py`, `models/inquiry.py`
+- Frontend: the Support settings section and `/admin/inquiries` in `src/frontend`

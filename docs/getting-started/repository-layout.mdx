@@ -48,7 +48,7 @@ The backend application follows a strict layering:
 
 ```text
 src/backend/app/
-├── routers/v1/   # HTTP endpoints (auth, admin, api-keys, billing, events)
+├── routers/v1/   # HTTP endpoints (auth, admin, api-keys, billing, events, inbox, inquiries)
 ├── services/     # domain logic called by routers
 ├── models/       # SQLAlchemy models and Pydantic schemas
 ├── core/         # config, db, cache, celery, mail, object_storage, realtime, observability, errors

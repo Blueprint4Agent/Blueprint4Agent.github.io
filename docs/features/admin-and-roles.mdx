@@ -12,7 +12,7 @@ Users have one of three roles: `user`, `manager`, or `admin`. Managers and admin
 | ------------- | ---------------------------------------------------------------------------------------------------- |
 | **Enable**    | Always available to users with the `manager` or `admin` role                                         |
 | **Endpoints** | `GET /api/v1/auth/admin/users`, `GET /api/v1/auth/admin/user-role-stats`, `GET /api/v1/admin/status` |
-| **Frontend**  | **Admin panel** in the profile menu (`/admin`, `/admin/server`)                                      |
+| **Frontend**  | **Admin panel** in the profile menu (`/admin`, `/admin/server`, `/admin/inquiries`)                  |
 | **Command**   | `make user-role EMAIL=<address> ROLE=admin\|manager\|user`                                           |
 
 ## Permissions
@@ -22,6 +22,8 @@ Users have one of three roles: `user`, `manager`, or `admin`. Managers and admin
 | Own account, API keys, and billing              | Yes  | Yes     | Yes   |
 | Read the user directory and role statistics     | No   | Yes     | Yes   |
 | Read server status and admin-only endpoints     | No   | No      | Yes   |
+| Read, reply to, and close all support inquiries | No   | No      | Yes   |
+| Read other users' notifications                 | No   | No      | No    |
 | Change another user's role, profile, or billing | No   | No      | No    |
 | Inspect or retry other users' lifecycle mail    | No   | No      | No    |
 
@@ -87,6 +89,10 @@ The panel refreshes on focus, visibility, manual refresh, and connectivity recov
 - Connection URLs, credentials, database names, bucket names, endpoints, regions, and local paths are never returned.
 
 A storage check proves bucket access only, not upload permission or bucket privacy. Worker health and historical metrics are outside this snapshot.
+
+## Support inquiries
+
+`/admin/inquiries` lists every [support inquiry](/docs/features/support) with a status filter. Admins reply and set **Open**, **In progress**, or **Closed**. Managers see only their own inquiries in Settings.
 
 ## Code
 

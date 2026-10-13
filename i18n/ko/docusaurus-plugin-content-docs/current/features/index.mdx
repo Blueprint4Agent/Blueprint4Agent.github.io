@@ -29,13 +29,19 @@ description: B4FastAPI와 B4React가 기본으로 제공하는 기능입니다.
     <Card icon="credit-card" title="결제" href="/docs/features/billing">
         Stripe 카드, Free/Plus/Pro 구독, 청구서, 웹훅
     </Card>
+    <Card icon="bell" title="알림함" href="/docs/features/notifications">
+        이메일과 별개로 동작하는 영속 앱 내 알림과 읽지 않은 개수
+    </Card>
+    <Card icon="support" title="문의하기" href="/docs/features/support">
+        상태와 알림함 알림을 갖춘 사용자·관리자 간 비공개 대화
+    </Card>
 </CardGrid>
 
 ## 런타임
 
 <CardGrid columns={2}>
     <Card icon="radio" title="실시간 이벤트" href="/docs/features/realtime-events">
-        Redis pub/sub 기반 사용자별 Server-Sent Events
+        Redis pub/sub 기반 사용자별 Server-Sent Events와 선택형 WebSocket provider
     </Card>
     <Card icon="clock" title="백그라운드 작업" href="/docs/features/background-jobs">
         독립 Celery 워커와 Beat 스케줄러
