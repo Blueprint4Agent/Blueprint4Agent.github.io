@@ -47,7 +47,7 @@ Beat runs two schedules. They are required when the matching feature is enabled:
 
 ## Run in Docker
 
-The worker (prefork, two processes) and Beat use the same app image. When both `LOGIN_ENABLED` and `EMAIL_ENABLED` are true, `make docker-up` and `make docker-deploy` start and health-check the worker before the API. Beat starts with `make docker-celery-up`; start it, and the worker, whenever billing or lifecycle email is enabled. Run exactly one Beat per deployment. Both services mount the object storage volume.
+The worker (prefork, two processes) and Beat use the same app image. When both `LOGIN_ENABLED` and `EMAIL_ENABLED` are true, `make docker-up` and `make docker-deploy` start and health-check the worker before the API. Beat starts with `make docker-celery-up`; start it, and the worker, whenever billing or lifecycle email is enabled. Run exactly one Beat per deployment. The worker mounts the object storage and SQLite volumes, and both run as the unprivileged UID 10001.
 
 ## Execution contract
 

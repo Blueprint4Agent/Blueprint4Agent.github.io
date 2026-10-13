@@ -22,7 +22,8 @@ B4FastAPI is the repository you clone and deploy. B4React lives inside it as a p
 ```text
 B4FastAPI/
 ├── AGENTS.md              # agent read order, verification, and git governance
-├── DEPLOY.md              # Docker deployment modes and pipelines
+├── DEPLOY.md              # Docker deployment modes, HTTPS, and pipelines
+├── LICENSE                # MIT
 ├── PROJECT_SETUP.md       # project.json initialization
 ├── Makefile               # every workflow hook (make help)
 ├── project.example.json
@@ -30,8 +31,11 @@ B4FastAPI/
 ├── contracts/             # exported OpenAPI baseline
 ├── docker/
 │   ├── docker-compose.yml
+│   ├── docker-compose.https.yml  # optional Caddy HTTPS overlay
+│   ├── Caddyfile
+│   ├── nginx/             # basePath location fragment for an external Nginx
 │   ├── observability/     # collector, Tempo, Loki, Prometheus, Grafana config
-│   └── scripts/           # build, up, down, deploy, export
+│   └── scripts/           # deploy.py entrypoint: init, check, build, up, deploy, smoke, status
 ├── notes/                 # verification, collections, submodule guides (+ ko/)
 ├── scripts/               # env, verification, governance, and architecture tooling
 ├── src/

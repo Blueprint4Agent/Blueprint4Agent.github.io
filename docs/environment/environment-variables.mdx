@@ -26,7 +26,7 @@ B4FastAPI reads three `.env` files. Each has a committed `.env.example`, which i
 - Before changing a file, sync writes a timestamped backup to `.env-backups/` (ignored by Git and Docker, readable only by you).
 - Values are never printed. Keys that exist only in your `.env` are kept in a separate section at the end.
 - Examples are grouped by section dividers, and a `# Values:` comment above each key lists its accepted values or format. Sync copies that layout and the comments.
-- `make docker-deploy` runs `docker-env-check` first and stops if keys are missing.
+- `make docker-check`, which every deploy runs first, rejects unsafe production values. See [Server deployment](/docs/environment/deployment#check-and-deploy).
 
 :::tip[Adding a setting]
 
@@ -40,18 +40,20 @@ Defaults below are from `src/backend/.env.example` (local development). [Docker 
 
 ### Server
 
-| Variable          | Default                                                         | Description                                                                                  |
-| ----------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `APP_NAME`        | `Blueprint4FastAPI API`                                         | API title shown in OpenAPI                                                                   |
-| `APP_MODE`        | `development`                                                   | `development` or `production`. See [Runtime modes](/docs/environment/runtime-modes).         |
-| `APP_ENV`         | `local`                                                         | Telemetry label (`docker` in Docker); does not select the mode                               |
-| `LOG_LEVEL`       | `INFO`                                                          | Python log level                                                                             |
-| `STARTUP_DISPLAY` | `auto`                                                          | `auto`, `plain`, or `off`. See [Startup & console logs](/docs/environment/startup-and-logs). |
-| `APP_PORT`        | `8000`                                                          | Port for `make backend-dev`                                                                  |
-| `APP_BASE_URL`    | `http://localhost:5173`                                         | Public frontend origin for email links and OAuth redirects                                   |
-| `SWAGGER_ENABLED` | `true`                                                          | Serves Swagger UI at `/docs`                                                                 |
-| `METRICS_ENABLED` | `true`                                                          | Serves Prometheus metrics at `/metrics`                                                      |
-| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | Comma-separated allowed origins                                                              |
+| Variable              | Default                                                         | Description                                                                                                            |
+| --------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `APP_NAME`            | `Blueprint4FastAPI API`                                         | API title shown in OpenAPI                                                                                             |
+| `APP_MODE`            | `development`                                                   | `development` or `production`. See [Runtime modes](/docs/environment/runtime-modes).                                   |
+| `APP_ENV`             | `local`                                                         | Telemetry label (`docker` in Docker); does not select the mode                                                         |
+| `LOG_LEVEL`           | `INFO`                                                          | Python log level                                                                                                       |
+| `STARTUP_DISPLAY`     | `auto`                                                          | `auto`, `plain`, or `off`. See [Startup & console logs](/docs/environment/startup-and-logs).                           |
+| `APP_PORT`            | `8000`                                                          | Port for `make backend-dev`                                                                                            |
+| `APP_BASE_URL`        | `http://localhost:5173`                                         | Public frontend URL for email links and OAuth redirects, including `APP_BASE_PATH`                                     |
+| `APP_BASE_PATH`       | _(empty)_                                                       | Public URL prefix such as `/my-app`; empty or `/` is the root. See [basePath](/docs/environment/deployment#base-path). |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1`                                                     | Proxy IPs or CIDRs whose forwarded headers Uvicorn trusts                                                              |
+| `SWAGGER_ENABLED`     | `true`                                                          | Serves Swagger UI at `/docs`                                                                                           |
+| `METRICS_ENABLED`     | `true`                                                          | Serves Prometheus metrics at `/metrics`                                                                                |
+| `CORS_ORIGINS`        | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | Comma-separated allowed origins                                                                                        |
 
 ### Observability
 
@@ -67,30 +69,30 @@ Defaults below are from `src/backend/.env.example` (local development). [Docker 
 
 ### Authentication
 
-| Variable                                  | Default                    | Description                                                        |
-| ----------------------------------------- | -------------------------- | ------------------------------------------------------------------ |
-| `LOGIN_ENABLED`                           | `true`                     | `false` runs with a bootstrap admin and forces email and OAuth off |
-| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | Bootstrap user when login is disabled                              |
-| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | Bootstrap user name                                                |
-| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | Token signing key. `make project-init` generates one.              |
-| `ALGORITHM`                               | `HS256`                    | JWT algorithm                                                      |
-| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | Access token lifetime                                              |
-| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | Refresh cookie lifetime with "remember me"                         |
-| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | Verification link lifetime                                         |
-| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | Reset link lifetime                                                |
-| `LOGIN_FAILED_LIMIT`                      | `5`                        | Failed logins per IP before lockout                                |
-| `LOGIN_LOCKED_MINUTES`                    | `5`                        | Lockout duration                                                   |
+| Variable                                  | Default                    | Description                                                                                                           |
+| ----------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `LOGIN_ENABLED`                           | `true`                     | `false` runs with a bootstrap admin and forces email and OAuth off                                                    |
+| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | Bootstrap user when login is disabled                                                                                 |
+| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | Bootstrap user name                                                                                                   |
+| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | Token signing key. Production requires a [unique random key](/docs/environment/runtime-modes#production-signing-key). |
+| `ALGORITHM`                               | `HS256`                    | JWT algorithm                                                                                                         |
+| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | Access token lifetime                                                                                                 |
+| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | Refresh cookie lifetime with "remember me"                                                                            |
+| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | Verification link lifetime                                                                                            |
+| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | Reset link lifetime                                                                                                   |
+| `LOGIN_FAILED_LIMIT`                      | `5`                        | Failed logins per IP before lockout                                                                                   |
+| `LOGIN_LOCKED_MINUTES`                    | `5`                        | Lockout duration                                                                                                      |
 
 ### Database
 
-| Variable      | Default            | Description                                                    |
-| ------------- | ------------------ | -------------------------------------------------------------- |
-| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` or `postgresql+asyncpg`                     |
-| `DB_NAME`     | `template.db`      | SQLite file name, or PostgreSQL database name                  |
-| `DB_HOST`     | `localhost`        | PostgreSQL host (ignored by SQLite)                            |
-| `DB_PORT`     | `5432`             | PostgreSQL port                                                |
-| `DB_USER`     | `postgres`         | PostgreSQL user                                                |
-| `DB_PASSWORD` | `postgres`         | PostgreSQL password. Enter it raw; the backend URL-encodes it. |
+| Variable      | Default            | Description                                                                                        |
+| ------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
+| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` or `postgresql+asyncpg`                                                         |
+| `DB_NAME`     | `template.db`      | SQLite file, or PostgreSQL database name. Docker SQLite uses `/var/lib/b4fastapi/database/<file>`. |
+| `DB_HOST`     | `localhost`        | PostgreSQL host (ignored by SQLite)                                                                |
+| `DB_PORT`     | `5432`             | PostgreSQL port                                                                                    |
+| `DB_USER`     | `postgres`         | PostgreSQL user                                                                                    |
+| `DB_PASSWORD` | `postgres`         | PostgreSQL password. Enter it raw; the backend URL-encodes it.                                     |
 
 Change `DB_DRIVER` and `DB_NAME` together. See [Database & Redis](/docs/environment/database-and-redis).
 
@@ -197,24 +199,37 @@ See [Object storage](/docs/features/object-storage).
 
 It also has Docker-only keys:
 
-| Variable                                      | Default                     | Description                                                      |
-| --------------------------------------------- | --------------------------- | ---------------------------------------------------------------- |
-| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | App image tag                                                    |
-| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose project; selects containers and volumes                  |
-| `APP_HOST_PORT`                               | `8000`                      | Published app port (all interfaces)                              |
-| `POSTGRES_HOST_PORT`                          | `5432`                      | Published on `127.0.0.1`                                         |
-| `REDIS_HOST_PORT`                             | `6379`                      | Published on `127.0.0.1`                                         |
-| `GRAFANA_HOST_PORT`                           | `3000`                      | Published on `127.0.0.1`                                         |
-| `PROMETHEUS_HOST_PORT`                        | `9090`                      | Published on `127.0.0.1`                                         |
-| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | Published on `127.0.0.1`                                         |
-| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Backend scraped by Prometheus (`app:8000` for the Docker app)    |
-| `GRAFANA_ADMIN_USER`                          | `admin`                     | Grafana admin user for a new volume                              |
-| `GRAFANA_ADMIN_PASSWORD`                      | _(empty)_                   | Required to start Grafana; `admin` and `CHANGE_ME*` are rejected |
+| Variable                                      | Default                     | Description                                                                |
+| --------------------------------------------- | --------------------------- | -------------------------------------------------------------------------- |
+| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | App image tag                                                              |
+| `COMPOSE_FILE`                                | `docker-compose.yml`        | Compose overlays; `docker-compose.yml:docker-compose.https.yml` adds Caddy |
+| `PUBLIC_DOMAIN`                               | _(empty)_                   | Bare hostname for the HTTPS overlay                                        |
+| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose project; selects containers and volumes                            |
+| `APP_HOST_PORT`                               | `8000`                      | Published on `127.0.0.1`                                                   |
+| `POSTGRES_HOST_PORT`                          | `5432`                      | Published on `127.0.0.1`                                                   |
+| `REDIS_HOST_PORT`                             | `6379`                      | Published on `127.0.0.1`                                                   |
+| `GRAFANA_HOST_PORT`                           | `3000`                      | Published on `127.0.0.1`                                                   |
+| `PROMETHEUS_HOST_PORT`                        | `9090`                      | Published on `127.0.0.1`                                                   |
+| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | Published on `127.0.0.1`                                                   |
+| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Backend scraped by Prometheus (`app:8000` for the Docker app)              |
+| `GRAFANA_ADMIN_USER`                          | `admin`                     | Grafana admin user for a new volume                                        |
+| `GRAFANA_ADMIN_PASSWORD`                      | _(empty)_                   | Required to start Grafana; `admin` and `CHANGE_ME*` are rejected           |
+
+| `INDEXNOW_ENABLED` | `false` | Submit changed public URLs after a successful `docker-deploy` |
+
+The Docker file also forwards the [public build values](/docs/environment/deployment#public-build-values) `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, and `VITE_INDEXNOW_KEY` to the frontend build. Changing them requires a rebuild.
 
 Quote literal values containing `$` with single quotes so Compose does not interpolate them.
 
 ## Frontend variables
 
-| Variable            | Default   | Description                                                                                                                                                                   |
-| ------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | _(empty)_ | API origin. Empty uses `http://localhost:8000` in development and the page's own origin in other web builds. Set it for desktop builds, separate hosting, or another backend. |
+| Variable                | Default   | Description                                                                                                                                                                   |
+| ----------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`     | _(empty)_ | API origin. Empty uses `http://localhost:8000` in development and the page's own origin in other web builds. Set it for desktop builds, separate hosting, or another backend. |
+| `VITE_BASE_PATH`        | _(empty)_ | basePath for a separate Vite dev server; packaged builds read the runtime `APP_BASE_PATH` instead                                                                             |
+| `VITE_PUBLIC_SITE_URL`  | _(empty)_ | Public origin for sharing metadata and discovery pages                                                                                                                        |
+| `VITE_SITE_DESCRIPTION` | _(empty)_ | Description in the static HTML                                                                                                                                                |
+| `VITE_PUBLIC_DISCOVERY` | `false`   | Builds the static `/about/` and `/about/ko/` introductions                                                                                                                    |
+| `VITE_INDEXNOW_KEY`     | _(empty)_ | Public IndexNow ownership key                                                                                                                                                 |
+
+All `VITE_*` values are public build-time values. Never put secrets in them.

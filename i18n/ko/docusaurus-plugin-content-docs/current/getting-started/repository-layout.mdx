@@ -22,7 +22,8 @@ B4FastAPI는 클론하고 배포하는 저장소입니다. B4React는 그 안에
 ```text
 B4FastAPI/
 ├── AGENTS.md              # 에이전트 읽기 순서, 검증, Git 거버넌스
-├── DEPLOY.md              # Docker 배포 모드와 파이프라인
+├── DEPLOY.md              # Docker 배포 모드, HTTPS, 파이프라인
+├── LICENSE                # MIT
 ├── PROJECT_SETUP.md       # project.json 초기화
 ├── Makefile               # 모든 워크플로우 훅(make help)
 ├── project.example.json
@@ -30,8 +31,11 @@ B4FastAPI/
 ├── contracts/             # 내보낸 OpenAPI 기준본
 ├── docker/
 │   ├── docker-compose.yml
+│   ├── docker-compose.https.yml  # 선택형 Caddy HTTPS 오버레이
+│   ├── Caddyfile
+│   ├── nginx/             # 외부 Nginx용 basePath location 조각
 │   ├── observability/     # Collector, Tempo, Loki, Prometheus, Grafana 설정
-│   └── scripts/           # build, up, down, deploy, export
+│   └── scripts/           # deploy.py 진입점: init, check, build, up, deploy, smoke, status
 ├── notes/                 # 검증, 컬렉션, 서브모듈 가이드(+ ko/)
 ├── scripts/               # env, 검증, 거버넌스, 아키텍처 도구
 ├── src/

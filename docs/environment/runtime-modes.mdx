@@ -30,6 +30,22 @@ An unknown mode, or production with login disabled, fails configuration validati
 
 Runtime gating does not remove showcase JavaScript from the shared build; it only controls navigation and routes.
 
+## Production signing key \{#production-signing-key\}
+
+In production, `SECRET_KEY` must be a unique random value. Startup, and the deployment preflight, reject a blank key, an example placeholder (`CHANGE_ME...`), surrounding whitespace, or a key shorter than the algorithm requires:
+
+| `ALGORITHM`       | Minimum length |
+| ----------------- | -------------- |
+| `HS256` (default) | 32 UTF-8 bytes |
+| `HS384`           | 48 UTF-8 bytes |
+| `HS512`           | 64 UTF-8 bytes |
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+`make docker-init` and `make project-init` generate a key and replace the published placeholder, but keep an already configured key. Length checks cannot prove entropy. Do not rotate a working key casually: it signs JWTs and derives other keys, such as the one that encrypts pending mail recipients, so rotation invalidates issued tokens and key-derived data. Development keeps accepting the example key.
+
 ## Bootstrap identities
 
 Login-disabled development uses a dedicated, password-less bootstrap identity:

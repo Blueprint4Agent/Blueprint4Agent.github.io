@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
                 doc("environment/observability", "activity"),
                 doc("environment/startup-and-logs", "terminal"),
                 doc("environment/docker", "container"),
+                doc("environment/deployment", "server"),
                 doc("environment/make-commands", "terminal"),
             ],
         },

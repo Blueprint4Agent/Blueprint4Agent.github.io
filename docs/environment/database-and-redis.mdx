@@ -19,11 +19,12 @@ flowchart LR
     Q -- "managed services" --> E["External PostgreSQL + Redis"]
 ```
 
-| Runtime                             | `DB_DRIVER`          | `DB_NAME`             | `DB_HOST`   |
-| ----------------------------------- | -------------------- | --------------------- | ----------- |
-| Local SQLite (development default)  | `sqlite+aiosqlite`   | `template.db` (file)  | Ignored     |
-| Host backend with Docker PostgreSQL | `postgresql+asyncpg` | `template` (database) | `localhost` |
-| Docker app with Docker PostgreSQL   | `postgresql+asyncpg` | `template` (database) | `postgres`  |
+| Runtime                             | `DB_DRIVER`          | `DB_NAME`                                 | `DB_HOST`   |
+| ----------------------------------- | -------------------- | ----------------------------------------- | ----------- |
+| Local SQLite (development default)  | `sqlite+aiosqlite`   | `template.db` (file)                      | Ignored     |
+| Host backend with Docker PostgreSQL | `postgresql+asyncpg` | `template` (database)                     | `localhost` |
+| Docker app with Docker PostgreSQL   | `postgresql+asyncpg` | `template` (database)                     | `postgres`  |
+| Docker app with SQLite              | `sqlite+aiosqlite`   | `/var/lib/b4fastapi/database/template.db` | Ignored     |
 
 :::warning[Switching engines]
 
@@ -32,7 +33,8 @@ Change `DB_DRIVER` and `DB_NAME` together. `env-sync` keeps existing values, so 
 :::
 
 - The local PostgreSQL container creates its user, password, and database from `DB_USER`, `DB_PASSWORD`, and `DB_NAME` only when its volume is new. Changing `.env` later does not change an existing password; change it in the database instead of deleting the volume.
-- Set a real `DB_PASSWORD` for deployments. Enter raw passwords; the backend URL-encodes them.
+- Set a real `DB_PASSWORD` for deployments. Enter raw passwords; the backend URL-encodes them. Production preflight rejects an empty, `postgres`, or `CHANGE_ME` password.
+- Docker SQLite lives in the `sqlite_data` volume, shared by the app and the mail worker, so it survives container recreation. Deploy commands reject a relative path or one outside `/var/lib/b4fastapi/database`. To move an existing SQLite file into the volume, stop writes, back it up with SQLite's backup facility, import it, and verify the Alembic revision before reopening traffic.
 
 ## Migrations
 
@@ -66,13 +68,13 @@ PostgreSQL in Docker (run from the repository root):
 ```bash
 mkdir -p docker/artifacts/db-backups
 docker compose -f docker/docker-compose.yml --env-file docker/.env exec -T postgres \
-  pg_dump -U postgres -d template -Fc > docker/artifacts/db-backups/template-$(date +%Y%m%d-%H%M%S).dump
+  sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > docker/artifacts/db-backups/template-$(date +%Y%m%d-%H%M%S).dump
 
 docker compose -f docker/docker-compose.yml --env-file docker/.env exec -T postgres \
-  pg_restore -U postgres -d template --clean --if-exists --no-owner --no-privileges < docker/artifacts/db-backups/<file>.dump
+  sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --no-privileges' < docker/artifacts/db-backups/<file>.dump
 ```
 
-SQLite: copy `src/backend/template.db`.
+`-T` disables TTY allocation so the binary dump is not corrupted, and Compose service names replace fixed container names. SQLite: use SQLite's backup facility on `src/backend/template.db`, or on the file in the `sqlite_data` volume for Docker. An image archive is not a data backup.
 
 After a restore, run `uv run alembic upgrade head` and the smoke tests (`uv run pytest tests/test_smoke.py`). Keep production backups encrypted, and test restores regularly. See `src/backend/DB_BACKUP_RESTORE.md` for external PostgreSQL.
 

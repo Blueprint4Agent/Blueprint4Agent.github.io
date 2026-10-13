@@ -26,7 +26,7 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 - 파일을 바꾸기 전에 `.env-backups/`에 시각이 붙은 백업을 남깁니다(Git·Docker 제외, 본인만 읽기 가능).
 - 값은 출력하지 않습니다. 내 `.env`에만 있는 키는 파일 끝의 별도 구역에 유지됩니다.
 - 예제는 구역 구분선으로 묶여 있고, 각 키 바로 위의 `# Values:` 주석이 허용 값이나 형식을 알려줍니다. 동기화는 이 배치와 주석을 그대로 복사합니다.
-- `make docker-deploy`는 먼저 `docker-env-check`를 실행하고 키가 빠져 있으면 멈춥니다.
+- 모든 배포가 먼저 실행하는 `make docker-check`는 안전하지 않은 운영 값을 거부합니다. [서버 배포](/docs/environment/deployment#check-and-deploy)를 참고하세요.
 
 :::tip[설정 추가]
 
@@ -40,18 +40,20 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 ### 서버
 
-| 변수              | 기본값                                                          | 설명                                                                                     |
-| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `APP_NAME`        | `Blueprint4FastAPI API`                                         | OpenAPI에 표시되는 API 이름                                                              |
-| `APP_MODE`        | `development`                                                   | `development` 또는 `production`. [런타임 모드](/docs/environment/runtime-modes) 참고     |
-| `APP_ENV`         | `local`                                                         | 텔레메트리 라벨(Docker에서는 `docker`), 모드를 정하지 않음                               |
-| `LOG_LEVEL`       | `INFO`                                                          | Python 로그 레벨                                                                         |
-| `STARTUP_DISPLAY` | `auto`                                                          | `auto`, `plain`, `off`. [시작 화면과 콘솔 로그](/docs/environment/startup-and-logs) 참고 |
-| `APP_PORT`        | `8000`                                                          | `make backend-dev` 포트                                                                  |
-| `APP_BASE_URL`    | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 origin                             |
-| `SWAGGER_ENABLED` | `true`                                                          | `/docs`에서 Swagger UI 제공                                                              |
-| `METRICS_ENABLED` | `true`                                                          | `/metrics`에서 Prometheus 메트릭 제공                                                    |
-| `CORS_ORIGINS`    | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | 쉼표로 구분한 허용 origin                                                                |
+| 변수                  | 기본값                                                          | 설명                                                                                                              |
+| --------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `APP_NAME`            | `Blueprint4FastAPI API`                                         | OpenAPI에 표시되는 API 이름                                                                                       |
+| `APP_MODE`            | `development`                                                   | `development` 또는 `production`. [런타임 모드](/docs/environment/runtime-modes) 참고                              |
+| `APP_ENV`             | `local`                                                         | 텔레메트리 라벨(Docker에서는 `docker`), 모드를 정하지 않음                                                        |
+| `LOG_LEVEL`           | `INFO`                                                          | Python 로그 레벨                                                                                                  |
+| `STARTUP_DISPLAY`     | `auto`                                                          | `auto`, `plain`, `off`. [시작 화면과 콘솔 로그](/docs/environment/startup-and-logs) 참고                          |
+| `APP_PORT`            | `8000`                                                          | `make backend-dev` 포트                                                                                           |
+| `APP_BASE_URL`        | `http://localhost:5173`                                         | 이메일 링크와 OAuth 리다이렉트에 쓰는 공개 프론트엔드 URL, `APP_BASE_PATH` 포함                                   |
+| `APP_BASE_PATH`       | _(비어 있음)_                                                   | `/my-app` 같은 공개 URL 접두사, 비어 있거나 `/`이면 루트. [basePath](/docs/environment/deployment#base-path) 참고 |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1`                                                     | Uvicorn이 forwarded 헤더를 신뢰할 프록시 IP 또는 CIDR                                                             |
+| `SWAGGER_ENABLED`     | `true`                                                          | `/docs`에서 Swagger UI 제공                                                                                       |
+| `METRICS_ENABLED`     | `true`                                                          | `/metrics`에서 Prometheus 메트릭 제공                                                                             |
+| `CORS_ORIGINS`        | `http://localhost:5173,http://127.0.0.1:5173,tauri://localhost` | 쉼표로 구분한 허용 origin                                                                                         |
 
 ### 옵저버빌리티
 
@@ -67,30 +69,30 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 ### 인증
 
-| 변수                                      | 기본값                     | 설명                                                            |
-| ----------------------------------------- | -------------------------- | --------------------------------------------------------------- |
-| `LOGIN_ENABLED`                           | `true`                     | `false`면 부트스트랩 관리자로 실행하고 이메일·OAuth를 강제로 끔 |
-| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | 로그인 비활성화 시 부트스트랩 사용자                            |
-| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | 부트스트랩 사용자 이름                                          |
-| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | 토큰 서명 키. `make project-init`이 생성                        |
-| `ALGORITHM`                               | `HS256`                    | JWT 알고리즘                                                    |
-| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | 액세스 토큰 수명                                                |
-| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | "기억하기" 사용 시 refresh 쿠키 수명                            |
-| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | 인증 링크 수명                                                  |
-| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | 재설정 링크 수명                                                |
-| `LOGIN_FAILED_LIMIT`                      | `5`                        | 잠금 전 IP별 허용 실패 횟수                                     |
-| `LOGIN_LOCKED_MINUTES`                    | `5`                        | 잠금 시간                                                       |
+| 변수                                      | 기본값                     | 설명                                                                                                     |
+| ----------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `LOGIN_ENABLED`                           | `true`                     | `false`면 부트스트랩 관리자로 실행하고 이메일·OAuth를 강제로 끔                                          |
+| `BOOTSTRAP_USER_EMAIL`                    | `demo@example.com`         | 로그인 비활성화 시 부트스트랩 사용자                                                                     |
+| `BOOTSTRAP_USER_NAME`                     | `Demo User`                | 부트스트랩 사용자 이름                                                                                   |
+| `SECRET_KEY`                              | `CHANGE_ME_FOR_PRODUCTION` | 토큰 서명 키. 운영에서는 [고유한 무작위 키](/docs/environment/runtime-modes#production-signing-key) 필요 |
+| `ALGORITHM`                               | `HS256`                    | JWT 알고리즘                                                                                             |
+| `ACCESS_TOKEN_EXPIRE_MINUTES`             | `30`                       | 액세스 토큰 수명                                                                                         |
+| `REFRESH_TOKEN_EXPIRE_DAYS`               | `7`                        | "기억하기" 사용 시 refresh 쿠키 수명                                                                     |
+| `EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES` | `60`                       | 인증 링크 수명                                                                                           |
+| `PASSWORD_RESET_TOKEN_EXPIRE_MINUTES`     | `30`                       | 재설정 링크 수명                                                                                         |
+| `LOGIN_FAILED_LIMIT`                      | `5`                        | 잠금 전 IP별 허용 실패 횟수                                                                              |
+| `LOGIN_LOCKED_MINUTES`                    | `5`                        | 잠금 시간                                                                                                |
 
 ### 데이터베이스
 
-| 변수          | 기본값             | 설명                                                          |
-| ------------- | ------------------ | ------------------------------------------------------------- |
-| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` 또는 `postgresql+asyncpg`                  |
-| `DB_NAME`     | `template.db`      | SQLite 파일 이름 또는 PostgreSQL 데이터베이스 이름            |
-| `DB_HOST`     | `localhost`        | PostgreSQL 호스트(SQLite는 무시)                              |
-| `DB_PORT`     | `5432`             | PostgreSQL 포트                                               |
-| `DB_USER`     | `postgres`         | PostgreSQL 사용자                                             |
-| `DB_PASSWORD` | `postgres`         | PostgreSQL 비밀번호. 원문 그대로 입력하면 백엔드가 URL 인코딩 |
+| 변수          | 기본값             | 설명                                                                                                |
+| ------------- | ------------------ | --------------------------------------------------------------------------------------------------- |
+| `DB_DRIVER`   | `sqlite+aiosqlite` | `sqlite+aiosqlite` 또는 `postgresql+asyncpg`                                                        |
+| `DB_NAME`     | `template.db`      | SQLite 파일 또는 PostgreSQL 데이터베이스 이름. Docker SQLite는 `/var/lib/b4fastapi/database/<파일>` |
+| `DB_HOST`     | `localhost`        | PostgreSQL 호스트(SQLite는 무시)                                                                    |
+| `DB_PORT`     | `5432`             | PostgreSQL 포트                                                                                     |
+| `DB_USER`     | `postgres`         | PostgreSQL 사용자                                                                                   |
+| `DB_PASSWORD` | `postgres`         | PostgreSQL 비밀번호. 원문 그대로 입력하면 백엔드가 URL 인코딩                                       |
 
 `DB_DRIVER`와 `DB_NAME`은 함께 바꿉니다. [데이터베이스와 Redis](/docs/environment/database-and-redis)를 참고하세요.
 
@@ -197,24 +199,37 @@ B4FastAPI는 `.env` 파일 세 개를 읽습니다. 각 파일에는 커밋된 `
 
 Docker 전용 키도 있습니다.
 
-| 변수                                          | 기본값                      | 설명                                               |
-| --------------------------------------------- | --------------------------- | -------------------------------------------------- |
-| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | 앱 이미지 태그                                     |
-| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose 프로젝트. 컨테이너와 볼륨을 결정           |
-| `APP_HOST_PORT`                               | `8000`                      | 공개되는 앱 포트(모든 인터페이스)                  |
-| `POSTGRES_HOST_PORT`                          | `5432`                      | `127.0.0.1`에만 공개                               |
-| `REDIS_HOST_PORT`                             | `6379`                      | `127.0.0.1`에만 공개                               |
-| `GRAFANA_HOST_PORT`                           | `3000`                      | `127.0.0.1`에만 공개                               |
-| `PROMETHEUS_HOST_PORT`                        | `9090`                      | `127.0.0.1`에만 공개                               |
-| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | `127.0.0.1`에만 공개                               |
-| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Prometheus가 수집할 백엔드(Docker 앱은 `app:8000`) |
-| `GRAFANA_ADMIN_USER`                          | `admin`                     | 새 볼륨의 Grafana 관리자                           |
-| `GRAFANA_ADMIN_PASSWORD`                      | _(비어 있음)_               | Grafana 시작에 필수. `admin`, `CHANGE_ME*`는 거부  |
+| 변수                                          | 기본값                      | 설명                                                                           |
+| --------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------ |
+| `APP_IMAGE`                                   | `blueprint4fastapi:local`   | 앱 이미지 태그                                                                 |
+| `COMPOSE_FILE`                                | `docker-compose.yml`        | Compose 오버레이, `docker-compose.yml:docker-compose.https.yml`이면 Caddy 추가 |
+| `PUBLIC_DOMAIN`                               | _(비어 있음)_               | HTTPS 오버레이용 호스트 이름                                                   |
+| `COMPOSE_PROJECT_NAME`                        | `docker`                    | Compose 프로젝트. 컨테이너와 볼륨을 결정                                       |
+| `APP_HOST_PORT`                               | `8000`                      | `127.0.0.1`에 게시                                                             |
+| `POSTGRES_HOST_PORT`                          | `5432`                      | `127.0.0.1`에만 공개                                                           |
+| `REDIS_HOST_PORT`                             | `6379`                      | `127.0.0.1`에만 공개                                                           |
+| `GRAFANA_HOST_PORT`                           | `3000`                      | `127.0.0.1`에만 공개                                                           |
+| `PROMETHEUS_HOST_PORT`                        | `9090`                      | `127.0.0.1`에만 공개                                                           |
+| `OTEL_GRPC_HOST_PORT` / `OTEL_HTTP_HOST_PORT` | `4317` / `4318`             | `127.0.0.1`에만 공개                                                           |
+| `PROMETHEUS_BACKEND_TARGET`                   | `host.docker.internal:8000` | Prometheus가 수집할 백엔드(Docker 앱은 `app:8000`)                             |
+| `GRAFANA_ADMIN_USER`                          | `admin`                     | 새 볼륨의 Grafana 관리자                                                       |
+| `GRAFANA_ADMIN_PASSWORD`                      | _(비어 있음)_               | Grafana 시작에 필수. `admin`, `CHANGE_ME*`는 거부                              |
+
+| `INDEXNOW_ENABLED` | `false` | `docker-deploy` 성공 후 변경된 공개 URL 제출 |
+
+Docker 파일은 [공개 빌드 값](/docs/environment/deployment#public-build-values)인 `VITE_PUBLIC_SITE_URL`, `VITE_SITE_DESCRIPTION`, `VITE_PUBLIC_DISCOVERY`, `VITE_INDEXNOW_KEY`도 프론트엔드 빌드에 전달합니다. 바꾸면 다시 빌드해야 합니다.
 
 `$`가 들어간 값은 Compose 보간을 막기 위해 작은따옴표로 감쌉니다.
 
 ## 프론트엔드 변수
 
-| 변수                | 기본값        | 설명                                                                                                                                                      |
-| ------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | _(비어 있음)_ | API origin. 비어 있으면 개발 중에는 `http://localhost:8000`, 다른 웹 빌드는 페이지 자신의 origin을 사용. 데스크톱 빌드, 별도 호스팅, 다른 백엔드에서 지정 |
+| 변수                    | 기본값        | 설명                                                                                                                                                      |
+| ----------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`     | _(비어 있음)_ | API origin. 비어 있으면 개발 중에는 `http://localhost:8000`, 다른 웹 빌드는 페이지 자신의 origin을 사용. 데스크톱 빌드, 별도 호스팅, 다른 백엔드에서 지정 |
+| `VITE_BASE_PATH`        | _(비어 있음)_ | 별도 Vite 개발 서버의 basePath. 패키징된 빌드는 런타임 `APP_BASE_PATH`를 읽음                                                                             |
+| `VITE_PUBLIC_SITE_URL`  | _(비어 있음)_ | 공유 메타데이터와 검색 공개 페이지의 공개 origin                                                                                                          |
+| `VITE_SITE_DESCRIPTION` | _(비어 있음)_ | 정적 HTML의 설명                                                                                                                                          |
+| `VITE_PUBLIC_DISCOVERY` | `false`       | 정적 `/about/`, `/about/ko/` 소개 페이지 빌드                                                                                                             |
+| `VITE_INDEXNOW_KEY`     | _(비어 있음)_ | 공개 IndexNow 소유 키                                                                                                                                     |
+
+모든 `VITE_*` 값은 공개 빌드 시점 값입니다. 비밀값을 넣지 않습니다.

@@ -17,22 +17,25 @@ description: 작업별로 묶은 B4FastAPI의 모든 make 타깃입니다.
 | 커밋 전 변경 검사              | `make verify-plan` 후 `make verify`                  |
 | 전체 검사                      | `make ci`                                            |
 | 데이터베이스 마이그레이션 적용 | `make db-migrate`                                    |
-| Docker로 배포                  | `make docker-deploy`                                 |
+| 서버에 배포                    | `make docker-init`, `docker-check`, `docker-deploy`  |
 | 사용자를 관리자·매니저로 지정  | `make user-role EMAIL=person@example.com ROLE=admin` |
 
 ## 변수
 
-| 변수                                                           | 사용 타깃                 | 효과                                 |
-| -------------------------------------------------------------- | ------------------------- | ------------------------------------ |
-| `VERIFY_BASE`                                                  | `verify-plan`, `verify`   | `HEAD` 대신 이 커밋부터 비교         |
-| `VERIFY_FULL=1`                                                | `verify`                  | 모든 검사 강제 실행                  |
-| `DOCKER_SERVICE`                                               | `docker-logs`             | 확인할 서비스(기본 `app`)            |
-| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`               | 시작 단계별 대기 시간(기본 120)      |
-| `PROJECT_CONFIG`                                               | `project-*`               | 매니페스트 경로(기본 `project.json`) |
-| `FRONTEND_DIR`                                                 | `frontend-style-studio`   | 편집할 프론트엔드 체크아웃           |
-| `EMAIL`, `ROLE`                                                | `user-role`               | 대상 계정과 새 역할                  |
-| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`    | 검증할 예정 메타데이터               |
-| `PR_NUMBER`                                                    | `git-governance-pr-check` | 실제 메타데이터를 확인할 PR          |
+| 변수                                                           | 사용 타깃                    | 효과                                 |
+| -------------------------------------------------------------- | ---------------------------- | ------------------------------------ |
+| `VERIFY_BASE`                                                  | `verify-plan`, `verify`      | `HEAD` 대신 이 커밋부터 비교         |
+| `VERIFY_FULL=1`                                                | `verify`                     | 모든 검사 강제 실행                  |
+| `DOCKER_SERVICE`                                               | `docker-logs`                | 확인할 서비스(기본 `app`)            |
+| `HEALTH_TIMEOUT_SECONDS`                                       | `docker-up`, `docker-deploy` | 시작 단계별 대기 시간(기본 120)      |
+| `DEPLOY_SOURCE`                                                | `docker-deploy`              | `build`(기본), `pull`, `local`       |
+| `DOCKER_ENV_FILE`                                              | `docker-*`                   | 환경 파일(기본 `docker/.env`)        |
+| `PUBLIC_DOMAIN`                                                | `docker-init`                | HTTPS 오버레이를 켜는 호스트 이름    |
+| `PROJECT_CONFIG`                                               | `project-*`                  | 매니페스트 경로(기본 `project.json`) |
+| `FRONTEND_DIR`                                                 | `frontend-style-studio`      | 편집할 프론트엔드 체크아웃           |
+| `EMAIL`, `ROLE`                                                | `user-role`                  | 대상 계정과 새 역할                  |
+| `COMMIT_TITLE`, `COMMIT_BODY_FILE`, `PR_TITLE`, `PR_BODY_FILE` | `git-governance-check`       | 검증할 예정 메타데이터               |
+| `PR_NUMBER`                                                    | `git-governance-pr-check`    | 실제 메타데이터를 확인할 PR          |
 
 ## 설정과 환경
 
@@ -138,18 +141,24 @@ description: 작업별로 묶은 B4FastAPI의 모든 make 타깃입니다.
 
 ## Docker
 
-| 타깃                        | 설명                                               |
-| --------------------------- | -------------------------------------------------- |
-| `docker-build`              | Docker 앱 이미지 빌드                              |
-| `docker-up`                 | 필요한 인프라를 시작하고 앱 준비 상태까지 대기     |
-| `docker-down`               | Docker 서비스 중지                                 |
-| `docker-logs`               | DOCKER_SERVICE(기본 app)의 Docker 로그 확인        |
-| `docker-deploy`             | 빌드, 앱만 재생성, 준비 상태 대기, 이미지 내보내기 |
-| `docker-export`             | Docker 앱 이미지를 docker/artifacts로 내보내기     |
-| `docker-observability-up`   | 로컬 옵저버빌리티 스택 시작                        |
-| `docker-observability-down` | 로컬 옵저버빌리티 서비스만 중지                    |
-| `docker-celery-up`          | 앱 이미지로 선택형 Celery 워커와 단일 Beat 시작    |
-| `docker-celery-down`        | API와 Redis는 두고 Celery 프로세스만 중지          |
+| 타깃                        | 설명                                                     |
+| --------------------------- | -------------------------------------------------------- |
+| `docker-init`               | 새 비공개 배포 환경 생성, PUBLIC_DOMAIN이면 HTTPS 구성   |
+| `docker-check`              | 비밀값을 출력하지 않고 해석된 배포 설정 검증             |
+| `docker-build`              | Docker 앱 이미지 빌드                                    |
+| `docker-up`                 | 필요한 인프라를 시작하고 앱 준비 상태까지 대기           |
+| `docker-down`               | Docker 서비스 중지                                       |
+| `docker-logs`               | DOCKER_SERVICE(기본 app)의 Docker 로그 확인              |
+| `docker-deploy`             | 이미지 준비, 선택된 서비스 시작, HTTP 준비 상태 확인     |
+| `docker-status`             | 배포 컨테이너와 이미지 식별자 표시                       |
+| `docker-smoke`              | 준비 상태, 런타임 설정, SPA, 공개 프록시 경계 확인       |
+| `docker-export`             | Docker 앱 이미지를 docker/artifacts로 내보내기           |
+| `docker-observability-up`   | 로컬 옵저버빌리티 스택 시작                              |
+| `docker-observability-down` | 로컬 옵저버빌리티 서비스만 중지                          |
+| `docker-celery-up`          | 앱 이미지로 선택형 Celery 워커와 단일 Beat 시작          |
+| `docker-celery-down`        | API와 Redis는 두고 Celery 프로세스만 중지                |
+| `base-path-deployment-test` | 실제 Nginx 뒤 격리된 모놀리식 앱 두 개 검증(Docker 필요) |
+| `discovery-check`           | 외부 제출 없이 변경 URL 게시 도구 검증                   |
 
 ## Git 거버넌스
 
