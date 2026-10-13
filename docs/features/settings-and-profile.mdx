@@ -64,7 +64,7 @@ The template owns no auth, API, routing state, or storage. The owning page filte
 | `focused` (Minimal) | Compact transparent header; a menu icon left of the brand opens a small navigation popup   |
 
 - The deployment chooses the layout with the runtime setting `APP_LAYOUT`, exposed as `app_layout` in `GET /config`. The same image serves all three: recreate the container with a new value and reload the browser. An unknown value fails startup validation. `src/service.config.ts` is only a fallback for providers that do not send the field.
-- Global navigation contains Home and, in development, the showcase. It never contains Settings or admin section lists: without the sidebar, those sections use a boxed column beside the content, which becomes a disclosure above it on narrow screens.
+- Global navigation contains Home, the [prompt builder](/docs/features/prompt-builder), and, in development, the showcase. It never contains Settings or admin section lists: without the sidebar, those sections use a boxed column beside the content, which becomes a disclosure above it on narrow screens.
 - Home, profile, inbox, error, and auth pages keep their own page styles. `/plans` and the public `/about/` pages keep their independent shells.
 - When the server reports `app_mode=development`, **Settings → Appearance → Layout** previews another layout in this browser only, and that preview takes precedence over `APP_LAYOUT`. **Use service default** removes it. Production ignores saved previews and hides the selector. Open clients pick up a changed `APP_LAYOUT` on reload.
 

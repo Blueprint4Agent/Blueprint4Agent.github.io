@@ -35,6 +35,7 @@ const sidebars: SidebarsConfig = {
                 doc("features/realtime-events", "radio"),
                 doc("features/background-jobs", "clock"),
                 doc("features/settings-and-profile", "settings"),
+                doc("features/prompt-builder", "prompt"),
                 doc("features/showcase-and-style-studio", "palette"),
                 doc("features/desktop-app", "monitor"),
             ],
